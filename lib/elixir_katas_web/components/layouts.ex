@@ -491,40 +491,81 @@ defmodule ElixirKatasWeb.Layouts do
 
   def use_case(assigns) do
     ~H"""
-    <div class="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
-      <!-- Header -->
-      <header class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <div class="flex items-center space-x-4">
-            <.link navigate="/" class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-pink-600">
-              Elixir Katas
-            </.link>
-            <span class="text-gray-400">|</span>
-            <.link navigate="/usecases" class="text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">
-              ← Back to Use Cases
-            </.link>
-          </div>
-          <div class="flex items-center space-x-4">
-            <%= if assigns[:current_scope] && assigns.current_scope.user do %>
-              <span class="text-sm text-gray-600 dark:text-gray-300"><%= assigns.current_scope.user.email %></span>
-              <.link href="/users/log-out" method="delete" class="text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">
-                Log out
-              </.link>
-            <% else %>
-              <.link navigate="/users/log-in" class="text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">
-                Log in
-              </.link>
-            <% end %>
-          </div>
-        </div>
-      </header>
+    <!DOCTYPE html>
+    <html lang="en">
+      <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="csrf-token" content={get_csrf_token()} />
+        <.live_title suffix=" · Elixir Katas">
+          {assigns[:page_title] || "Elixir Katas"}
+        </.live_title>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+        <link phx-track-static rel="stylesheet" href={~p"/assets/css/app.css"} />
+        <style>
+          body { font-family: 'Inter', sans-serif; }
+        </style>
+        <script defer phx-track-static type="text/javascript" src={~p"/assets/js/app.js"}>
+        </script>
+        <script>
+          (() => {
+            const setTheme = (theme) => {
+              if (theme === "system") {
+                localStorage.removeItem("phx:theme");
+                document.documentElement.removeAttribute("data-theme");
+              } else {
+                localStorage.setItem("phx:theme", theme);
+                document.documentElement.setAttribute("data-theme", theme);
+              }
+            };
+            if (!document.documentElement.hasAttribute("data-theme")) {
+              setTheme(localStorage.getItem("phx:theme") || "system");
+            }
+            window.addEventListener("storage", (e) => e.key === "phx:theme" && setTheme(e.newValue || "system"));
+            
+            window.addEventListener("phx:set-theme", (e) => setTheme(e.target.dataset.phxTheme));
+          })();
+        </script>
+      </head>
+      <body>
+        <div class="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+          <!-- Header -->
+          <header class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+              <div class="flex items-center space-x-4">
+                <.link navigate="/" class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-pink-600">
+                  Elixir Katas
+                </.link>
+                <span class="text-gray-400">|</span>
+                <.link navigate="/usecases" class="text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">
+                  ← Back to Use Cases
+                </.link>
+              </div>
+              <div class="flex items-center space-x-4">
+                <%= if assigns[:current_scope] && assigns.current_scope.user do %>
+                  <span class="text-sm text-gray-600 dark:text-gray-300"><%= assigns.current_scope.user.email %></span>
+                  <.link href="/users/log-out" method="delete" class="text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">
+                    Log out
+                  </.link>
+                <% else %>
+                  <.link navigate="/users/log-in" class="text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">
+                    Log in
+                  </.link>
+                <% end %>
+              </div>
+            </div>
+          </header>
 
-      <!-- Main Content -->
-      <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <.flash_group flash={@flash} />
-        {@inner_content}
-      </main>
-    </div>
+          <!-- Main Content -->
+          <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <.flash_group flash={@flash} />
+            {@inner_content}
+          </main>
+        </div>
+      </body>
+    </html>
     """
   end
 
