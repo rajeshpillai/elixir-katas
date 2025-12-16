@@ -55,6 +55,11 @@ defmodule ElixirKatasWeb.Router do
     live "/katas/33-formats", Kata33FormatsLive
     live "/katas/34-live-feedback", Kata34LiveFeedbackLive
     live "/katas/35-form-restoration", Kata35FormRestorationLive
+    live "/katas/36-debounce", Kata36DebounceLive
+    live "/katas/37-wizard", Kata37WizardLive
+    live "/katas/38-tag-input", Kata38TagInputLive
+    live "/katas/39-rating", Kata39RatingLive
+    live "/katas/40-uploads", Kata40UploadsLive
     end
   end
 

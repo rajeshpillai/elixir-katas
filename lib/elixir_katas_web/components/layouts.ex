@@ -196,6 +196,26 @@ defmodule ElixirKatasWeb.Layouts do
                    <span class="w-2 h-2 mr-3 rounded-full bg-red-400"></span>
                    35 - Form Restoration
                  </.link>
+                 <.link navigate="/katas/36-debounce" class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white">
+                   <span class="w-2 h-2 mr-3 rounded-full bg-purple-400"></span>
+                   36 - Debounce
+                 </.link>
+                 <.link navigate="/katas/37-wizard" class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white">
+                   <span class="w-2 h-2 mr-3 rounded-full bg-pink-400"></span>
+                   37 - The Wizard
+                 </.link>
+                 <.link navigate="/katas/38-tag-input" class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white">
+                   <span class="w-2 h-2 mr-3 rounded-full bg-green-400"></span>
+                   38 - The Tag Input
+                 </.link>
+                 <.link navigate="/katas/39-rating" class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white">
+                   <span class="w-2 h-2 mr-3 rounded-full bg-orange-400"></span>
+                   39 - The Rating Input
+                 </.link>
+                 <.link navigate="/katas/40-uploads" class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white">
+                   <span class="w-2 h-2 mr-3 rounded-full bg-red-400"></span>
+                   40 - File Uploads
+                 </.link>
               </div>
             </div>
           </nav>

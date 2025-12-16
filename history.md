@@ -40,6 +40,11 @@ This file tracks your progress through the Elixir Katas.
 | 33 - Formats | Completed | 2025-12-16 | Verified formatting |
 | 34 - Live Feedback | Completed | 2025-12-16 | Verified live feedback |
 | 35 - Form Restoration | Completed | 2025-12-16 | Verified form restoration |
+| 36 - Debounce | Completed | 2025-12-16 | Verified debounce |
+| 37 - The Wizard | Completed | 2025-12-16 | Verified multi-step form |
+| 38 - The Tag Input | Completed | 2025-12-16 | Verified tag input |
+| 39 - The Rating Input | Completed | 2025-12-16 | Verified rating input |
+| 40 - File Uploads | Completed | 2025-12-16 | Verified file uploads |
 
 ## Infrastructure Updates
 | Update | Date | Notes |

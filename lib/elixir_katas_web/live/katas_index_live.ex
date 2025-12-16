@@ -309,6 +309,31 @@ defmodule ElixirKatasWeb.KatasIndexLive do
         description="Recovering form state after a server crash/reconnect."
         path={~p"/katas/35-form-restoration"}
       />
+      <.kata_card
+        title="36. Debounce"
+        description="Delaying search requests while typing to reduce server load."
+        path={~p"/katas/36-debounce"}
+      />
+      <.kata_card
+        title="37. The Wizard"
+        description="A multi-step form that accumulates data across steps."
+        path={~p"/katas/37-wizard"}
+      />
+      <.kata_card
+        title="38. Tag Input"
+        description="Entering multiple values as pills (chips) using Enter or Comma."
+        path={~p"/katas/38-tag-input"}
+      />
+      <.kata_card
+        title="39. Rating Input"
+        description="Custom star rating component with hidden input synchronization."
+        path={~p"/katas/39-rating"}
+      />
+      <.kata_card
+        title="40. File Uploads"
+        description="Core LiveView file upload functionality with drag & drop."
+        path={~p"/katas/40-uploads"}
+      />
       </div>
     </div>
     """
