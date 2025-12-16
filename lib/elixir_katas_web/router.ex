@@ -28,6 +28,7 @@ defmodule ElixirKatasWeb.Router do
       live "/katas/06-resizer", Kata06ResizerLive
       live "/katas/07-spoiler", Kata07SpoilerLive
       live "/katas/08-accordion", Kata08AccordionLive
+      live "/katas/09-tabs", Kata09TabsLive
     end
   end
 

@@ -88,6 +88,10 @@ defmodule ElixirKatasWeb.Layouts do
                    <span class="w-2 h-2 mr-3 rounded-full bg-cyan-400"></span>
                    08 - The Accordion
                  </.link>
+                 <.link navigate="/katas/09-tabs" class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white">
+                   <span class="w-2 h-2 mr-3 rounded-full bg-indigo-400"></span>
+                   09 - The Tabs
+                 </.link>
               </div>
             </div>
           </nav>
