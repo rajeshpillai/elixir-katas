@@ -40,9 +40,13 @@ defmodule ElixirKatas.Tasky do
     offset = (page - 1) * per_page
 
     search = Keyword.get(opts, :search)
+    category = Keyword.get(opts, :category)
+    priority = Keyword.get(opts, :priority)
+    due_date_filter = Keyword.get(opts, :due_date_filter)
     
     base_query = from t in Todo, where: t.user_id == ^user_id
     
+    # Apply search filter
     query = if search && search != "" do
       search_term = "%#{search}%"
       from t in base_query, where: ilike(t.title, ^search_term)
@@ -50,17 +54,81 @@ defmodule ElixirKatas.Tasky do
       base_query
     end
 
+    # Apply category filter
+    query = if category && category != "" do
+      from t in query, where: t.category == ^category
+    else
+      query
+    end
+
+    # Apply priority filter
+    query = if priority && priority != "" do
+      from t in query, where: t.priority == ^priority
+    else
+      query
+    end
+
+    # Apply due date filter
+    query = case due_date_filter do
+      "overdue" ->
+        today = Date.utc_today()
+        from t in query, where: not is_nil(t.due_date) and t.due_date < ^today
+      "today" ->
+        today = Date.utc_today()
+        from t in query, where: t.due_date == ^today
+      "week" ->
+        today = Date.utc_today()
+        week_end = Date.add(today, 7)
+        from t in query, where: not is_nil(t.due_date) and t.due_date >= ^today and t.due_date <= ^week_end
+      "no_date" ->
+        from t in query, where: is_nil(t.due_date)
+      _ ->
+        query
+    end
+
+    # Apply pagination and ordering
     query = from t in query,
       limit: ^per_page,
       offset: ^offset,
       order_by: [desc: t.inserted_at]
     
-    # We need to filter the aggregate count too
+    # Count query with same filters
+    count_query = base_query
+    
     count_query = if search && search != "" do
-        search_term = "%#{search}%"
-        from t in Todo, where: t.user_id == ^user_id and ilike(t.title, ^search_term)
+      search_term = "%#{search}%"
+      from t in count_query, where: ilike(t.title, ^search_term)
     else
-        from t in Todo, where: t.user_id == ^user_id
+      count_query
+    end
+
+    count_query = if category && category != "" do
+      from t in count_query, where: t.category == ^category
+    else
+      count_query
+    end
+
+    count_query = if priority && priority != "" do
+      from t in count_query, where: t.priority == ^priority
+    else
+      count_query
+    end
+
+    count_query = case due_date_filter do
+      "overdue" ->
+        today = Date.utc_today()
+        from t in count_query, where: not is_nil(t.due_date) and t.due_date < ^today
+      "today" ->
+        today = Date.utc_today()
+        from t in count_query, where: t.due_date == ^today
+      "week" ->
+        today = Date.utc_today()
+        week_end = Date.add(today, 7)
+        from t in count_query, where: not is_nil(t.due_date) and t.due_date >= ^today and t.due_date <= ^week_end
+      "no_date" ->
+        from t in count_query, where: is_nil(t.due_date)
+      _ ->
+        count_query
     end
 
     total_count = Repo.aggregate(count_query, :count, :id)
@@ -175,5 +243,29 @@ defmodule ElixirKatas.Tasky do
   """
   def change_todo(%Todo{} = todo, attrs \\ %{}) do
     Todo.changeset(todo, attrs)
+  end
+
+  @doc """
+  Returns a list of unique categories for a user's todos.
+  """
+  def list_categories(user_id) do
+    query = from t in Todo,
+      where: t.user_id == ^user_id and not is_nil(t.category),
+      distinct: true,
+      select: t.category,
+      order_by: t.category
+
+    Repo.all(query)
+  end
+
+  @doc """
+  Returns the count of overdue todos for a user.
+  """
+  def get_overdue_count(user_id) do
+    today = Date.utc_today()
+    query = from t in Todo,
+      where: t.user_id == ^user_id and not is_nil(t.due_date) and t.due_date < ^today
+
+    Repo.aggregate(query, :count, :id)
   end
 end
