@@ -6,3 +6,9 @@ This file tracks your progress through the Elixir Katas.
 | Kata | Status | Completion Date | Notes |
 |------|--------|-----------------|-------|
 | 01 - Hello World | Completed | 2025-12-16 | Verified manually |
+
+## Infrastructure Updates
+| Update | Date | Notes |
+|--------|------|-------|
+| Layout Refactor | 2025-12-16 | Added Sidebar and Tabbed Viewer (Interactive/Source/Notes) |
+| Typography Plugin | 2025-12-16 | Installed @tailwindcss/typography for formatted notes |

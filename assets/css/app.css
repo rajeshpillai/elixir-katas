@@ -16,6 +16,7 @@
 @plugin "../vendor/daisyui" {
   themes: false;
 }
+@plugin "@tailwindcss/typography";
 
 /* daisyUI theme plugin. You can update this file by fetching the latest version with:
   curl -sLO https://github.com/saadeghi/daisyui/releases/latest/download/daisyui-theme.js
