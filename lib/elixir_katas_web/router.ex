@@ -160,6 +160,7 @@ defmodule ElixirKatasWeb.Router do
 
     live_session :use_cases,
       layout: {ElixirKatasWeb.Layouts, :use_case},
+      root_layout: false,
       on_mount: [{ElixirKatasWeb.UserAuth, :require_authenticated}] do
       live "/usecases/tasky", TaskyLive.Index
     end
