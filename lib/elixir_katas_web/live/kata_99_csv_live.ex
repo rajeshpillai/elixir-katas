@@ -37,10 +37,10 @@ defmodule ElixirKatasWeb.Kata99CSVExportLive do
               phx-click="toggle_demo"
               class="px-6 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700"
             >
-              {%= if @demo_active, do: "Hide Demo", else: "Show Demo" %}
+              <%= if @demo_active, do: "Hide Demo", else: "Show Demo" %>
             </button>
 
-            {%= if @demo_active do %}
+            <%= if @demo_active do %>
               <div class="p-4 bg-blue-50 border border-blue-200 rounded">
                 <div class="font-medium mb-2">CSV Export Demo</div>
                 <div class="text-sm text-gray-700">
@@ -52,7 +52,7 @@ defmodule ElixirKatasWeb.Kata99CSVExportLive do
                   Check the Notes and Source Code tabs for implementation details.
                 </div>
               </div>
-            {% end %}
+            <% end %>
           </div>
         </div>
       </div>
