@@ -4,7 +4,7 @@ defmodule ElixirKatasWeb.Kata01HelloWorldLive do
 
   def mount(_params, _session, socket) do
     source_code = File.read!(__ENV__.file)
-    notes_content = File.read!("kata_01_hello_world_notes.md")
+    notes_content = File.read!("notes/kata_01_hello_world_notes.md")
     
     {:ok, 
      socket

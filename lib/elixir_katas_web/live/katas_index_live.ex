@@ -35,6 +35,16 @@ defmodule ElixirKatasWeb.KatasIndexLive do
             Master state management. Build a counter with increment, decrement, and reset functionality.
           </p>
         </.link>
+
+        <.link navigate="/katas/03" class="card bg-white dark:bg-gray-800 shadow-md hover:shadow-lg transition-shadow border border-gray-200 dark:border-gray-700 p-6 rounded-lg group">
+          <div class="flex items-center mb-4">
+            <span class="w-3 h-3 rounded-full bg-purple-500 mr-3"></span>
+            <h2 class="text-xl font-semibold group-hover:text-primary transition-colors">03 - The Mirror</h2>
+          </div>
+          <p class="text-gray-600 dark:text-gray-400">
+            Form bindings and real-time updates. mirroring input text instantly to the UI.
+          </p>
+        </.link>
       </div>
     </div>
     """
