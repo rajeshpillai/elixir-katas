@@ -22,7 +22,7 @@ defmodule ElixirKatasWeb.TaskyLive.Index do
     search = params["search"] || ""
     per_page = 5
     
-    user_id = socket.assigns.current_user.id
+    user_id = socket.assigns.current_scope.user.id
     pagination = Tasky.list_todos(user_id, page: page, per_page: per_page, search: search)
     
     {:noreply,
@@ -48,19 +48,15 @@ defmodule ElixirKatasWeb.TaskyLive.Index do
   end
 
   def handle_event("save", %{"todo" => todo_params}, socket) do
-    user_id = socket.assigns.current_user.id
-    
-    case Tasky.create_todo(user_id, todo_params) do
-      {:ok, todo} ->
-        total_count = Tasky.count_todos(user_id, socket.assigns.search)
-        total_pages = ceil(total_count / socket.assigns.per_page)
-
+    case Tasky.create_todo(socket.assigns.current_scope.user.id, todo_params) do
+      {:ok, _todo} ->
+        search = socket.assigns.search
+        total_pages = ceil(Tasky.count_todos(socket.assigns.current_scope.user.id, search) / socket.assigns.per_page)
+        
         {:noreply,
          socket
          |> assign(:total_pages, total_pages)
-         |> stream_insert(:todos, todo, at: 0)
          |> assign(:form, to_form(Tasky.change_todo(%Todo{})))}
-
       {:error, %Ecto.Changeset{} = changeset} ->
         {:noreply, assign(socket, form: to_form(changeset))}
     end
@@ -92,20 +88,16 @@ defmodule ElixirKatasWeb.TaskyLive.Index do
      |> assign(:show_confirm_modal, false)}
   end
 
-  def handle_event("delete_todo", _params, socket) do
-    if id = socket.assigns.confirm_delete_id do
-      todo = Tasky.get_todo!(id)
-      Tasky.delete_todo(todo)
-    end
+  def handle_event("delete_todo", %{"id" => id}, socket) do
+    todo = Tasky.get_todo!(id)
+    {:ok, _} = Tasky.delete_todo(todo)
     
-    user_id = socket.assigns.current_user.id
-    total_count = Tasky.count_todos(user_id, socket.assigns.search)
-    total_pages = ceil(total_count / socket.assigns.per_page)
-
+    search = socket.assigns.search
+    total_pages = ceil(Tasky.count_todos(socket.assigns.current_scope.user.id, search) / socket.assigns.per_page)
+    
     {:noreply,
      socket
      |> assign(:total_pages, total_pages)
-     |> assign(:confirm_delete_id, nil)
      |> assign(:show_confirm_modal, false)}
   end
 
