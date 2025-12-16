@@ -161,6 +161,44 @@ defmodule ElixirKatasWeb.TaskyLive.Index do
     "/usecases/tasky?" <> params
   end
 
+  defp priority_class("high"), do: "bg-red-100 text-red-800"
+  defp priority_class("medium"), do: "bg-yellow-100 text-yellow-800"
+  defp priority_class("low"), do: "bg-green-100 text-green-800"
+  defp priority_class(_), do: "bg-gray-100 text-gray-800"
+
+  defp due_date_class(due_date) do
+    today = Date.utc_today()
+    case Date.compare(due_date, today) do
+      :lt -> "text-red-600 font-medium"  # Overdue
+      :eq -> "text-orange-600 font-medium"  # Due today
+      :gt ->
+        days_until = Date.diff(due_date, today)
+        if days_until <= 7 do
+          "text-blue-600"  # Due this week
+        else
+          "text-gray-600"  # Future
+        end
+    end
+  end
+
+  defp format_due_date(due_date) do
+    today = Date.utc_today()
+    case Date.compare(due_date, today) do
+      :lt ->
+        days_ago = Date.diff(today, due_date)
+        "Overdue by #{days_ago} #{if days_ago == 1, do: "day", else: "days"}"
+      :eq ->
+        "Due today"
+      :gt ->
+        days_until = Date.diff(due_date, today)
+        cond do
+          days_until == 1 -> "Due tomorrow"
+          days_until <= 7 -> "Due in #{days_until} days"
+          true -> "Due #{Calendar.strftime(due_date, "%b %d, %Y")}"
+        end
+    end
+  end
+
   def render(assigns) do
     ~H"""
     <div class="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
@@ -259,30 +297,59 @@ defmodule ElixirKatasWeb.TaskyLive.Index do
 
           <!-- Todo List -->
           <ul id="todos" phx-update="stream" class="divide-y divide-gray-200">
-            <li :for={{id, todo} <- @streams.todos} id={id} class="py-4 flex items-center justify-between group">
-              <div class="flex items-center">
-                <button phx-click="toggle_complete" phx-value-id={todo.id} class="focus:outline-none">
-                  <%= if todo.is_complete do %>
-                    <.icon name="hero-check-circle-solid" class="h-6 w-6 text-green-500" />
-                  <% else %>
-                    <.icon name="hero-check-circle" class="h-6 w-6 text-gray-300 group-hover:text-green-500 transition-colors" />
-                  <% end %>
-                </button>
-                <span class={"ml-3 text-sm font-medium #{if todo.is_complete, do: "text-gray-400 line-through", else: "text-gray-900"}"}>
-                  <%= todo.title %>
-                </span>
-              </div>
-              <div class="flex items-center gap-2">
-                <button phx-click="toggle_favorite" phx-value-id={todo.id} class="focus:outline-none transition-transform active:scale-95 group/fav">
-                   <%= if todo.is_favorite do %>
-                     <.icon name="hero-star-solid" class="h-5 w-5 text-yellow-500" />
-                   <% else %>
-                     <.icon name="hero-star" class="h-5 w-5 text-gray-300 group-hover/fav:text-yellow-400" />
-                   <% end %>
-                </button>
-                <button phx-click="confirm_delete" phx-value-id={todo.id} class="text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <.icon name="hero-trash" class="h-5 w-5" />
-                </button>
+            <li :for={{id, todo} <- @streams.todos} id={id} class="py-4 group">
+              <div class="flex items-start justify-between">
+                <div class="flex items-start flex-1">
+                  <button phx-click="toggle_complete" phx-value-id={todo.id} class="focus:outline-none mt-1">
+                    <%= if todo.is_complete do %>
+                      <.icon name="hero-check-circle-solid" class="h-6 w-6 text-green-500" />
+                    <% else %>
+                      <.icon name="hero-check-circle" class="h-6 w-6 text-gray-300 group-hover:text-green-500 transition-colors" />
+                    <% end %>
+                  </button>
+                  <div class="ml-3 flex-1">
+                    <div class="flex items-center gap-2 flex-wrap">
+                      <span class={"text-sm font-medium #{if todo.is_complete, do: "text-gray-400 line-through", else: "text-gray-900"}"}>
+                        <%= todo.title %>
+                      </span>
+                      
+                      <!-- Priority Badge -->
+                      <%= if todo.priority do %>
+                        <span class={"inline-flex items-center px-2 py-0.5 rounded text-xs font-medium #{priority_class(todo.priority)}"}>
+                          <%= String.capitalize(todo.priority) %>
+                        </span>
+                      <% end %>
+                      
+                      <!-- Category Badge -->
+                      <%= if todo.category do %>
+                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
+                          <%= todo.category %>
+                        </span>
+                      <% end %>
+                    </div>
+                    
+                    <!-- Due Date -->
+                    <%= if todo.due_date do %>
+                      <div class={"text-xs mt-1 #{due_date_class(todo.due_date)}"}>
+                        <.icon name="hero-calendar" class="h-3 w-3 inline" />
+                        <%= format_due_date(todo.due_date) %>
+                      </div>
+                    <% end %>
+                  </div>
+                </div>
+                
+                <div class="flex items-center gap-2 ml-2">
+                  <button phx-click="toggle_favorite" phx-value-id={todo.id} class="focus:outline-none transition-transform active:scale-95 group/fav">
+                     <%= if todo.is_favorite do %>
+                       <.icon name="hero-star-solid" class="h-5 w-5 text-yellow-500" />
+                     <% else %>
+                       <.icon name="hero-star" class="h-5 w-5 text-gray-300 group-hover/fav:text-yellow-400" />
+                     <% end %>
+                  </button>
+                  <button phx-click="confirm_delete" phx-value-id={todo.id} class="text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <.icon name="hero-trash" class="h-5 w-5" />
+                  </button>
+                </div>
               </div>
             </li>
           </ul>
