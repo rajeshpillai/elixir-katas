@@ -33,15 +33,25 @@ defmodule ElixirKatasWeb.Kata81LiveCursorLive do
         <div class="bg-white p-6 rounded-lg shadow-sm border">
           <div 
             id="cursor-area"
-            class="h-96 bg-gray-50 rounded relative cursor-crosshair"
-            phx-window-mousemove="track_cursor"
+            class="h-96 bg-gradient-to-br from-indigo-50 to-purple-50 rounded relative"
+            phx-mousemove="track_cursor"
           >
-            <div class="absolute top-4 left-4 bg-white px-4 py-2 rounded shadow text-sm">
-              X: <%= @cursor_x %>, Y: <%= @cursor_y %>
+            <div class="absolute top-4 left-4 bg-white px-4 py-2 rounded-lg shadow-md text-sm font-mono">
+              <div class="text-gray-600">Cursor Position:</div>
+              <div class="text-indigo-600 font-bold">X: <%= @cursor_x %> px</div>
+              <div class="text-purple-600 font-bold">Y: <%= @cursor_y %> px</div>
             </div>
+            
             <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center text-gray-400">
-              <div class="text-lg mb-2">Move your mouse</div>
-              <div class="text-sm">Coordinates are tracked in real-time</div>
+              <div class="text-lg mb-2">👆 Move your mouse over this area</div>
+              <div class="text-sm">Coordinates update in real-time</div>
+            </div>
+            
+            <div 
+              class="absolute w-3 h-3 bg-indigo-500 rounded-full pointer-events-none transition-all duration-75"
+              style={"left: #{@cursor_x}px; top: #{@cursor_y}px; transform: translate(-50%, -50%);"}
+            >
+              <div class="absolute inset-0 bg-indigo-500 rounded-full animate-ping opacity-75"></div>
             </div>
           </div>
         </div>
@@ -50,7 +60,11 @@ defmodule ElixirKatasWeb.Kata81LiveCursorLive do
     """
   end
 
-  def handle_event("track_cursor", %{"clientX" => x, "clientY" => y}, socket) do
+  def handle_event("track_cursor", params, socket) do
+    # Extract coordinates from the event
+    x = Map.get(params, "offsetX", 0)
+    y = Map.get(params, "offsetY", 0)
+    
     {:noreply, assign(socket, cursor_x: x, cursor_y: y)}
   end
 
