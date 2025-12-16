@@ -28,8 +28,64 @@ defmodule ElixirKatas.Tasky do
       [%Todo{}, ...]
 
   """
-  def list_todos do
-    Repo.all(Todo)
+  @doc """
+  Returns the list of todos.
+  
+  Supports pagination options: `page` (default 1) and `per_page` (default 5).
+  """
+  def list_todos(opts \\ []) do
+    page = Keyword.get(opts, :page, 1)
+    per_page = Keyword.get(opts, :per_page, 5)
+    offset = (page - 1) * per_page
+
+    search = Keyword.get(opts, :search)
+    
+    base_query = Todo
+    
+    query = if search && search != "" do
+      search_term = "%#{search}%"
+      from t in base_query, where: ilike(t.title, ^search_term)
+    else
+      base_query
+    end
+
+    query = from t in query,
+      limit: ^per_page,
+      offset: ^offset,
+      order_by: [desc: t.inserted_at]
+    
+    # We need to filter the aggregate count too
+    count_query = if search && search != "" do
+        search_term = "%#{search}%"
+        from t in Todo, where: ilike(t.title, ^search_term)
+    else
+        Todo
+    end
+
+    total_count = Repo.aggregate(count_query, :count, :id)
+    entries = Repo.all(query)
+    total_pages = ceil(total_count / per_page)
+    
+    %{
+      entries: entries,
+      page_number: page,
+      page_size: per_page,
+      total_pages: total_pages,
+      total_entries: total_count
+    }
+  end
+
+  @doc """
+  Returns the total count of todos, optionally filtered by search.
+  """
+  def count_todos(search \\ nil) do
+    query = if search && search != "" do
+        search_term = "%#{search}%"
+        from t in Todo, where: ilike(t.title, ^search_term)
+    else
+        Todo
+    end
+    Repo.aggregate(query, :count, :id)
   end
 
   @doc """

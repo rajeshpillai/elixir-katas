@@ -11,10 +11,30 @@ defmodule ElixirKatasWeb.TaskyLive.Index do
     {:ok, 
      socket
      |> assign(:page_title, "Tasky")
-     |> stream(:todos, Tasky.list_todos())
      |> assign(:form, to_form(Tasky.change_todo(%Todo{})))
      |> assign(:show_confirm_modal, false)
-     |> assign(:confirm_delete_id, nil)}
+     |> assign(:confirm_delete_id, nil)
+     |> stream(:todos, [])}
+  end
+
+  def handle_params(params, _url, socket) do
+    page = String.to_integer(params["page"] || "1")
+    search = params["search"] || ""
+    per_page = 5
+    
+    pagination = Tasky.list_todos(page: page, per_page: per_page, search: search)
+    
+    {:noreply,
+     socket
+     |> assign(:page, page)
+     |> assign(:per_page, per_page)
+     |> assign(:search, search)
+     |> assign(:total_pages, pagination.total_pages)
+     |> stream(:todos, pagination.entries, reset: true)}
+  end
+
+  def handle_event("search", %{"query" => search}, socket) do
+    {:noreply, push_patch(socket, to: ~p"/usecases/tasky?page=1&search=#{search}")}
   end
 
   def handle_event("validate", %{"todo" => todo_params}, socket) do
@@ -29,8 +49,12 @@ defmodule ElixirKatasWeb.TaskyLive.Index do
   def handle_event("save", %{"todo" => todo_params}, socket) do
     case Tasky.create_todo(todo_params) do
       {:ok, todo} ->
+        total_count = Tasky.count_todos(socket.assigns.search)
+        total_pages = ceil(total_count / socket.assigns.per_page)
+
         {:noreply,
          socket
+         |> assign(:total_pages, total_pages)
          |> stream_insert(:todos, todo, at: 0)
          |> assign(:form, to_form(Tasky.change_todo(%Todo{})))}
 
@@ -71,8 +95,12 @@ defmodule ElixirKatasWeb.TaskyLive.Index do
       Tasky.delete_todo(todo)
     end
     
+    total_count = Tasky.count_todos(socket.assigns.search)
+    total_pages = ceil(total_count / socket.assigns.per_page)
+
     {:noreply,
      socket
+     |> assign(:total_pages, total_pages)
      |> assign(:confirm_delete_id, nil)
      |> assign(:show_confirm_modal, false)}
   end
@@ -103,6 +131,24 @@ defmodule ElixirKatasWeb.TaskyLive.Index do
 
       <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div class="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
+          <div class="mb-6">
+             <div class="relative rounded-md shadow-sm">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <.icon name="hero-magnifying-glass" class="h-5 w-5 text-gray-400" />
+                </div>
+                <form phx-change="search" phx-submit="search" onsubmit="return false;">
+                  <input 
+                    type="text" 
+                    name="query" 
+                    value={@search}
+                    placeholder="Search tasks..." 
+                    phx-debounce="300"
+                    class="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md" 
+                  />
+                </form>
+             </div>
+          </div>
+
           <!-- Add Task Form -->
           <.form for={@form} phx-change="validate" phx-submit="save" class="space-y-4 mb-8">
             <div>
@@ -146,6 +192,37 @@ defmodule ElixirKatasWeb.TaskyLive.Index do
               </div>
             </li>
           </ul>
+          
+          <!-- Pagination -->
+          <div class="mt-6 flex items-center justify-between border-t border-gray-200 pt-4">
+            <div class="flex flex-1 justify-between sm:hidden">
+              <.link :if={@page > 1} patch={~p"/usecases/tasky?page=#{@page - 1}&search=#{@search}"} class="relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
+                Previous
+              </.link>
+              <.link :if={@page < @total_pages} patch={~p"/usecases/tasky?page=#{@page + 1}&search=#{@search}"} class="relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
+                Next
+              </.link>
+            </div>
+            <div class="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
+              <div>
+                <p class="text-sm text-gray-700">
+                  Showing page <span class="font-medium"><%= @page %></span> of <span class="font-medium"><%= @total_pages %></span>
+                </p>
+              </div>
+              <div>
+                <nav class="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
+                  <.link :if={@page > 1} patch={~p"/usecases/tasky?page=#{@page - 1}&search=#{@search}"} class="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0">
+                    <span class="sr-only">Previous</span>
+                    <.icon name="hero-chevron-left-mini" class="h-5 w-5" />
+                  </.link>
+                  <.link :if={@page < @total_pages} patch={~p"/usecases/tasky?page=#{@page + 1}&search=#{@search}"} class="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0">
+                    <span class="sr-only">Next</span>
+                    <.icon name="hero-chevron-right-mini" class="h-5 w-5" />
+                  </.link>
+                </nav>
+              </div>
+            </div>
+          </div>
           
 
         </div>
