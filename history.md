@@ -35,6 +35,11 @@ This file tracks your progress through the Elixir Katas.
 | 28 - Radio Buttons | Completed | 2025-12-16 | Verified radio button binding |
 | 29 - The Select | Completed | 2025-12-16 | Verified select dropdown binding |
 | 30 - The Multi-Select Form | Completed | 2025-12-16 | Verified multi-select binding |
+| 31 - Dependent Inputs | Completed | 2025-12-16 | Verified dependent inputs |
+| 32 - Comparison Validation | Completed | 2025-12-16 | Verified comparison validation |
+| 33 - Formats | Completed | 2025-12-16 | Verified formatting |
+| 34 - Live Feedback | Completed | 2025-12-16 | Verified live feedback |
+| 35 - Form Restoration | Completed | 2025-12-16 | Verified form restoration |
 
 ## Infrastructure Updates
 | Update | Date | Notes |

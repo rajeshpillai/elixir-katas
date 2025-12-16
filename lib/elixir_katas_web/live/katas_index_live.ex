@@ -284,6 +284,31 @@ defmodule ElixirKatasWeb.KatasIndexLive do
         description="Handling multiple selections with standard HTML select."
         path={~p"/katas/30-multi-select-form"}
       />
+      <.kata_card
+        title="31. Dependent Inputs"
+        description="Dynamic dropdowns where choices depend on previous selections."
+        path={~p"/katas/31-dependent-inputs"}
+      />
+      <.kata_card
+        title="32. Comparison Validation"
+        description="Validating that two fields match (e.g. Password Confirmation)."
+        path={~p"/katas/32-comparison-validation"}
+      />
+      <.kata_card
+        title="33. Formats"
+        description="Regex validation for Email and Phone numbers."
+        path={~p"/katas/33-formats"}
+      />
+      <.kata_card
+        title="34. Live Feedback"
+        description="Showing validation errors only after user interaction (blur)."
+        path={~p"/katas/34-live-feedback"}
+      />
+      <.kata_card
+        title="35. Form Restoration"
+        description="Recovering form state after a server crash/reconnect."
+        path={~p"/katas/35-form-restoration"}
+      />
       </div>
     </div>
     """

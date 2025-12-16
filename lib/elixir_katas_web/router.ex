@@ -50,6 +50,11 @@ defmodule ElixirKatasWeb.Router do
     live "/katas/28-radio-buttons", Kata28RadioButtonsLive
     live "/katas/29-select", Kata29SelectLive
     live "/katas/30-multi-select-form", Kata30MultiSelectFormLive
+    live "/katas/31-dependent-inputs", Kata31DependentInputsLive
+    live "/katas/32-comparison-validation", Kata32ComparisonValidationLive
+    live "/katas/33-formats", Kata33FormatsLive
+    live "/katas/34-live-feedback", Kata34LiveFeedbackLive
+    live "/katas/35-form-restoration", Kata35FormRestorationLive
     end
   end
 

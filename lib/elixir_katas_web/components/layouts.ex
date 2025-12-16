@@ -176,6 +176,26 @@ defmodule ElixirKatasWeb.Layouts do
                    <span class="w-2 h-2 mr-3 rounded-full bg-orange-400"></span>
                    30 - Multi-Select Form
                  </.link>
+                 <.link navigate="/katas/31-dependent-inputs" class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white">
+                   <span class="w-2 h-2 mr-3 rounded-full bg-purple-400"></span>
+                   31 - Dependent Inputs
+                 </.link>
+                 <.link navigate="/katas/32-comparison-validation" class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white">
+                   <span class="w-2 h-2 mr-3 rounded-full bg-pink-400"></span>
+                   32 - Comparison Validation
+                 </.link>
+                 <.link navigate="/katas/33-formats" class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white">
+                   <span class="w-2 h-2 mr-3 rounded-full bg-blue-400"></span>
+                   33 - Formats
+                 </.link>
+                 <.link navigate="/katas/34-live-feedback" class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white">
+                   <span class="w-2 h-2 mr-3 rounded-full bg-green-400"></span>
+                   34 - Live Feedback
+                 </.link>
+                 <.link navigate="/katas/35-form-restoration" class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white">
+                   <span class="w-2 h-2 mr-3 rounded-full bg-red-400"></span>
+                   35 - Form Restoration
+                 </.link>
               </div>
             </div>
           </nav>
