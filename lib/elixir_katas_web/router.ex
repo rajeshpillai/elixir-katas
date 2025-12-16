@@ -157,6 +157,7 @@ defmodule ElixirKatasWeb.Router do
     pipe_through [:browser, :require_authenticated_user]
 
     live_session :require_authenticated_user,
+      layout: {ElixirKatasWeb.Layouts, :use_case},
       on_mount: [{ElixirKatasWeb.UserAuth, :require_authenticated}] do
       live "/usecases/tasky", TaskyLive.Index
       live "/users/settings", UserLive.Settings, :edit

@@ -485,6 +485,50 @@ defmodule ElixirKatasWeb.Layouts do
   end
 
   @doc """
+  Renders a simple layout for use cases without the katas sidebar.
+  """
+  attr :flash, :map, required: true, doc: "the map of flash messages"
+
+  def use_case(assigns) do
+    ~H"""
+    <div class="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+      <!-- Header -->
+      <header class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+          <div class="flex items-center space-x-4">
+            <.link navigate="/" class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-pink-600">
+              Elixir Katas
+            </.link>
+            <span class="text-gray-400">|</span>
+            <.link navigate="/usecases" class="text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">
+              ← Back to Use Cases
+            </.link>
+          </div>
+          <div class="flex items-center space-x-4">
+            <%= if assigns[:current_user] do %>
+              <span class="text-sm text-gray-600 dark:text-gray-300"><%= @current_user.email %></span>
+              <.link href="/users/log-out" method="delete" class="text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">
+                Log out
+              </.link>
+            <% else %>
+              <.link navigate="/users/log-in" class="text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">
+                Log in
+              </.link>
+            <% end %>
+          </div>
+        </div>
+      </header>
+
+      <!-- Main Content -->
+      <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <.flash_group flash={@flash} />
+        {@inner_content}
+      </main>
+    </div>
+    """
+  end
+
+  @doc """
   Shows the flash group with standard titles and content.
 
   ## Examples
