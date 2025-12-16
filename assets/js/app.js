@@ -46,11 +46,13 @@ const ScrollPosition = {
 import { InfiniteScroll } from "./hooks/infinite_scroll"
 import { CursorTracker } from "./hooks/cursor_tracker"
 import { InputMask } from "./hooks/input_mask"
+import { ChartJS } from "./hooks/chart_hook"
+import { AudioPlayer } from "./hooks/audio_player"
 
 const liveSocket = new LiveSocket("/live", Socket, {
   longPollFallbackMs: 2500,
   params: { _csrf_token: csrfToken },
-  hooks: { ...colocatedHooks, ScrollPosition, InfiniteScroll, CursorTracker, InputMask },
+  hooks: { ...colocatedHooks, ScrollPosition, InfiniteScroll, CursorTracker, InputMask, ChartJS, AudioPlayer },
 })
 
 // Show progress bar on live navigation and form submits

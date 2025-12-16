@@ -89,6 +89,12 @@ This file tracks your progress through the Elixir Katas.
 | 75 - Bulk Actions | Enhanced | 2025-12-16 | Fixed bulk delete |
 | 76 - The Clock | Completed | 2025-12-16 | Server-side intervals |
 | 91 - Masked Input | Enhanced | 2025-12-16 | Added InputMask JS hook |
+| 88 - Theme Switcher | Enhanced | 2025-12-16 | Session-based theme toggle |
+| 89 - Chart.js | Enhanced | 2025-12-16 | Integrated Chart.js via JS Hook |
+| 90 - Mapbox | Pending | - | Leaflet.js integration pending |
+| 93 - Sortable List | Pending | - | SortableJS integration pending |
+| 94 - Audio Player | Enhanced | 2025-12-16 | HTML5 Audio Hook with server controls |
+| 95 - Async Assigns | Enhanced | 2025-12-16 | Used assign_async for non-blocking UI |
 | 77 - The Ticker | Enhanced | 2025-12-16 | PubSub stock updates |
 | 78 - Chat Room | Enhanced | 2025-12-16 | Multi-user PubSub chat |
 | 79 - Typing Indicator | Enhanced | 2025-12-16 | PubSub typing events |

@@ -11,7 +11,7 @@ defmodule ElixirKatasWeb.Kata94AudioPlayerLive do
       |> assign(active_tab: "interactive")
       |> assign(source_code: source_code)
       |> assign(notes_content: notes_content)
-      |> assign(:demo_active, false)
+      |> assign(:is_playing, false)
 
     {:ok, socket}
   end
@@ -26,33 +26,43 @@ defmodule ElixirKatasWeb.Kata94AudioPlayerLive do
     >
       <div class="p-6 max-w-2xl mx-auto">
         <div class="mb-6 text-sm text-gray-500">
-          Play/pause audio
+          Audio controls using LiveView and JavaScript Hooks
         </div>
 
         <div class="bg-white p-6 rounded-lg shadow-sm border">
-          <h3 class="text-lg font-medium mb-4">Audio Player</h3>
+          <h3 class="text-lg font-medium mb-4">Music Player</h3>
           
-          <div class="space-y-4">
-            <button 
-              phx-click="toggle_demo"
-              class="px-6 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700"
-            >
-              <%= if @demo_active, do: "Hide Demo", else: "Show Demo" %>
-            </button>
+          <div id="audio-player" phx-hook="AudioPlayer" class="space-y-4">
+             <!-- Hidden Audio Element -->
+             <audio src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"></audio>
 
-            <%= if @demo_active do %>
-              <div class="p-4 bg-blue-50 border border-blue-200 rounded">
-                <div class="font-medium mb-2">Audio Player Demo</div>
-                <div class="text-sm text-gray-700">
-                  This demonstrates media control. In a real implementation, 
-                  this would include full audio player functionality with proper 
-                  JavaScript integration.
+             <div class="flex items-center justify-between bg-gray-50 p-4 rounded-lg border">
+                <div class="flex items-center gap-4">
+                  <button 
+                    phx-click="toggle_playback" 
+                    class="w-12 h-12 flex items-center justify-center bg-indigo-600 text-white rounded-full hover:bg-indigo-700 transition"
+                  >
+                    <%= if @is_playing do %>
+                      <.icon name="hero-pause" class="w-6 h-6" />
+                    <% else %>
+                      <.icon name="hero-play" class="w-6 h-6 ml-1" />
+                    <% end %>
+                  </button>
+                  <div>
+                    <div class="text-sm font-bold text-gray-900">SoundHelix Song 1</div>
+                    <div class="text-xs text-gray-500">SoundHelix Library</div>
+                  </div>
                 </div>
-                <div class="mt-3 text-xs text-gray-500">
-                  Check the Notes and Source Code tabs for implementation details.
+                
+                <div class="text-sm font-mono text-gray-600">
+                   <span class="time-display">0:00</span> / <span class="duration-display">0:00</span>
                 </div>
-              </div>
-            <% end %>
+             </div>
+
+             <!-- Progress Bar -->
+             <div class="w-full bg-gray-200 rounded-full h-2.5 overflow-hidden">
+               <div class="progress-bar bg-indigo-600 h-2.5 rounded-full" style="width: 0%"></div>
+             </div>
           </div>
         </div>
       </div>
@@ -60,8 +70,22 @@ defmodule ElixirKatasWeb.Kata94AudioPlayerLive do
     """
   end
 
-  def handle_event("toggle_demo", _, socket) do
-    {:noreply, assign(socket, :demo_active, !socket.assigns.demo_active)}
+  def handle_event("toggle_playback", _, socket) do
+    if socket.assigns.is_playing do
+      {:noreply, 
+       socket 
+       |> assign(:is_playing, false) 
+       |> push_event("pause", %{})}
+    else
+      {:noreply, 
+       socket 
+       |> assign(:is_playing, true) 
+       |> push_event("play", %{})}
+    end
+  end
+
+  def handle_event("audio_ended", _, socket) do
+    {:noreply, assign(socket, :is_playing, false)}
   end
 
   def handle_event("set_tab", %{"tab" => tab}, socket) do

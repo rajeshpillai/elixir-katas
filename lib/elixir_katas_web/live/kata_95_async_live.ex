@@ -11,7 +11,7 @@ defmodule ElixirKatasWeb.Kata95AsyncAssignsLive do
       |> assign(active_tab: "interactive")
       |> assign(source_code: source_code)
       |> assign(notes_content: notes_content)
-      |> assign(:demo_active, false)
+      |> load_async_data()
 
     {:ok, socket}
   end
@@ -26,33 +26,77 @@ defmodule ElixirKatasWeb.Kata95AsyncAssignsLive do
     >
       <div class="p-6 max-w-2xl mx-auto">
         <div class="mb-6 text-sm text-gray-500">
-          Async data loading
+          Loading data asynchronously with loading states and error handling
         </div>
 
         <div class="bg-white p-6 rounded-lg shadow-sm border">
-          <h3 class="text-lg font-medium mb-4">Async Assigns</h3>
-          
-          <div class="space-y-4">
+          <div class="flex justify-between items-center mb-6">
+            <h3 class="text-lg font-medium">Async Dashboard</h3>
             <button 
-              phx-click="toggle_demo"
-              class="px-6 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700"
+              phx-click="reload" 
+              class="px-4 py-2 bg-indigo-600 text-white text-sm rounded hover:bg-indigo-700 transition"
             >
-              <%= if @demo_active, do: "Hide Demo", else: "Show Demo" %>
+              Reload Data
             </button>
-
-            <%= if @demo_active do %>
-              <div class="p-4 bg-blue-50 border border-blue-200 rounded">
-                <div class="font-medium mb-2">Async Assigns Demo</div>
-                <div class="text-sm text-gray-700">
-                  This demonstrates non-blocking ui. In a real implementation, 
-                  this would include full async assigns functionality with proper 
-                  JavaScript integration.
-                </div>
-                <div class="mt-3 text-xs text-gray-500">
-                  Check the Notes and Source Code tabs for implementation details.
-                </div>
+          </div>
+          
+          <div class="grid gap-6">
+            <!-- Stats Card (Loads Quickly) -->
+            <.async_result :let={stats} assign={@stats}>
+              <:loading>
+                <div class="animate-pulse bg-gray-100 p-4 rounded-lg h-24"></div>
+              </:loading>
+              <:failed :let={_failure}>
+                 <div class="bg-red-50 p-4 rounded-lg text-red-600 text-sm">
+                   Failed to load stats
+                 </div>
+              </:failed>
+              <div class="bg-indigo-50 p-4 rounded-lg border border-indigo-100">
+                <div class="text-sm text-indigo-600 font-medium">Total Revenue</div>
+                <div class="text-2xl font-bold text-indigo-900"><%= stats.revenue %></div>
+                <div class="text-xs text-indigo-500 mt-1">+<%= stats.growth %>% from last month</div>
               </div>
-            <% end %>
+            </.async_result>
+
+            <!-- Users List (Loads Slowly) -->
+             <.async_result :let={users} assign={@users}>
+              <:loading>
+                <div class="space-y-3">
+                   <div class="animate-pulse bg-gray-100 h-10 rounded w-full"></div>
+                   <div class="animate-pulse bg-gray-100 h-10 rounded w-full"></div>
+                   <div class="animate-pulse bg-gray-100 h-10 rounded w-full"></div>
+                </div>
+              </:loading>
+              <:failed :let={_failure}>
+                 <div class="bg-red-50 p-4 rounded-lg text-red-600 text-sm flex items-center justify-between">
+                   <span>Failed to load user data.</span>
+                   <button phx-click="reload" class="text-red-800 underline">Retry</button>
+                 </div>
+              </:failed>
+              
+              <div class="border rounded-lg overflow-hidden">
+                <table class="min-w-full divide-y divide-gray-200">
+                  <thead class="bg-gray-50">
+                    <tr>
+                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">User</th>
+                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody class="bg-white divide-y divide-gray-200">
+                    <%= for user <- users do %>
+                      <tr>
+                        <td class="px-6 py-4 text-sm font-medium text-gray-900"><%= user.name %></td>
+                        <td class="px-6 py-4 text-sm">
+                          <span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+                            <%= user.status %>
+                          </span>
+                        </td>
+                      </tr>
+                    <% end %>
+                  </tbody>
+                </table>
+              </div>
+            </.async_result>
           </div>
         </div>
       </div>
@@ -60,8 +104,24 @@ defmodule ElixirKatasWeb.Kata95AsyncAssignsLive do
     """
   end
 
-  def handle_event("toggle_demo", _, socket) do
-    {:noreply, assign(socket, :demo_active, !socket.assigns.demo_active)}
+  def handle_event("reload", _, socket) do
+    {:noreply, load_async_data(socket)}
+  end
+
+  defp load_async_data(socket) do
+    socket
+    |> assign_async(:stats, fn -> 
+      Process.sleep(500) # Fast load
+      {:ok, %{stats: %{revenue: "$124,500", growth: 12}}} 
+    end)
+    |> assign_async(:users, fn ->
+      Process.sleep(2000) # Slow load
+      {:ok, %{users: [
+        %{name: "John Doe", status: "Active"},
+        %{name: "Jane Smith", status: "Active"},
+        %{name: "Bob Johnson", status: "Away"}
+      ]}}
+    end)
   end
 
   def handle_event("set_tab", %{"tab" => tab}, socket) do
