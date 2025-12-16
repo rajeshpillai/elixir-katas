@@ -505,8 +505,8 @@ defmodule ElixirKatasWeb.Layouts do
             </.link>
           </div>
           <div class="flex items-center space-x-4">
-            <%= if assigns[:current_user] do %>
-              <span class="text-sm text-gray-600 dark:text-gray-300"><%= @current_user.email %></span>
+            <%= if assigns[:current_scope] && assigns.current_scope.user do %>
+              <span class="text-sm text-gray-600 dark:text-gray-300"><%= assigns.current_scope.user.email %></span>
               <.link href="/users/log-out" method="delete" class="text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">
                 Log out
               </.link>
