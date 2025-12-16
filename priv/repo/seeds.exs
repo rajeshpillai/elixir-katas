@@ -14,8 +14,8 @@ alias ElixirKatas.Accounts
 
 # Create demo user for Tasky
 {:ok, _user} = Accounts.register_user(%{
-  email: "demo1",
+  email: "demo1@example.com",
   password: "demo123"
 })
 
-IO.puts("Demo user created: demo1 / demo123")
+IO.puts("Demo user created: demo1@example.com / demo123")
