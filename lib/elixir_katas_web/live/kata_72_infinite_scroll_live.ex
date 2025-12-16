@@ -30,28 +30,36 @@ defmodule ElixirKatasWeb.Kata72InfiniteScrollLive do
     >
       <div class="p-6 max-w-4xl mx-auto">
         <div class="mb-6 text-sm text-gray-500">
-          Scroll down to load more items automatically.
+          Load more items by clicking the button (simulates infinite scroll).
         </div>
 
         <div class="bg-white p-6 rounded-lg shadow-sm border">
-          <div id="items-container" phx-update="stream" class="space-y-2 max-h-96 overflow-y-auto" phx-hook="InfiniteScroll">
+          <div id="items-container" phx-update="stream" class="space-y-2 max-h-96 overflow-y-auto">
             <%= for {dom_id, item} <- @streams.items do %>
               <div id={dom_id} class="p-4 bg-gray-50 rounded">
                 <div class="font-medium"><%= item.title %></div>
                 <div class="text-sm text-gray-500">Item #<%= item.id %></div>
               </div>
             <% end %>
-            
-            <%= if @has_more do %>
-              <div id="loading-indicator" class="text-center py-4">
-                <div class="text-gray-500">Scroll for more...</div>
-              </div>
-            <% else %>
-              <div class="text-center py-4 text-gray-500">
-                No more items
-              </div>
-            <% end %>
           </div>
+          
+          <%= if @has_more do %>
+            <div class="mt-4 text-center">
+              <button 
+                phx-click="load-more" 
+                class="px-6 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700"
+              >
+                Load More Items
+              </button>
+              <div class="text-xs text-gray-500 mt-2">
+                Page <%= @page %> of 5
+              </div>
+            </div>
+          <% else %>
+            <div class="mt-4 text-center text-gray-500">
+              All items loaded!
+            </div>
+          <% end %>
         </div>
       </div>
     </.kata_viewer>

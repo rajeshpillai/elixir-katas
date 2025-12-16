@@ -27,23 +27,21 @@ defmodule ElixirKatasWeb.Kata81LiveCursorLive do
     >
       <div class="p-6 max-w-2xl mx-auto">
         <div class="mb-6 text-sm text-gray-500">
-          Track and broadcast mouse cursor positions.
+          Track mouse cursor positions in real-time.
         </div>
 
         <div class="bg-white p-6 rounded-lg shadow-sm border">
           <div 
-            phx-hook="TrackCursor"
             id="cursor-area"
             class="h-96 bg-gray-50 rounded relative cursor-crosshair"
-            phx-mousemove="track_cursor"
+            phx-window-mousemove="track_cursor"
           >
             <div class="absolute top-4 left-4 bg-white px-4 py-2 rounded shadow text-sm">
               X: <%= @cursor_x %>, Y: <%= @cursor_y %>
             </div>
-            <div 
-              class="absolute w-4 h-4 bg-indigo-500 rounded-full -translate-x-2 -translate-y-2 pointer-events-none"
-              style={"left: #{@cursor_x}px; top: #{@cursor_y}px;"}
-            >
+            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center text-gray-400">
+              <div class="text-lg mb-2">Move your mouse</div>
+              <div class="text-sm">Coordinates are tracked in real-time</div>
             </div>
           </div>
         </div>
@@ -52,7 +50,7 @@ defmodule ElixirKatasWeb.Kata81LiveCursorLive do
     """
   end
 
-  def handle_event("track_cursor", %{"offsetX" => x, "offsetY" => y}, socket) do
+  def handle_event("track_cursor", %{"clientX" => x, "clientY" => y}, socket) do
     {:noreply, assign(socket, cursor_x: x, cursor_y: y)}
   end
 
