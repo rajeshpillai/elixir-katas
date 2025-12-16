@@ -11,7 +11,7 @@ defmodule ElixirKatasWeb.Kata91MaskedInputLive do
       |> assign(active_tab: "interactive")
       |> assign(source_code: source_code)
       |> assign(notes_content: notes_content)
-      |> assign(:demo_active, false)
+      |> assign(:form, to_form(%{"phone" => "", "card" => "", "date" => ""}))
 
     {:ok, socket}
   end
@@ -26,42 +26,83 @@ defmodule ElixirKatasWeb.Kata91MaskedInputLive do
     >
       <div class="p-6 max-w-2xl mx-auto">
         <div class="mb-6 text-sm text-gray-500">
-          Phone/card number masking
+          Input masking for Phone, Credit Card, and Date using JS Hooks
         </div>
 
         <div class="bg-white p-6 rounded-lg shadow-sm border">
-          <h3 class="text-lg font-medium mb-4">Masked Input</h3>
+          <h3 class="text-lg font-medium mb-6">Masked Inputs</h3>
           
-          <div class="space-y-4">
-            <button 
-              phx-click="toggle_demo"
-              class="px-6 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700"
-            >
-              <%= if @demo_active, do: "Hide Demo", else: "Show Demo" %>
-            </button>
+          <.form for={@form} phx-change="validate" phx-submit="save" class="space-y-6">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Phone Number (US)</label>
+              <.input 
+                field={@form[:phone]} 
+                type="text" 
+                phx-hook="InputMask" 
+                data-mask="phone"
+                placeholder="(123) 456-7890" 
+                class="w-full" 
+              />
+              <p class="mt-1 text-xs text-gray-500">Format: (XXX) XXX-XXXX</p>
+            </div>
 
-            <%= if @demo_active do %>
-              <div class="p-4 bg-blue-50 border border-blue-200 rounded">
-                <div class="font-medium mb-2">Masked Input Demo</div>
-                <div class="text-sm text-gray-700">
-                  This demonstrates input formatting. In a real implementation, 
-                  this would include full masked input functionality with proper 
-                  JavaScript integration.
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Credit Card</label>
+              <.input 
+                field={@form[:card]} 
+                type="text" 
+                phx-hook="InputMask" 
+                data-mask="credit-card"
+                placeholder="0000 0000 0000 0000" 
+                class="w-full" 
+              />
+              <p class="mt-1 text-xs text-gray-500">Format: XXXX XXXX XXXX XXXX</p>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Date</label>
+              <.input 
+                field={@form[:date]} 
+                type="text" 
+                phx-hook="InputMask" 
+                data-mask="date"
+                placeholder="MM/DD/YYYY" 
+                class="w-full" 
+              />
+              <p class="mt-1 text-xs text-gray-500">Format: MM/DD/YYYY</p>
+            </div>
+            
+            <div class="pt-4 border-t">
+              <h4 class="text-xs font-semibold text-gray-500 uppercase mb-2">Current Values (Server Side)</h4>
+              <dl class="grid grid-cols-3 gap-4 text-sm">
+                <div>
+                  <dt class="text-gray-500">Phone</dt>
+                  <dd class="font-mono text-indigo-600"><%= @form[:phone].value %></dd>
                 </div>
-                <div class="mt-3 text-xs text-gray-500">
-                  Check the Notes and Source Code tabs for implementation details.
+                <div>
+                  <dt class="text-gray-500">Card</dt>
+                  <dd class="font-mono text-indigo-600"><%= @form[:card].value %></dd>
                 </div>
-              </div>
-            <% end %>
-          </div>
+                <div>
+                  <dt class="text-gray-500">Date</dt>
+                  <dd class="font-mono text-indigo-600"><%= @form[:date].value %></dd>
+                </div>
+              </dl>
+            </div>
+          </.form>
         </div>
       </div>
     </.kata_viewer>
     """
   end
 
-  def handle_event("toggle_demo", _, socket) do
-    {:noreply, assign(socket, :demo_active, !socket.assigns.demo_active)}
+  def handle_event("validate", params, socket) do
+    {:noreply, assign(socket, :form, to_form(params))}
+  end
+
+  def handle_event("save", params, socket) do
+    # Just update the form with submitted values
+    {:noreply, assign(socket, :form, to_form(params))}
   end
 
   def handle_event("set_tab", %{"tab" => tab}, socket) do

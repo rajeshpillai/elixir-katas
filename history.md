@@ -88,8 +88,11 @@ This file tracks your progress through the Elixir Katas.
 | 74 - Stream Reset | Completed | 2025-12-16 | Stream filtering |
 | 75 - Bulk Actions | Enhanced | 2025-12-16 | Fixed bulk delete |
 | 76 - The Clock | Completed | 2025-12-16 | Server-side intervals |
+| 91 - Masked Input | Enhanced | 2025-12-16 | Added InputMask JS hook |
 | 77 - The Ticker | Enhanced | 2025-12-16 | PubSub stock updates |
 | 78 - Chat Room | Enhanced | 2025-12-16 | Multi-user PubSub chat |
 | 79 - Typing Indicator | Enhanced | 2025-12-16 | PubSub typing events |
 | 80 - Presence List | Enhanced | 2025-12-16 | Phoenix.Presence tracking |
 | 81 - Live Cursor | Enhanced | 2025-12-16 | Multi-user cursor tracking |
+| 96 - File Uploads | Enhanced | 2025-12-16 | Integrated allow_upload & drag-drop |
+| 99 - CSV Export | Enhanced | 2025-12-16 | NimbleCSV export with download |

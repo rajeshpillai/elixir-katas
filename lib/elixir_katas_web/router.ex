@@ -18,6 +18,7 @@ defmodule ElixirKatasWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :home
+    get "/exports/csv", ExportController, :csv
     live_session :default, layout: {ElixirKatasWeb.Layouts, :app} do
       live "/katas", KatasIndexLive
       live "/katas/01-hello-world", Kata01HelloWorldLive
