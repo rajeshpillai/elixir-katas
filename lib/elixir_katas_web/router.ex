@@ -24,6 +24,7 @@ defmodule ElixirKatasWeb.Router do
     get "/exports/csv", ExportController, :csv
     post "/exports/pdf", ExportController, :pdf
     live_session :default, layout: {ElixirKatasWeb.Layouts, :app} do
+      live "/usecases", UseCasesIndexLive
       live "/katas", KatasIndexLive
       live "/katas/01-hello-world", Kata01HelloWorldLive
       live "/katas/02-counter", Kata02CounterLive
