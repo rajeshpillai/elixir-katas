@@ -84,11 +84,14 @@ defmodule ElixirKatasWeb.TaskyLive.Index do
     case Tasky.create_todo(socket.assigns.current_scope.user.id, todo_params) do
       {:ok, _todo} ->
         search = socket.assigns.search
-        total_pages = ceil(Tasky.count_todos(socket.assigns.current_scope.user.id, search) / socket.assigns.per_page)
+        user_id = socket.assigns.current_scope.user.id
+        total_pages = ceil(Tasky.count_todos(user_id, search) / socket.assigns.per_page)
+        categories = Tasky.list_categories(user_id)
         
         {:noreply,
          socket
          |> assign(:total_pages, total_pages)
+         |> assign(:categories, categories)
          |> assign(:form, to_form(Tasky.change_todo(%Todo{})))}
       {:error, %Ecto.Changeset{} = changeset} ->
         {:noreply, assign(socket, form: to_form(changeset))}
