@@ -1,5 +1,6 @@
 defmodule ElixirKatasWeb.KatasIndexLive do
   use ElixirKatasWeb, :live_view
+  import ElixirKatasWeb.KataComponents
 
   def mount(_params, _session, socket) do
     {:ok, socket}
@@ -253,15 +254,36 @@ defmodule ElixirKatasWeb.KatasIndexLive do
           </p>
         </.link>
 
-        <.link navigate="/katas/25-tree" class="card bg-white dark:bg-gray-800 shadow-md hover:shadow-lg transition-shadow border border-gray-200 dark:border-gray-700 p-6 rounded-lg group">
-          <div class="flex items-center mb-4">
-            <span class="w-3 h-3 rounded-full bg-indigo-600 mr-3"></span>
-            <h2 class="text-xl font-semibold group-hover:text-primary transition-colors">25 - The Tree</h2>
-          </div>
-          <p class="text-gray-600 dark:text-gray-400">
-            Recursive rendering of nested data structures.
-          </p>
-        </.link>
+        <.kata_card
+        title="25. The Tree"
+        description="Recursive rendering of nested data structures."
+        path={~p"/katas/25-tree"}
+      />
+      <.kata_card
+        title="26. The Text Input"
+        description="Handling basic text input, form bindings, and submission."
+        path={~p"/katas/26-text-input"}
+      />
+      <.kata_card
+        title="27. The Checkbox"
+        description="Boolean state toggling with checkboxes and hidden inputs."
+        path={~p"/katas/27-checkbox"}
+      />
+      <.kata_card
+        title="28. Radio Buttons"
+        description="Mutually exclusive selection using radio inputs."
+        path={~p"/katas/28-radio-buttons"}
+      />
+      <.kata_card
+        title="29. The Select"
+        description="Single selection from a dropdown list."
+        path={~p"/katas/29-select"}
+      />
+      <.kata_card
+        title="30. The Multi-Select Form"
+        description="Handling multiple selections with standard HTML select."
+        path={~p"/katas/30-multi-select-form"}
+      />
       </div>
     </div>
     """

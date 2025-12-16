@@ -156,6 +156,26 @@ defmodule ElixirKatasWeb.Layouts do
                    <span class="w-2 h-2 mr-3 rounded-full bg-indigo-400"></span>
                    25 - The Tree
                  </.link>
+                 <.link navigate="/katas/26-text-input" class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white">
+                   <span class="w-2 h-2 mr-3 rounded-full bg-green-400"></span>
+                   26 - The Text Input
+                 </.link>
+                 <.link navigate="/katas/27-checkbox" class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white">
+                   <span class="w-2 h-2 mr-3 rounded-full bg-red-400"></span>
+                   27 - The Checkbox
+                 </.link>
+                 <.link navigate="/katas/28-radio-buttons" class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white">
+                   <span class="w-2 h-2 mr-3 rounded-full bg-blue-400"></span>
+                   28 - Radio Buttons
+                 </.link>
+                 <.link navigate="/katas/29-select" class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white">
+                   <span class="w-2 h-2 mr-3 rounded-full bg-green-400"></span>
+                   29 - The Select
+                 </.link>
+                 <.link navigate="/katas/30-multi-select-form" class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white">
+                   <span class="w-2 h-2 mr-3 rounded-full bg-orange-400"></span>
+                   30 - Multi-Select Form
+                 </.link>
               </div>
             </div>
           </nav>

@@ -30,6 +30,11 @@ This file tracks your progress through the Elixir Katas.
 | 23 - The Multi-Select | Completed | 2025-12-16 | Verified MapSet selection logic |
 | 24 - The Grid | Completed | 2025-12-16 | Verified CSS Grid Responsive Layout |
 | 25 - The Tree | Completed | 2025-12-16 | Verified recursive tree rendering |
+| 26 - The Text Input | Completed | 2025-12-16 | Verified text input binding |
+| 27 - The Checkbox | Completed | 2025-12-16 | Verified checkbox binding |
+| 28 - Radio Buttons | Completed | 2025-12-16 | Verified radio button binding |
+| 29 - The Select | Completed | 2025-12-16 | Verified select dropdown binding |
+| 30 - The Multi-Select Form | Completed | 2025-12-16 | Verified multi-select binding |
 
 ## Infrastructure Updates
 | Update | Date | Notes |
