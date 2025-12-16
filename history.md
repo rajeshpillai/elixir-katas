@@ -115,6 +115,70 @@ This file tracks your progress through the Elixir Katas.
 | Tasky Level 3 | Completed | 2025-12-16 | Added Favorites Logic & UI (Star Icon) |
 | Tasky Yellow Belt | Completed | 2025-12-16 | Added Pagination & Search (Level 1 & 2) |
 | Tasky Orange Belt | Completed | 2025-12-16 | Added Authentication (phx.gen.auth, user scoping) |
-| Tasky Green Belt | Completed | 2025-12-16 | Added category, priority, and due date fields with filtering, visual indicators, and color-coded badges |
+| Tasky Green Belt | Completed | 2025-12-16 | Added organization features: categories, priority levels, due dates with filtering and visual indicators |
 | Navigation Refactoring | Completed | 2025-12-16 | Added landing page hub, Use Cases index |
-```
+
+## Recent Session Notes
+
+### 2025-12-16 - Tasky Green Belt Implementation
+
+**Objective**: Add organization features to Tasky (categories, priorities, due dates)
+
+**Changes Made**:
+
+1. **Database Migration**
+   - Added `category` (string), `priority` (string, default: "medium"), `due_date` (date) fields to todos table
+   - Created indexes for efficient filtering
+
+2. **Schema & Validations**
+   - Updated `Todo` schema with new fields
+   - Added priority validation (low/medium/high)
+   - Added due date validation (cannot be in the past)
+
+3. **Context Functions**
+   - Enhanced `list_todos/2` with filtering by category, priority, and due date ranges
+   - Added `list_categories/1` for category autocomplete
+   - Added `get_overdue_count/1` for overdue task counting
+
+4. **Frontend - Form Inputs**
+   - Category input with datalist autocomplete
+   - Priority dropdown (Low/Medium/High)
+   - Due date picker
+   - Submit button for better UX
+
+5. **Frontend - Filter Controls**
+   - Category filter dropdown
+   - Priority filter dropdown
+   - Due date filter (All/Overdue/Today/This Week/No Date)
+   - Clear filters button
+
+6. **Frontend - Visual Indicators**
+   - Priority badges: Red (High), Yellow (Medium), Green (Low)
+   - Category tags: Blue
+   - Due date colors: Red (overdue), Orange (today), Blue (this week), Gray (future)
+   - Smart date formatting ("Overdue by X days", "Due today", "Due in X days")
+
+7. **Bug Fixes**
+   - Fixed category dropdown not updating after task creation
+   - Added submit button to form for clarity
+
+**Files Modified**:
+- `priv/repo/migrations/20251216173821_add_organization_fields_to_todos.exs`
+- `lib/elixir_katas/tasky/todo.ex`
+- `lib/elixir_katas/tasky.ex`
+- `lib/elixir_katas_web/live/tasky_live/index.ex`
+
+**Commits**:
+- `feat: Add category, priority, and due_date fields to Todo schema`
+- `feat: Add filtering by category, priority, and due date to Tasky context`
+- `feat: Add category, priority, and due date inputs to task form`
+- `feat: Add filter controls and event handlers`
+- `feat: Add visual indicators for priority, category, and due date`
+- `fix: Refresh categories list after creating a task`
+- `feat: Add submit button to task form for better UX`
+
+**Next Steps**:
+- Blue Belt: Subtasks, attachments, comments
+- Purple Belt: Real-time collaboration, task assignment
+- Brown Belt: Drag & drop, bulk actions, export/import
+- Black Belt: Email notifications, mobile optimization, keyboard shortcuts
