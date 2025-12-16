@@ -31,7 +31,7 @@ defmodule ElixirKatasWeb.Layouts do
     default: nil,
     doc: "the current [scope](https://hexdocs.pm/phoenix/scopes.html)"
 
-  slot :inner_block, required: true
+  slot :inner_block, required: false
 
   def app(assigns) do
     ~H"""
