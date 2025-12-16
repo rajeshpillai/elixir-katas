@@ -334,6 +334,56 @@ defmodule ElixirKatasWeb.KatasIndexLive do
         description="Core LiveView file upload functionality with drag & drop."
         path={~p"/katas/40-uploads"}
       />
+      <.kata_card
+        title="41. URL Params"
+        description="Handling query string parameters with handle_params/3."
+        path={~p"/katas/41-url-params"}
+      />
+      <.kata_card
+        title="42. Path Params"
+        description="Dynamic route segments like /user/:id."
+        path={~p"/katas/42-path-params/1"}
+      />
+      <.kata_card
+        title="43. The Nav Bar"
+        description="Active link highlighting based on current URI."
+        path={~p"/katas/43-navbar"}
+      />
+      <.kata_card
+        title="44. The Breadcrumb"
+        description="Dynamic navigation hierarchy based on path."
+        path={~p"/katas/44-breadcrumb"}
+      />
+      <.kata_card
+        title="45. Tabs with URL"
+        description="Syncing tab state to URL query parameters."
+        path={~p"/katas/45-tabs-url"}
+      />
+      <.kata_card
+        title="46. Search with URL"
+        description="Deep linking search results via URL params."
+        path={~p"/katas/46-search-url"}
+      />
+      <.kata_card
+        title="47. Protected Routes"
+        description="Redirecting unauthenticated users with on_mount."
+        path={~p"/katas/47-protected"}
+      />
+      <.kata_card
+        title="48. Live Redirects"
+        description="Understanding push_navigate vs push_patch."
+        path={~p"/katas/48-redirects"}
+      />
+      <.kata_card
+        title="49. The Translator"
+        description="Switching locales and i18n patterns."
+        path={~p"/katas/49-translator"}
+      />
+      <.kata_card
+        title="50. Functional Components"
+        description="Creating reusable components with attr and slot."
+        path={~p"/katas/50-components"}
+      />
       </div>
     </div>
     """

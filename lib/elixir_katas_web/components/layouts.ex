@@ -215,6 +215,46 @@ defmodule ElixirKatasWeb.Layouts do
                  <.link navigate="/katas/40-uploads" class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white">
                    <span class="w-2 h-2 mr-3 rounded-full bg-red-400"></span>
                    40 - File Uploads
+                  </.link>
+                 <.link navigate="/katas/41-url-params" class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white">
+                   <span class="w-2 h-2 mr-3 rounded-full bg-blue-500"></span>
+                   41 - URL Params
+                 </.link>
+                 <.link navigate="/katas/42-path-params/1" class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white">
+                   <span class="w-2 h-2 mr-3 rounded-full bg-green-500"></span>
+                   42 - Path Params
+                 </.link>
+                 <.link navigate="/katas/43-navbar" class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white">
+                   <span class="w-2 h-2 mr-3 rounded-full bg-purple-500"></span>
+                   43 - The Nav Bar
+                 </.link>
+                 <.link navigate="/katas/44-breadcrumb" class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white">
+                   <span class="w-2 h-2 mr-3 rounded-full bg-pink-500"></span>
+                   44 - The Breadcrumb
+                 </.link>
+                 <.link navigate="/katas/45-tabs-url" class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white">
+                   <span class="w-2 h-2 mr-3 rounded-full bg-indigo-500"></span>
+                   45 - Tabs with URL
+                 </.link>
+                 <.link navigate="/katas/46-search-url" class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white">
+                   <span class="w-2 h-2 mr-3 rounded-full bg-cyan-500"></span>
+                   46 - Search with URL
+                 </.link>
+                 <.link navigate="/katas/47-protected" class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white">
+                   <span class="w-2 h-2 mr-3 rounded-full bg-orange-500"></span>
+                   47 - Protected Routes
+                 </.link>
+                 <.link navigate="/katas/48-redirects" class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white">
+                   <span class="w-2 h-2 mr-3 rounded-full bg-teal-500"></span>
+                   48 - Live Redirects
+                 </.link>
+                 <.link navigate="/katas/49-translator" class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white">
+                   <span class="w-2 h-2 mr-3 rounded-full bg-yellow-500"></span>
+                   49 - The Translator
+                 </.link>
+                 <.link navigate="/katas/50-components" class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white">
+                   <span class="w-2 h-2 mr-3 rounded-full bg-red-500"></span>
+                   50 - Functional Components
                  </.link>
               </div>
             </div>

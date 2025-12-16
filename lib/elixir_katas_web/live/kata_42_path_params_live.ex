@@ -1,0 +1,108 @@
+defmodule ElixirKatasWeb.Kata42PathParamsLive do
+  use ElixirKatasWeb, :live_view
+  import ElixirKatasWeb.KataComponents
+
+  def mount(_params, _session, socket) do
+    source_code = File.read!(__ENV__.file)
+    notes_content = File.read!("notes/kata_42_path_params_notes.md")
+
+    items = [
+      %{id: 1, name: "Phoenix Framework", description: "Web framework for Elixir"},
+      %{id: 2, name: "LiveView", description: "Real-time server-rendered apps"},
+      %{id: 3, name: "Ecto", description: "Database wrapper and query generator"},
+      %{id: 4, name: "Plug", description: "Composable web middleware"}
+    ]
+
+    socket =
+      socket
+      |> assign(active_tab: "interactive")
+      |> assign(source_code: source_code)
+      |> assign(notes_content: notes_content)
+      |> assign(:items, items)
+      |> assign(:selected_item, nil)
+
+    {:ok, socket}
+  end
+
+  def handle_params(%{"id" => id}, _uri, socket) do
+    item = Enum.find(socket.assigns.items, &(Integer.to_string(&1.id) == id))
+    {:noreply, assign(socket, selected_item: item)}
+  end
+
+  def handle_params(_params, _uri, socket) do
+    {:noreply, assign(socket, selected_item: nil)}
+  end
+
+  def render(assigns) do
+    ~H"""
+    <.kata_viewer 
+      active_tab={@active_tab} 
+      title="Kata 42: Path Params" 
+      source_code={@source_code} 
+      notes_content={@notes_content}
+    >
+      <div class="p-6 max-w-2xl mx-auto">
+        <div class="mb-6 text-sm text-gray-500">
+           Click an item below. Notice the URL changes to <code>/katas/42-path-params/:id</code>
+        </div>
+
+        <div class="grid grid-cols-2 gap-6">
+          <!-- Items List -->
+          <div class="bg-white p-4 rounded-lg shadow-sm border">
+            <h3 class="text-sm font-medium text-gray-900 mb-3">Items</h3>
+            <div class="space-y-2">
+              <%= for item <- @items do %>
+                <.link
+                  patch={~p"/katas/42-path-params/#{item.id}"}
+                  class={"block p-3 rounded transition-colors " <> 
+                         if(@selected_item && @selected_item.id == item.id, 
+                            do: "bg-indigo-50 border-2 border-indigo-500", 
+                            else: "bg-gray-50 hover:bg-gray-100 border-2 border-transparent")}
+                >
+                  <div class="font-medium text-sm"><%= item.name %></div>
+                  <div class="text-xs text-gray-500">ID: <%= item.id %></div>
+                </.link>
+              <% end %>
+            </div>
+          </div>
+
+          <!-- Selected Item Detail -->
+          <div class="bg-white p-4 rounded-lg shadow-sm border">
+            <h3 class="text-sm font-medium text-gray-900 mb-3">Details</h3>
+            <%= if @selected_item do %>
+              <div class="space-y-3">
+                <div>
+                  <label class="text-xs text-gray-500">ID</label>
+                  <div class="font-mono text-sm"><%= @selected_item.id %></div>
+                </div>
+                <div>
+                  <label class="text-xs text-gray-500">Name</label>
+                  <div class="font-medium"><%= @selected_item.name %></div>
+                </div>
+                <div>
+                  <label class="text-xs text-gray-500">Description</label>
+                  <div class="text-sm text-gray-700"><%= @selected_item.description %></div>
+                </div>
+                <div class="pt-3 border-t">
+                  <label class="text-xs text-gray-500">Current URL</label>
+                  <div class="font-mono text-xs text-indigo-600">
+                    /katas/42-path-params/<%= @selected_item.id %>
+                  </div>
+                </div>
+              </div>
+            <% else %>
+              <div class="text-sm text-gray-400 italic text-center py-8">
+                Select an item to view details
+              </div>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </.kata_viewer>
+    """
+  end
+
+  def handle_event("set_tab", %{"tab" => tab}, socket) do
+    {:noreply, assign(socket, active_tab: tab)}
+  end
+end

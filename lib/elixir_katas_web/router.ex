@@ -60,6 +60,16 @@ defmodule ElixirKatasWeb.Router do
     live "/katas/38-tag-input", Kata38TagInputLive
     live "/katas/39-rating", Kata39RatingLive
     live "/katas/40-uploads", Kata40UploadsLive
+    live "/katas/41-url-params", Kata41UrlParamsLive
+    live "/katas/42-path-params/:id", Kata42PathParamsLive
+    live "/katas/43-navbar", Kata43NavbarLive
+    live "/katas/44-breadcrumb", Kata44BreadcrumbLive
+    live "/katas/45-tabs-url", Kata45TabsUrlLive
+    live "/katas/46-search-url", Kata46SearchUrlLive
+    live "/katas/47-protected", Kata47ProtectedLive
+    live "/katas/48-redirects", Kata48RedirectsLive
+    live "/katas/49-translator", Kata49TranslatorLive
+    live "/katas/50-components", Kata50ComponentsLive
     end
   end
 

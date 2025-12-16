@@ -45,6 +45,16 @@ This file tracks your progress through the Elixir Katas.
 | 38 - The Tag Input | Completed | 2025-12-16 | Verified tag input |
 | 39 - The Rating Input | Completed | 2025-12-16 | Verified rating input |
 | 40 - File Uploads | Completed | 2025-12-16 | Verified file uploads |
+| 41 - URL Params | Completed | 2025-12-16 | Verified URL parameters |
+| 42 - Path Params | Completed | 2025-12-16 | Verified path parameters |
+| 43 - The Nav Bar | Completed | 2025-12-16 | Verified navigation bar |
+| 44 - The Breadcrumb | Completed | 2025-12-16 | Verified breadcrumb navigation |
+| 45 - Tabs with URL | Completed | 2025-12-16 | Verified tabs with URL state |
+| 46 - Search with URL | Completed | 2025-12-16 | Verified search with URL parameters |
+| 47 - Protected Routes | Completed | 2025-12-16 | Verified protected routes |
+| 48 - Live Redirects | Completed | 2025-12-16 | Verified live redirects |
+| 49 - The Translator | Completed | 2025-12-16 | Verified translation functionality |
+| 50 - Functional Components | Completed | 2025-12-16 | Verified functional components |
 
 ## Infrastructure Updates
 | Update | Date | Notes |
