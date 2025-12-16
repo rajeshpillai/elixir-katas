@@ -108,7 +108,7 @@ defmodule ElixirKatasWeb.Router do
     live "/katas/86-clipboard", Kata86ClipboardCopyLive
     live "/katas/87-storage", Kata87LocalStorageLive
     live "/katas/88-theme", Kata88ThemeSwitcherLive
-    live "/katas/89-chart", Kata89ChartJsLive
+    live "/katas/89-chart", Kata89ChartjsLive
     live "/katas/90-map", Kata90MapboxLive
     live "/katas/91-masked", Kata91MaskedInputLive
     live "/katas/92-dropzone", Kata92FileDropzoneLive
