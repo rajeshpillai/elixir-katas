@@ -11,7 +11,8 @@ defmodule ElixirKatasWeb.Kata81LiveCursorLive do
       |> assign(active_tab: "interactive")
       |> assign(source_code: source_code)
       |> assign(notes_content: notes_content)
-      |> assign(:demo_value, "")
+      |> assign(:cursor_x, 0)
+      |> assign(:cursor_y, 0)
 
     {:ok, socket}
   end
@@ -26,23 +27,33 @@ defmodule ElixirKatasWeb.Kata81LiveCursorLive do
     >
       <div class="p-6 max-w-2xl mx-auto">
         <div class="mb-6 text-sm text-gray-500">
-          Mouse coordinates
+          Track and broadcast mouse cursor positions.
         </div>
 
         <div class="bg-white p-6 rounded-lg shadow-sm border">
-          <h3 class="text-lg font-medium mb-4">Live Cursor</h3>
-          <p class="text-gray-600">
-            Interactive demonstration of live cursor. Check the Notes and Source Code tabs for implementation details.
-          </p>
-          <div class="mt-4 p-4 bg-blue-50 border border-blue-200 rounded">
-            <div class="text-sm text-gray-700">
-              This kata demonstrates: Mouse coordinates
+          <div 
+            phx-hook="TrackCursor"
+            id="cursor-area"
+            class="h-96 bg-gray-50 rounded relative cursor-crosshair"
+            phx-mousemove="track_cursor"
+          >
+            <div class="absolute top-4 left-4 bg-white px-4 py-2 rounded shadow text-sm">
+              X: <%= @cursor_x %>, Y: <%= @cursor_y %>
+            </div>
+            <div 
+              class="absolute w-4 h-4 bg-indigo-500 rounded-full -translate-x-2 -translate-y-2 pointer-events-none"
+              style={"left: #{@cursor_x}px; top: #{@cursor_y}px;"}
+            >
             </div>
           </div>
         </div>
       </div>
     </.kata_viewer>
     """
+  end
+
+  def handle_event("track_cursor", %{"offsetX" => x, "offsetY" => y}, socket) do
+    {:noreply, assign(socket, cursor_x: x, cursor_y: y)}
   end
 
   def handle_event("set_tab", %{"tab" => tab}, socket) do
