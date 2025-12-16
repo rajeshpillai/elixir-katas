@@ -43,7 +43,7 @@ defmodule ElixirKatasWeb.Layouts do
             Elixir Katas
           </span>
         </div>
-        <div class="flex-1 overflow-y-auto p-4">
+        <div class="flex-1 overflow-y-auto p-4" phx-hook="ScrollPosition" data-scroll-key="sidebar-nav" id="sidebar-nav">
           <nav class="space-y-1">
             <a href="/" class="group flex items-center px-4 py-2 text-sm font-medium rounded-md bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-300">
               <.icon name="hero-home" class="mr-3 h-5 w-5 text-purple-600 dark:text-purple-400" />
