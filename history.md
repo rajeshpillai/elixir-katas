@@ -105,3 +105,9 @@ This file tracks your progress through the Elixir Katas.
 | 97 - Image Processing | Enhanced | 2025-12-16 | Mogrify (ImageMagick) integration |
 | 98 - PDF Generation | Enhanced | 2025-12-16 | PdfGenerator (wkhtmltopdf) integration |
 | 99 - CSV Export | Enhanced | 2025-12-16 | NimbleCSV export with download |
+
+### Phase 4: Use Case - Tasky
+
+| ID | Status | Date | Notes |
+|:---|:---|:---|:---|
+| Tasky Level 1 | Completed | 2025-12-16 | Basic CRUD (List, Add, Toggle) with Tailwind |
