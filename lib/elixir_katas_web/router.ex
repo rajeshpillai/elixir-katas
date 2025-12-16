@@ -23,6 +23,7 @@ defmodule ElixirKatasWeb.Router do
       live "/katas/01", Kata01HelloWorldLive
       live "/katas/02", Kata02CounterLive
       live "/katas/03", Kata03MirrorLive
+      live "/katas/04", Kata04TogglerLive
     end
   end
 
