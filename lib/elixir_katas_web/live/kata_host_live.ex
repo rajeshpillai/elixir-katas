@@ -35,7 +35,11 @@ defmodule ElixirKatasWeb.KataHostLive do
     # 2. Compile Initial
     # Always recompile if it's the user's custom version to ensure the module is fresh in memory.
     # If it's the default file, we still compile it for the "Hot Seat" (to get a unique module name for this user/session).
-    {:ok, module} = DynamicCompiler.compile(user_id, "Kata#{kata_id}", source_code)
+    {dynamic_module, flash} = 
+      case DynamicCompiler.compile(user_id, "Kata#{kata_id}", source_code) do
+         {:ok, module} -> {module, nil}
+         {:error, err} -> {nil, {:error, "Initial compilation failed: #{inspect(err)}. Please fix the source code."}}
+      end
 
     # 3. Load Notes
     notes_path = "notes/kata_01_hello_world_notes.md" # hardcoded for PoC
@@ -44,7 +48,7 @@ defmodule ElixirKatasWeb.KataHostLive do
 
     {:ok, 
      socket
-     |> assign(:dynamic_module, module)
+     |> assign(:dynamic_module, dynamic_module)
      |> assign(:source_code, source_code)
      |> assign(:user_id, user_id)
      |> assign(:kata_id, kata_id) # Need this for saving
@@ -53,6 +57,14 @@ defmodule ElixirKatasWeb.KataHostLive do
      |> assign(:read_only, false) # PoC is always editable
      |> assign(:is_user_author, is_user_author)
      |> assign(:compiling, false)
+     |> then(fn s -> 
+        if flash do
+          {type, msg} = flash
+          put_flash(s, type, msg)
+        else
+          s
+        end
+     end)
     }
   end
 
