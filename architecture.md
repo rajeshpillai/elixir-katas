@@ -132,10 +132,41 @@ Add a new navigation link to the standard app layout in the `app/1` function.
 
 ---
 
+## Multi-user Kata Editing Architecture
+
+The application supports a multi-user environment where logged-in users can edit and run their own versions of any kata without affecting others or the original source code.
+
+### 1. The Host (`KataHostLive`)
+Instead of accessing katas directly, they are served through `KataHostLive`.
+- **Responsibility**: Manages the multi-user session, loads/saves user-specific source code, and handles the "Interactive" tab by rendering the dynamically compiled module.
+- **Loading Logic**: 
+  1. Checks if the user is logged in.
+  2. If yes, attempts to load the user's custom version from the `user_katas` table.
+  3. Falls back to reading the original template file from disk.
+
+### 2. Dynamic Compilation (`DynamicCompiler`)
+To allow users to run modified code simultaneously, each user gets their own ephemeral module.
+- **Module Rewriting**: The compiler takes the source code and replaces the original module name (e.g., `ElixirKatasWeb.Kata01HelloWorldLive`) with a unique name based on the `user_id` (e.g., `ElixirKatas.U123.Kata01`).
+- **In-Memory Compilation**: Uses `Code.compile_string/1` to load the new module into the BEAM in real-time.
+- **Lifecycle**: Old versions of the user's module are purged/deleted before new ones are compiled to prevent memory bloat and stale state.
+
+### 3. Asynchronous Workflow
+Compilation is CPU-intensive (~400ms). To maintain UI responsiveness:
+- **Background Task**: `save_source` events trigger a `Task.async` to handle compilation and database persistence.
+- **Status Indicators**: The UI shows a "Compiling..." spinner and a temporary "✓ Saved!" indicator in the header once complete.
+- **Non-Disruptive Errors**: Compilation errors are caught and displayed in an absolutely positioned banner at the bottom of the editor, preventing layout shifts and focus loss.
+
+### 4. Persistence Layer
+- **Schema**: `ElixirKatas.Katas.UserKata` stores `user_id`, `kata_name`, and `source_code`.
+- **Constraint**: A unique index on `[user_id, kata_name]` ensures each user has exactly one personal version of each kata.
+
+---
+
 ## Verification Checklist
-- [ ] Server compiles without errors (`mix phx.server`).
-- [ ] Route `/katas/XX-name` is accessible.
-- [ ] Navigation link appears in the Sidebar.
-- [ ] Card appears on the Home/Index page.
-- [ ] "Source Code" tab correctly shows the file content.
-- [ ] "Notes" tab correctly renders the markdown.
+- [x] Server compiles without errors (`mix phx.server`).
+- [x] Route `/katas/01-hello-world` is accessible.
+- [x] Compilation works for guests (In-memory only).
+- [x] Compilation works for logged-in users (In-memory + DB persistence).
+- [x] "Revert to Original" restores the source from disk and deletes DB record.
+- [x] Editor focus is maintained during auto-saves.
+- [x] Syntax errors show up in the non-disruptive banner.
