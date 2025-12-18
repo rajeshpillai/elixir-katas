@@ -2,6 +2,8 @@ import { EditorView, basicSetup } from "codemirror"
 import { EditorState } from "@codemirror/state"
 import { elixir } from "codemirror-lang-elixir"
 import { oneDark } from "@codemirror/theme-one-dark"
+import { keymap } from "@codemirror/view"
+import { indentWithTab } from "@codemirror/commands"
 
 export default {
     mounted() {
@@ -26,6 +28,7 @@ export default {
                 doc: initialContent,
                 extensions: [
                     basicSetup,
+                    keymap.of([indentWithTab]),
                     elixir(),
                     oneDark,
                     EditorState.readOnly.of(isReadOnly),
@@ -36,7 +39,7 @@ export default {
                                 this.pushEventTo(this.el, "save_source", {
                                     source: update.state.doc.toString()
                                 })
-                            }, 2000)
+                            }, 1000)
                         }
                     })
                 ]

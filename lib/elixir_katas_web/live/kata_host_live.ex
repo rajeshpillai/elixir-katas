@@ -52,18 +52,27 @@ defmodule ElixirKatasWeb.KataHostLive do
      |> assign(:notes_content, notes_content)
      |> assign(:read_only, false) # PoC is always editable
      |> assign(:is_user_author, is_user_author)
+     |> assign(:compiling, false)
     }
   end
 
   def render(assigns) do
     ~H"""
-    <div class="h-screen w-full">
+    <div class="h-screen w-full relative">
+      <%= if @compiling do %>
+        <div class="absolute top-4 right-4 z-50">
+           <span class="loading loading-spinner text-primary"></span>
+           <span class="ml-2 text-sm text-gray-500">Compiling...</span>
+        </div>
+      <% end %>
+
       <.kata_viewer 
         active_tab={@active_tab}
         title="Kata 01: Hello World"
         source_code={@source_code}
         notes_content={@notes_content}
         read_only={@read_only}
+        is_user_author={@is_user_author}
       >
         <div class="h-full w-full">
              <.live_component module={@dynamic_module} id="kata-sandbox" />
@@ -82,25 +91,57 @@ defmodule ElixirKatasWeb.KataHostLive do
      kata_id = socket.assigns.kata_id
      kata_name = "Kata#{kata_id}"
 
-     # 1. Recompile User Code
-     case DynamicCompiler.compile(user_id, kata_name, source) do
-        {:ok, new_module} -> 
-            
-            # 2. Persist to DB if logged in
-            if user_id != 0 do
-               ElixirKatas.Katas.save_user_kata(user_id, kata_name, source)
-            end
+     # Start Async Task
+     task = Task.async(fn -> 
+        # 1. Compile
+        compile_result = DynamicCompiler.compile(user_id, kata_name, source)
+        
+        # 2. Persist if success equivalent (compile doesn't prevent saving generally, but good to check)
+        # Actually, we should probably save even if it fails compiling? 
+        # For now, let's follows previous logic: save if logged in (effectively)
+        
+        if user_id != 0 do
+           ElixirKatas.Katas.save_user_kata(user_id, kata_name, source)
+        end
+        
+        compile_result
+     end)
 
-            {:noreply, 
-             socket
-             |> assign(:source_code, source)
-             |> assign(:dynamic_module, new_module)
-             |> assign(:is_user_author, true)
-             |> put_flash(:info, "Saved & Compiled successfully!")
-            }
-        {:error, err} ->
-            {:noreply, put_flash(socket, :error, "Compilation failed: #{inspect(err)}")}
-     end
+     {:noreply, 
+      socket
+      |> assign(:compiling, true)
+     }
+  end
+
+  def handle_info({ref, result}, socket) do
+    Process.demonitor(ref, [:flush])
+    
+    case result do
+      {:ok, new_module} ->
+        {:noreply, 
+         socket
+         |> assign(:compiling, false)
+         |> assign(:dynamic_module, new_module)
+         |> assign(:is_user_author, true)
+         |> put_flash(:info, "Saved & Compiled!")
+        }
+      
+      {:error, err} ->
+         {:noreply, 
+          socket
+          |> assign(:compiling, false)
+          |> put_flash(:error, "Compilation failed: #{inspect(err)}")
+         }
+    end
+  end
+
+  # Handle task crashing
+  def handle_info({:DOWN, _ref, :process, _pid, reason}, socket) do
+     {:noreply, 
+      socket
+      |> assign(:compiling, false)
+      |> put_flash(:error, "Compiler crashed: #{inspect(reason)}")
+     }
   end
   
   def handle_event("revert", _, socket) do

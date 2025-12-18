@@ -8,12 +8,20 @@ defmodule ElixirKatasWeb.KataComponents do
   slot :inner_block, required: true
   
   attr :read_only, :boolean, default: false
+  attr :is_user_author, :boolean, default: false
   
   def kata_viewer(assigns) do
     ~H"""
     <div class="flex flex-col h-full">
       <div class="flex items-center justify-between border-b border-zinc-200 dark:border-zinc-700 px-4 py-2">
-        <h2 class="text-xl font-bold">{@title}</h2>
+        <div class="flex items-center gap-4">
+          <h2 class="text-xl font-bold">{@title}</h2>
+          <%= if @read_only == false and @active_tab == "source" and @is_user_author do %>
+             <button phx-click="revert" data-confirm="Are you sure? This will discard your changes and restore the original code." class="btn btn-xs btn-outline btn-error">
+               Revert to Original
+             </button>
+          <% end %>
+        </div>
         
         <div class="flex gap-2 items-center">
           <.tab_button active={@active_tab == "notes"} phx-click="set_tab" phx-value-tab="notes">
@@ -30,12 +38,6 @@ defmodule ElixirKatasWeb.KataComponents do
              <span class="ml-2 px-2 py-1 text-xs font-semibold bg-gray-200 text-gray-700 rounded-full dark:bg-gray-700 dark:text-gray-300">
                Read Only
              </span>
-          <% else %>
-             <%= if @active_tab == "source" do %>
-                <button phx-click="revert" data-confirm="Are you sure? This will discard your changes and restore the original code." class="ml-2 btn btn-xs btn-outline btn-error">
-                  Revert to Original
-                </button>
-             <% end %>
           <% end %>
         </div>
       </div>
