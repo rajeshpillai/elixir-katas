@@ -1,0 +1,37 @@
+import { EditorView, basicSetup } from "codemirror"
+import { EditorState } from "@codemirror/state"
+import { elixir } from "codemirror-lang-elixir"
+import { oneDark } from "@codemirror/theme-one-dark"
+
+export default {
+    mounted() {
+        this.initEditor()
+    },
+
+    updated() {
+        // Optional: Handle updates from server if needed
+    },
+
+    initEditor() {
+        const initialContent = this.el.dataset.content
+
+        this.editor = new EditorView({
+            state: EditorState.create({
+                doc: initialContent,
+                extensions: [
+                    basicSetup,
+                    elixir(),
+                    oneDark,
+                    EditorView.updateListener.of((update) => {
+                        if (update.docChanged) {
+                            this.pushEventTo(this.el, "save_source", {
+                                source: update.state.doc.toString()
+                            })
+                        }
+                    })
+                ]
+            }),
+            parent: this.el
+        })
+    }
+}

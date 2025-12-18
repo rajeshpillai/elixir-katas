@@ -32,8 +32,14 @@ defmodule ElixirKatasWeb.KataComponents do
             {render_slot(@inner_block)}
           
           <% "source" -> %>
-            <div class="mockup-code w-full">
-              <pre><code>{@source_code}</code></pre>
+            <div class="mockup-code w-full p-0 overflow-hidden">
+              <div 
+                id={"editor-#{@title |> slugify()}"}
+                phx-hook="CodeEditor" 
+                data-content={@source_code} 
+                phx-update="ignore"
+                class="w-full text-sm"
+              ></div>
             </div>
 
           <% "notes" -> %>
@@ -80,5 +86,11 @@ defmodule ElixirKatasWeb.KataComponents do
       </p>
     </.link>
     """
+  end
+  defp slugify(str) do
+    str
+    |> String.downcase()
+    |> String.replace(~r/[^a-z0-9\s-]/, "")
+    |> String.replace(~r/\s+/, "-")
   end
 end

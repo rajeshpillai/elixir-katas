@@ -1,17 +1,8 @@
 defmodule ElixirKatasWeb.Kata01HelloWorldLive do
-  use ElixirKatasWeb, :live_view
-  import ElixirKatasWeb.KataComponents
+  use ElixirKatasWeb.KataLive
 
-  def mount(_params, _session, socket) do
-    source_code = File.read!(__ENV__.file)
-    notes_content = File.read!("notes/kata_01_hello_world_notes.md")
-    
-    {:ok, 
-     socket
-     |> assign(clicked: false)
-     |> assign(active_tab: "notes")
-     |> assign(source_code: source_code)
-     |> assign(notes_content: notes_content)}
+  defp assign_defaults(socket) do
+    assign(socket, clicked: false)
   end
 
   def render(assigns) do
@@ -44,9 +35,5 @@ defmodule ElixirKatasWeb.Kata01HelloWorldLive do
 
   def handle_event("toggle", _params, socket) do
     {:noreply, update(socket, :clicked, &(!&1))}
-  end
-
-  def handle_event("set_tab", %{"tab" => tab}, socket) do
-    {:noreply, assign(socket, active_tab: tab)}
   end
 end
