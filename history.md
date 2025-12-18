@@ -220,3 +220,31 @@ This file tracks your progress through the Phoenix LiveView Katas.
 
 **Next Steps**:
 - Purple Belt: Real-time collaboration (Presence, Assignments)
+
+### 2025-12-18 - Multi-User Katas & Refactoring
+
+**Objective**: Enable multi-user live editing, ensure stability, and refine Kata UI.
+
+**Changes Made**:
+
+1.  **Multi-User "Hot Seat" Editing**
+    - Implemented a "Hot Seat" model where user-specific source code is written to the live file on the server.
+    - Added `UserKata` schema and context to persist user edits.
+    - Updated `KataLive` to switch between Read-Only (Guest) and Editable (User) modes.
+
+2.  **Stability & Bug Fixes**
+    - **Registration Fix**: Added missing password field to `UserLive.Registration` to enable standard auth flow.
+    - **Infinite Reload Fix**: Patched `KataLive` to only write to disk if content *differs*, preventing infinite LiveReload loops.
+    - **Race Condition Fix**: Updated `CodeEditor` hook (`code_editor.js`) to clear timers on destroy, preventing "ghost saves" from reverting file state.
+
+3.  **Kata 01 Refactoring**
+    - Simplified `kata_01_hello_world_live.ex` by removing the static console mockup `div` to declutter the UI.
+    - (Note: "Click me" button logic preserved/toggled during experimental refactoring).
+
+**Files Modified**:
+- `lib/elixir_katas_web/live/kata_live.ex`
+- `lib/elixir_katas/katas/user_kata.ex`
+- `assets/js/hooks/code_editor.js`
+- `lib/elixir_katas_web/live/user_live/registration.ex`
+- `lib/elixir_katas_web/live/kata_01_hello_world_live.ex`
+
