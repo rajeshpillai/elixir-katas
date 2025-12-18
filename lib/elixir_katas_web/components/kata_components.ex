@@ -9,6 +9,9 @@ defmodule ElixirKatasWeb.KataComponents do
   
   attr :read_only, :boolean, default: false
   attr :is_user_author, :boolean, default: false
+  attr :compile_error, :string, default: nil
+  attr :compiling, :boolean, default: false
+  attr :saved_at, :integer, default: nil
   
   def kata_viewer(assigns) do
     ~H"""
@@ -16,6 +19,18 @@ defmodule ElixirKatasWeb.KataComponents do
       <div class="flex items-center justify-between border-b border-zinc-200 dark:border-zinc-700 px-4 py-2">
         <div class="flex items-center gap-4">
           <h2 class="text-xl font-bold">{@title}</h2>
+          <%= if @compiling do %>
+             <div class="flex items-center gap-2">
+                <span class="loading loading-spinner loading-xs text-primary"></span>
+                <span class="text-xs text-zinc-500">Compiling...</span>
+             </div>
+          <% else %>
+             <%= if @saved_at && !@compile_error do %>
+                <span class="text-xs text-green-600 font-medium animate-out fade-out duration-1000 delay-[2000ms]">
+                  ✓ Saved!
+                </span>
+             <% end %>
+          <% end %>
           <%= if @read_only == false and @active_tab == "source" and @is_user_author do %>
              <button phx-click="revert" data-confirm="Are you sure? This will discard your changes and restore the original code." class="btn btn-xs btn-outline btn-error">
                Revert to Original
@@ -57,6 +72,14 @@ defmodule ElixirKatasWeb.KataComponents do
                 phx-update="ignore"
                 class="w-full text-sm"
               ></div>
+              <%= if @compile_error do %>
+                 <div class="absolute bottom-0 left-0 right-0 p-4 bg-red-900/90 text-red-100 text-xs font-mono z-50 animate-in fade-in slide-in-from-bottom-2 duration-300 pointer-events-none">
+                    <div class="flex items-start gap-2">
+                       <span class="font-bold flex-shrink-0">ERROR:</span>
+                       <span class="whitespace-pre-wrap">{@compile_error}</span>
+                    </div>
+                 </div>
+               <% end %>
             </div>
 
           <% "notes" -> %>

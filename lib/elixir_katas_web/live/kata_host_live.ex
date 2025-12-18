@@ -57,10 +57,18 @@ defmodule ElixirKatasWeb.KataHostLive do
      |> assign(:read_only, false) # PoC is always editable
      |> assign(:is_user_author, is_user_author)
      |> assign(:compiling, false)
+     |> assign(:compile_error, nil)
+     |> assign(:saved_at, nil) # Track last save time for status indication
      |> then(fn s -> 
         if flash do
           {type, msg} = flash
-          put_flash(s, type, msg)
+          # Only use flash for initial load errors if preferred, 
+          # but we'll use compile_error for consistency if it's a compile error.
+          if type == :error and String.contains?(String.downcase(msg), "compilation failed") do
+             assign(s, :compile_error, msg)
+          else
+             put_flash(s, type, msg)
+          end
         else
           s
         end
@@ -70,27 +78,28 @@ defmodule ElixirKatasWeb.KataHostLive do
 
   def render(assigns) do
     ~H"""
-    <div class="h-screen w-full relative">
-      <%= if @compiling do %>
-        <div class="absolute top-4 right-4 z-50">
-           <span class="loading loading-spinner text-primary"></span>
-           <span class="ml-2 text-sm text-gray-500">Compiling...</span>
-        </div>
-      <% end %>
-
-      <.kata_viewer 
-        active_tab={@active_tab}
-        title="Kata 01: Hello World"
-        source_code={@source_code}
-        notes_content={@notes_content}
-        read_only={@read_only}
-        is_user_author={@is_user_author}
-      >
-        <div class="h-full w-full">
-             <.live_component module={@dynamic_module} id="kata-sandbox" />
-        </div>
-      </.kata_viewer>
-    </div>
+    <.kata_viewer 
+      active_tab={@active_tab}
+      title="Kata 01: Hello World"
+      source_code={@source_code}
+      notes_content={@notes_content}
+      read_only={@read_only}
+      is_user_author={@is_user_author}
+      compile_error={@compile_error}
+      compiling={@compiling}
+      saved_at={@saved_at}
+    >
+      <div class="h-full w-full">
+         <%= if @dynamic_module do %>
+            <.live_component module={@dynamic_module} id="kata-sandbox" />
+         <% else %>
+            <div class="flex flex-col items-center justify-center h-full text-zinc-500 gap-4">
+              <.icon name="hero-exclamation-triangle" class="w-12 h-12 opacity-20" />
+              <p>Waiting for successful compilation...</p>
+            </div>
+         <% end %>
+      </div>
+    </.kata_viewer>
     """
   end
 
@@ -133,16 +142,17 @@ defmodule ElixirKatasWeb.KataHostLive do
         {:noreply, 
          socket
          |> assign(:compiling, false)
+         |> assign(:compile_error, nil) # Success - clear error
+         |> assign(:saved_at, System.system_time(:second)) # Updated save timestamp
          |> assign(:dynamic_module, new_module)
          |> assign(:is_user_author, true)
-         |> put_flash(:info, "Saved & Compiled!")
         }
       
       {:error, err} ->
          {:noreply, 
           socket
           |> assign(:compiling, false)
-          |> put_flash(:error, "Compilation failed: #{inspect(err)}")
+          |> assign(:compile_error, "Compilation failed: #{inspect(err)}")
          }
     end
   end
