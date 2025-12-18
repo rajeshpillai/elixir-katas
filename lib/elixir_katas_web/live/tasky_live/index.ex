@@ -17,6 +17,7 @@ defmodule ElixirKatasWeb.TaskyLive.Index do
      |> assign(:form, to_form(Tasky.change_todo(%Todo{})))
      |> assign(:show_confirm_modal, false)
      |> assign(:confirm_delete_id, nil)
+     |> assign(:confirm_delete_type, nil)
      |> assign(:categories, categories)
      |> assign(:selected_todo, nil)
      |> allow_upload(:attachment, accept: ~w(.jpg .jpeg .png .pdf .txt), max_entries: 1)
@@ -112,10 +113,11 @@ defmodule ElixirKatasWeb.TaskyLive.Index do
     {:noreply, stream_insert(socket, :todos, updated_todo)}
   end
 
-  def handle_event("confirm_delete", %{"id" => id}, socket) do
+  def handle_event("confirm_delete", %{"id" => id, "type" => type}, socket) do
     {:noreply,
      socket
      |> assign(:confirm_delete_id, id)
+     |> assign(:confirm_delete_type, type)
      |> assign(:show_confirm_modal, true)}
   end
 
@@ -123,6 +125,7 @@ defmodule ElixirKatasWeb.TaskyLive.Index do
     {:noreply,
      socket
      |> assign(:confirm_delete_id, nil)
+     |> assign(:confirm_delete_type, nil)
      |> assign(:show_confirm_modal, false)}
   end
 
@@ -136,7 +139,8 @@ defmodule ElixirKatasWeb.TaskyLive.Index do
     {:noreply,
      socket
      |> assign(:total_pages, total_pages)
-     |> assign(:show_confirm_modal, false)}
+     |> assign(:show_confirm_modal, false)
+     |> assign(:confirm_delete_type, nil)}
   end
 
   # Blue Belt Handlers
@@ -234,7 +238,12 @@ defmodule ElixirKatasWeb.TaskyLive.Index do
     {:ok, _} = Tasky.delete_attachment(attachment)
     
     updated_todo = Tasky.get_todo!(socket.assigns.selected_todo.id)
-    {:noreply, assign(socket, selected_todo: updated_todo)}
+    updated_todo = Tasky.get_todo!(socket.assigns.selected_todo.id)
+    {:noreply, 
+     socket 
+     |> assign(:selected_todo, updated_todo)
+     |> assign(:show_confirm_modal, false)
+     |> assign(:confirm_delete_type, nil)}
   end
 
   def handle_info({:todo_created, todo}, socket) do
@@ -467,7 +476,7 @@ defmodule ElixirKatasWeb.TaskyLive.Index do
                        <.icon name="hero-star" class="h-5 w-5 text-gray-300 group-hover/fav:text-yellow-400" />
                      <% end %>
                   </button>
-                  <button phx-click="confirm_delete" phx-value-id={todo.id} class="text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <button phx-click="confirm_delete" phx-value-id={todo.id} phx-value-type="todo" class="text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity">
                     <.icon name="hero-trash" class="h-5 w-5" />
                   </button>
                 </div>
@@ -510,36 +519,7 @@ defmodule ElixirKatasWeb.TaskyLive.Index do
         </div>
       </div>
 
-      <%= if @show_confirm_modal do %>
-      <.modal 
-        id="confirm_modal" 
-        show={@show_confirm_modal} 
-        on_cancel={Phoenix.LiveView.JS.push("cancel_delete")}
-      >
-        <div class="p-4 sm:p-6 text-center">
-            <div class="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 mb-4">
-              <.icon name="hero-exclamation-triangle" class="h-6 w-6 text-red-600" />
-            </div>
-            <h3 class="text-base font-semibold leading-6 text-gray-900 mb-2">Delete Task</h3>
-            <p class="text-sm text-gray-500 mb-6">Are you sure you want to delete this task? This action cannot be undone.</p>
-            
-            <div class="flex justify-end gap-3">
-              <button 
-                phx-click="cancel_delete"
-                class="rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
-              >
-                Cancel
-              </button>
-              <button 
-                phx-click="delete_todo"
-                class="rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500"
-              >
-                Delete
-              </button>
-            </div>
-        </div>
-      </.modal>
-      <% end %>
+
 
       <%= if @selected_todo do %>
       <.modal id="todo_detail_modal" show={true} on_cancel={Phoenix.LiveView.JS.push("close_todo")}>
@@ -630,8 +610,8 @@ defmodule ElixirKatasWeb.TaskyLive.Index do
                            </a>
                            <p class="text-xs text-gray-500"><%= humanize_size(attachment.size) %></p>
                         </div>
-                        <button phx-click="delete_attachment" phx-value-id={attachment.id} class="ml-2 text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100">
-                          <.icon name="hero-x-mark" class="h-4 w-4" />
+                        <button phx-click="confirm_delete" phx-value-id={attachment.id} phx-value-type="attachment" class="ml-2 text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <.icon name="hero-trash" class="h-4 w-4" />
                         </button>
                     </div>
                     
@@ -712,6 +692,45 @@ defmodule ElixirKatasWeb.TaskyLive.Index do
       </.modal>
       <% end %>
     </div>
+      <%= if @show_confirm_modal do %>
+      <.modal 
+        id="confirm_modal" 
+        show={@show_confirm_modal} 
+        on_cancel={Phoenix.LiveView.JS.push("cancel_delete")}
+      >
+        <div class="p-4 sm:p-6 text-center">
+            <div class="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 mb-4">
+              <.icon name="hero-exclamation-triangle" class="h-6 w-6 text-red-600" />
+            </div>
+            <h3 class="text-base font-semibold leading-6 text-gray-900 mb-2">
+              <%= if @confirm_delete_type == "todo", do: "Delete Task", else: "Delete Attachment" %>
+            </h3>
+            <p class="text-sm text-gray-500 mb-6">
+              <%= if @confirm_delete_type == "todo" do %>
+                Are you sure you want to delete this task? This action cannot be undone.
+              <% else %>
+                Are you sure you want to delete this attachment? This action cannot be undone.
+              <% end %>
+            </p>
+            
+            <div class="flex justify-end gap-3">
+              <button 
+                phx-click="cancel_delete"
+                class="rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button 
+                phx-click={if @confirm_delete_type == "todo", do: "delete_todo", else: "delete_attachment"}
+                phx-value-id={@confirm_delete_id}
+                class="rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500"
+              >
+                Delete
+              </button>
+            </div>
+        </div>
+      </.modal>
+      <% end %>
     """
   end
 end
