@@ -33,7 +33,7 @@ defmodule ElixirKatasWeb.Kata02CounterLive do
   end
 
   def handle_event("inc", _params, socket) do
-    {:noreply, update(socket, :count, &(&1 + 1))}
+    {:noreply, update(socket, :count, &(&1 + 2))}
   end
 
   def handle_event("dec", _params, socket) do

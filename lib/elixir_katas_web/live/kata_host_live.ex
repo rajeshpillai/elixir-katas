@@ -213,7 +213,13 @@ defmodule ElixirKatasWeb.KataHostLive do
        ElixirKatas.Katas.delete_user_kata(user_id, kata_name)
        
        # 2. Reload generic version
-       base_file = "lib/elixir_katas_web/live/kata_#{kata_id}_hello_world_live.ex" 
+       source_pattern = "lib/elixir_katas_web/live/kata_#{kata_id}_*_live.ex"
+       base_file = 
+         case Path.wildcard(source_pattern) do
+           [file | _] -> file
+           [] -> nil
+         end
+       
        source_code = File.read!(base_file)
        
        # 3. Recompile generic version
