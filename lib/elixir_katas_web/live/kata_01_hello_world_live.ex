@@ -17,12 +17,6 @@ defmodule ElixirKatasWeb.Kata01HelloWorldLive do
         <h1>Kata 01: Hello World</h1>
         <p>Welcome to your first Elixir LiveView Kata!</p>
         
-        <div class="mockup-code">
-          <pre data-prefix="$"><code>iex</code></pre> 
-          <pre data-prefix=">"><code>IO.puts("Hello World")</code></pre> 
-          <pre data-prefix="" class="text-success"><code>Hello World</code></pre>
-        </div>
-
         <div class="mt-8 flex gap-4">
           <button phx-click="toggle" class="btn btn-primary">
             {if @clicked, do: "You clicked me!!!", else: "Click me!"}

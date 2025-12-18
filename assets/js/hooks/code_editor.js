@@ -13,6 +13,10 @@ export default {
         // Optional: Handle updates from server if needed
     },
 
+    destroyed() {
+        clearTimeout(this.timer)
+    },
+
     initEditor() {
         const initialContent = this.el.dataset.content
         const isReadOnly = this.el.dataset.readOnly === "true"
