@@ -28,8 +28,8 @@ defmodule ElixirKatasWeb.Router do
     
     live_session :default, layout: {ElixirKatasWeb.Layouts, :app} do
       live "/katas", KatasIndexLive
-      live "/katas/01-hello-world", KataHostLive, :index
-      live "/katas/02-counter", Kata02CounterLive
+      live "/katas/01-hello-world", KataHostLive, :kata_01
+      live "/katas/02-counter", KataHostLive, :kata_02
       live "/katas/03-mirror", Kata03MirrorLive
       live "/katas/04-toggler", Kata04TogglerLive
       live "/katas/05-color-picker", Kata05ColorPickerLive

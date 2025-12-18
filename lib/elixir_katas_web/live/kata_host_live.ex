@@ -4,7 +4,18 @@ defmodule ElixirKatasWeb.KataHostLive do
   import ElixirKatasWeb.KataComponents
 
   def mount(params, session, socket) do
-    kata_id = Map.get(params, "kata_id", "01")
+    kata_id = 
+      case socket.assigns.live_action do
+        action when is_atom(action) ->
+          action_str = Atom.to_string(action)
+          if String.starts_with?(action_str, "kata_") do
+             String.replace(action_str, "kata_", "")
+          else
+             Map.get(params, "kata_id", "01")
+          end
+        _ -> 
+          Map.get(params, "kata_id", "01")
+      end
     
     user_token = session["user_token"]
     user = 
@@ -17,70 +28,95 @@ defmodule ElixirKatasWeb.KataHostLive do
     
     user_id = if user, do: user.id, else: 0
     
-    # 1. Load Source
-    base_file = "lib/elixir_katas_web/live/kata_#{kata_id}_hello_world_live.ex" 
-    file_source = File.read!(base_file)
-
-    # Check DB for User Version
-    {source_code, is_user_author} =
-      if user_id != 0 do
-         case ElixirKatas.Katas.get_user_kata(user_id, "Kata#{kata_id}") do
-            nil -> {file_source, false}
-            user_kata -> {user_kata.source_code, true}
-         end
-      else
-         {file_source, false}
-      end
-    
-    # 2. Compile Initial
-    # Always recompile if it's the user's custom version to ensure the module is fresh in memory.
-    # If it's the default file, we still compile it for the "Hot Seat" (to get a unique module name for this user/session).
-    {dynamic_module, flash} = 
-      case DynamicCompiler.compile(user_id, "Kata#{kata_id}", source_code) do
-         {:ok, module} -> {module, nil}
-         {:error, err} -> {nil, {:error, "Initial compilation failed: #{inspect(err)}. Please fix the source code."}}
+    # 1. Resolve Files Dynamically
+    # Find source file e.g. lib/elixir_katas_web/live/kata_02_counter_live.ex
+    source_pattern = "lib/elixir_katas_web/live/kata_#{kata_id}_*_live.ex"
+    base_file = 
+      case Path.wildcard(source_pattern) do
+        [file | _] -> file
+        [] -> nil
       end
 
-    # 3. Load Notes
-    notes_path = "notes/kata_01_hello_world_notes.md" # hardcoded for PoC
-    notes_content = 
-        if File.exists?(notes_path), do: File.read!(notes_path), else: "Notes not found."
+    if base_file == nil do
+      {:ok, socket |> put_flash(:error, "Kata #{kata_id} not found.") |> push_navigate(to: ~p"/katas")}
+    else
+      file_source = File.read!(base_file)
 
-    {:ok, 
-     socket
-     |> assign(:dynamic_module, dynamic_module)
-     |> assign(:source_code, source_code)
-     |> assign(:user_id, user_id)
-     |> assign(:kata_id, kata_id) # Need this for saving
-     |> assign(:active_tab, "interactive")
-     |> assign(:notes_content, notes_content)
-     |> assign(:read_only, false) # PoC is always editable
-     |> assign(:is_user_author, is_user_author)
-     |> assign(:compiling, false)
-     |> assign(:compile_error, nil)
-     |> assign(:saved_at, nil) # Track last save time for status indication
-     |> then(fn s -> 
-        if flash do
-          {type, msg} = flash
-          # Only use flash for initial load errors if preferred, 
-          # but we'll use compile_error for consistency if it's a compile error.
-          if type == :error and String.contains?(String.downcase(msg), "compilation failed") do
-             assign(s, :compile_error, msg)
-          else
-             put_flash(s, type, msg)
-          end
+      # Derive Title from Filename (e.g. kata_02_counter_live.ex -> "Kata 02: Counter")
+      title = 
+        base_file 
+        |> Path.basename(".ex") 
+        |> String.replace("kata_", "Kata ") 
+        |> String.replace("_live", "")
+        |> String.split("_")
+        |> Enum.map_join(" ", &String.capitalize/1)
+        |> String.replace(~r/^Kata (\d+)/, "Kata \\1:")
+
+      # 2. Load Source (DB or File)
+      kata_name = "Kata#{kata_id}"
+      {source_code, is_user_author} =
+        if user_id != 0 do
+           case ElixirKatas.Katas.get_user_kata(user_id, kata_name) do
+              nil -> {file_source, false}
+              user_kata -> {user_kata.source_code, true}
+           end
         else
-          s
+           {file_source, false}
         end
-     end)
-    }
+      
+      # 3. Compile Initial
+      {dynamic_module, flash} = 
+        case DynamicCompiler.compile(user_id, kata_name, source_code) do
+           {:ok, module} -> {module, nil}
+           {:error, err} -> {nil, {:error, "Initial compilation failed: #{inspect(err)}. Please fix the source code."}}
+        end
+
+      # 4. Load Notes
+      notes_pattern = "notes/kata_#{kata_id}_*_notes.md"
+      notes_path = 
+        case Path.wildcard(notes_pattern) do
+          [file | _] -> file
+          [] -> nil
+        end
+      
+      notes_content = 
+          if notes_path && File.exists?(notes_path), do: File.read!(notes_path), else: "Notes not found."
+
+      {:ok, 
+       socket
+       |> assign(:dynamic_module, dynamic_module)
+       |> assign(:source_code, source_code)
+       |> assign(:user_id, user_id)
+       |> assign(:kata_id, kata_id)
+       |> assign(:title, title)
+       |> assign(:active_tab, "interactive")
+       |> assign(:notes_content, notes_content)
+       |> assign(:read_only, false)
+       |> assign(:is_user_author, is_user_author)
+       |> assign(:compiling, false)
+       |> assign(:compile_error, nil)
+       |> assign(:saved_at, nil)
+       |> then(fn s -> 
+          if flash do
+            {type, msg} = flash
+            if type == :error and String.contains?(String.downcase(msg), "compilation failed") do
+               assign(s, :compile_error, msg)
+            else
+               put_flash(s, type, msg)
+            end
+          else
+            s
+          end
+       end)
+      }
+    end
   end
 
   def render(assigns) do
     ~H"""
     <.kata_viewer 
       active_tab={@active_tab}
-      title="Kata 01: Hello World"
+      title={@title}
       source_code={@source_code}
       notes_content={@notes_content}
       read_only={@read_only}
@@ -131,6 +167,7 @@ defmodule ElixirKatasWeb.KataHostLive do
      {:noreply, 
       socket
       |> assign(:compiling, true)
+      |> assign(:source_code, source)
      }
   end
 

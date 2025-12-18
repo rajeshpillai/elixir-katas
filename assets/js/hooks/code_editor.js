@@ -16,7 +16,12 @@ export default {
     },
 
     destroyed() {
-        clearTimeout(this.timer)
+        if (this.timer) {
+            clearTimeout(this.timer)
+            this.pushEventTo(this.el, "save_source", {
+                source: this.source
+            })
+        }
     },
 
     initEditor() {
@@ -34,11 +39,13 @@ export default {
                     EditorState.readOnly.of(isReadOnly),
                     EditorView.updateListener.of((update) => {
                         if (update.docChanged && !isReadOnly) {
+                            this.source = update.state.doc.toString()
                             clearTimeout(this.timer)
                             this.timer = setTimeout(() => {
                                 this.pushEventTo(this.el, "save_source", {
-                                    source: update.state.doc.toString()
+                                    source: this.source
                                 })
+                                this.timer = null
                             }, 1000)
                         }
                     })

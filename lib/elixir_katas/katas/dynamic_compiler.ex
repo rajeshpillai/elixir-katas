@@ -9,16 +9,10 @@ defmodule ElixirKatas.Katas.DynamicCompiler do
     module_name = Module.concat(["ElixirKatas", "User#{user_id}", Macro.camelize(kata_name)])
     
     # 2. Rewrite the source code to use this module name
-    # This is a bit simplistic (regex replace), but works for PoC if we stick to conventions.
-    # Assuming code starts with "defmodule ElixirKatasWeb.Kata..."
-    
-    # We need to find the original module name in the string and replace it.
-    # Or strict convention: User provides body, we wrap it?
-    # For now, let's try replacing the module definition line.
-    
+    # We use a more robust regex that handles multiline and varying whitespaces
     new_source = 
       Regex.replace(
-        ~r/defmodule\s+([a-zA-Z0-9._]+)\s+do/, 
+        ~r/defmodule\s+[\w\.]+\s+do/s, 
         source_code, 
         "defmodule #{module_name} do", 
         global: false
@@ -26,16 +20,20 @@ defmodule ElixirKatas.Katas.DynamicCompiler do
 
     # 3. Compile
     try do
-      # Purge old version if exists to avoid "redefining module" warnings/errors in long run
-      :code.purge(module_name)
-      :code.delete(module_name)
+      # Purge old version if exists to avoid "redefining module" warnings/errors
+      if Code.ensure_loaded?(module_name) do
+        :code.purge(module_name)
+        :code.delete(module_name)
+      end
       
-      [{module, _bytecode}] = Code.compile_string(new_source)
-      {:ok, module}
+      Code.compile_string(new_source)
+      {:ok, module_name}
     rescue
-      e -> {:error, e}
+      e -> 
+        {:error, Exception.message(e)}
     catch
-      k, e -> {:error, {k, e}}
+      kind, error -> 
+        {:error, "Compile-time error (#{kind}): #{inspect(error)}"}
     end
   end
 end
