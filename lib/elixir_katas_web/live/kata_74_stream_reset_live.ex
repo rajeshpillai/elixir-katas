@@ -1,16 +1,14 @@
 defmodule ElixirKatasWeb.Kata74StreamResetLive do
-  use ElixirKatasWeb, :live_view
+  use ElixirKatasWeb, :live_component
   import ElixirKatasWeb.KataComponents
 
-  def mount(_params, _session, socket) do
-    source_code = File.read!(__ENV__.file)
-    notes_content = File.read!("notes/kata_74_stream_reset_notes.md")
-
+  def update(assigns, socket) do
+    socket = assign(socket, assigns)
     socket =
       socket
       |> assign(active_tab: "notes")
-      |> assign(source_code: source_code)
-      |> assign(notes_content: notes_content)
+      
+      
       |> assign(:filter, "all")
       |> load_items("all")
 
@@ -19,12 +17,7 @@ defmodule ElixirKatasWeb.Kata74StreamResetLive do
 
   def render(assigns) do
     ~H"""
-    <.kata_viewer 
-      active_tab={@active_tab} 
-      title="Kata 74: Stream Reset" 
-      source_code={@source_code} 
-      notes_content={@notes_content}
-    >
+    
       <div class="p-6 max-w-4xl mx-auto">
         <div class="mb-6 text-sm text-gray-500">
           Reset streams to clear and repopulate with filtered data.
@@ -32,15 +25,15 @@ defmodule ElixirKatasWeb.Kata74StreamResetLive do
 
         <div class="bg-white p-6 rounded-lg shadow-sm border">
           <div class="flex gap-2 mb-4">
-            <button phx-click="filter" phx-value-type="all" 
+            <button phx-click="filter" phx-target={@myself} phx-value-type="all" 
                     class={"px-4 py-2 rounded " <> if @filter == "all", do: "bg-indigo-600 text-white", else: "bg-gray-200"}>
               All
             </button>
-            <button phx-click="filter" phx-value-type="active" 
+            <button phx-click="filter" phx-target={@myself} phx-value-type="active" 
                     class={"px-4 py-2 rounded " <> if @filter == "active", do: "bg-green-600 text-white", else: "bg-gray-200"}>
               Active
             </button>
-            <button phx-click="filter" phx-value-type="completed" 
+            <button phx-click="filter" phx-target={@myself} phx-value-type="completed" 
                     class={"px-4 py-2 rounded " <> if @filter == "completed", do: "bg-blue-600 text-white", else: "bg-gray-200"}>
               Completed
             </button>
@@ -59,7 +52,7 @@ defmodule ElixirKatasWeb.Kata74StreamResetLive do
           </div>
         </div>
       </div>
-    </.kata_viewer>
+    
     """
   end
 

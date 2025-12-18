@@ -1,16 +1,14 @@
 defmodule ElixirKatasWeb.Kata48RedirectsLive do
-  use ElixirKatasWeb, :live_view
+  use ElixirKatasWeb, :live_component
   import ElixirKatasWeb.KataComponents
 
-  def mount(_params, _session, socket) do
-    source_code = File.read!(__ENV__.file)
-    notes_content = File.read!("notes/kata_48_redirects_notes.md")
-
+  def update(assigns, socket) do
+    socket = assign(socket, assigns)
     socket =
       socket
       |> assign(active_tab: "notes")
-      |> assign(source_code: source_code)
-      |> assign(notes_content: notes_content)
+      
+      
       |> assign(:page, 1)
       |> assign(:patch_count, 0)
       |> assign(:navigate_count, 0)
@@ -28,12 +26,7 @@ defmodule ElixirKatasWeb.Kata48RedirectsLive do
 
   def render(assigns) do
     ~H"""
-    <.kata_viewer 
-      active_tab={@active_tab} 
-      title="Kata 48: Live Redirects" 
-      source_code={@source_code} 
-      notes_content={@notes_content}
-    >
+    
       <div class="p-6 max-w-2xl mx-auto">
         <div class="mb-6 text-sm text-gray-500">
            Compare <code>push_patch</code> (stays in same LiveView) vs <code>push_navigate</code> (remounts).
@@ -55,14 +48,14 @@ defmodule ElixirKatasWeb.Kata48RedirectsLive do
               
               <div class="flex gap-2">
                 <button
-                  phx-click="patch_prev"
+                  phx-click="patch_prev" phx-target={@myself}
                   disabled={@page == 1}
                   class="flex-1 px-3 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-sm"
                 >
                   ← Prev
                 </button>
                 <button
-                  phx-click="patch_next"
+                  phx-click="patch_next" phx-target={@myself}
                   class="flex-1 px-3 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 text-sm"
                 >
                   Next →
@@ -90,14 +83,14 @@ defmodule ElixirKatasWeb.Kata48RedirectsLive do
               </div>
               
               <button
-                phx-click="navigate_home"
+                phx-click="navigate_home" phx-target={@myself}
                 class="w-full px-3 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 text-sm"
               >
                 Navigate to Home
               </button>
               
               <button
-                phx-click="navigate_kata1"
+                phx-click="navigate_kata1" phx-target={@myself}
                 class="w-full px-3 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 text-sm"
               >
                 Navigate to Kata 1
@@ -118,7 +111,7 @@ defmodule ElixirKatasWeb.Kata48RedirectsLive do
           </ul>
         </div>
       </div>
-    </.kata_viewer>
+    
     """
   end
 

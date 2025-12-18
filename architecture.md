@@ -7,126 +7,87 @@ This document outlines the architecture of the Phoenix LiveView Katas applicatio
 The application is built with **Phoenix LiveView** 1.0+.
 
 ### Core Structure
-- **Katas as LiveViews**: Each kata is a distinct LiveView module located in `lib/elixir_katas_web/live/`.
+- **Katas as LiveComponents**: Each kata is a **LiveComponent** module located in `lib/elixir_katas_web/live/`.
   - Naming Convention: `kata_XX_name_live.ex` (e.g., `kata_09_tabs_live.ex`).
   - Namespace: `ElixirKatasWeb.KataXXNameLive`.
+  - **Dynamic Hosting**: Katas are no longer standalone LiveViews. They are hosted by `KataHostLive` via a single dynamic route: `/katas/:slug`.
 - **Shared Layout**:
   - `layouts.ex` defines the main application shell, including the sidebar navigation.
   - `root.html.heex` provides the base HTML structure.
 - **Components**:
-  - `KataComponents.kata_viewer/1`: The standard wrapper for all katas. It handles the tabbed interface (Interactive, Source, Notes) and layout consistency.
+  - `KataComponents.kata_viewer/1`: A standard UI wrapper used within the host to provide the tabbed interface (Interactive, Source Code, Notes).
 - **Notes**: Markdown files in `notes/` provide the educational content for each kata.
 
 ---
 
 ## How to Add a New Kata
 
-Adding a new kata involves touching 5 distinct files. Follow this checklist:
+Adding a new kata is largely automated, provided you follow the naming conventions. `KataHostLive` uses file pattern matching to resolve modules and notes without requiring manual registration in the host's source code.
 
-For each kata add the "Interactive", "Source Code" and "Notes" tabs.
-
-### 1. Create the LiveView Module
+### 1. Create the LiveComponent Module
 **Path:** `lib/elixir_katas_web/live/kata_XX_name_live.ex`
 
-Create a new file with the following structure. Replace `XX` and `Name` appropriately.
+Create a new file with the following structure. 
+- **Naming**: Must catch `kata_XX_*_live.ex` (where `XX` is two digits).
+- **Structure**: Use `use ElixirKatasWeb, :live_component` and the `update/2` callback.
 
 ```elixir
 defmodule ElixirKatasWeb.KataXXNameLive do
-  use ElixirKatasWeb, :live_view
-  import ElixirKatasWeb.KataComponents
+  use ElixirKatasWeb, :live_component
 
-  def mount(_params, _session, socket) do
-    # Load source code and notes for the viewer
-    source_code = File.read!(__ENV__.file)
-    notes_content = File.read!("notes/kata_XX_name_notes.md")
-
+  def update(assigns, socket) do
+    # socket = assign(socket, assigns) is often needed to merge incoming assigns
     {:ok, 
      socket
-     |> assign(active_tab: "interactive") # Required for KataViewer
-     |> assign(source_code: source_code)
-     |> assign(notes_content: notes_content)
+     |> assign(assigns)
      # ... Initialize your kata-specific state here ...
      }
   end
 
   def render(assigns) do
     ~H"""
-    <.kata_viewer 
-      active_tab={@active_tab} 
-      title="Kata XX: [Name]" 
-      source_code={@source_code} 
-      notes_content={@notes_content}
-    >
-      <!-- YOUR KATA UI GOES HERE -->
-      <div class="p-4">
-        ...
-      </div>
-    </.kata_viewer>
+    <div class="p-6">
+      <h2 class="text-2xl font-bold mb-4">Kata XX: [Name]</h2>
+      
+      <!-- IMPORTANT: Use phx-target={@myself} for all interactive events -->
+      <button phx-click="increment" phx-target={@myself} class="...">
+        Click Me
+      </button>
+    </div>
     """
   end
 
-  # Required for KataViewer tab switching
-  def handle_event("set_tab", %{"tab" => tab}, socket) do
-    # Handle viewer tabs
-    if tab in ["interactive", "source", "notes"] do
-       {:noreply, assign(socket, active_tab: tab)}
-    else
-       # Handle your internal kata tabs/events if any
-       {:noreply, socket} 
-    end
+  def handle_event("increment", _params, socket) do
+    {:noreply, socket}
   end
-
-  # ... Your specific event handlers ...
 end
 ```
 
 ### 2. Create the Notes File
 **Path:** `notes/kata_XX_name_notes.md`
 
-Create a markdown file explaining the concept.
+- **Naming**: Must match `notes/kata_XX_*_notes.md`.
+- **Content**: Use standard Markdown. `KataHostLive` will render this in the "Notes" tab.
 
-```markdown
-# Kata XX: [Name]
+### 3. Automatic Registration
+You do **not** need to modify `KataHostLive` or `router.ex`. The host will automatically:
+- Locate the `.ex` file based on the ID.
+- Extract the title from the filename.
+- Locate the notes file.
+- Compile and render the component in the "Interactive" tab.
 
-## The Goal
-...
+### 4. Link the New Kata
+To make the kata discoverable, add links in two places:
 
-## Key Concepts
-- ...
-- ...
+**Index Page (`lib/elixir_katas_web/live/katas_index_live.ex`):**
+Add a card with the `navigate` attribute using the slug `XX-name`.
 
-## The Solution
-...
-```
-
-### 3. Add the Route
-**Path:** `lib/elixir_katas_web/router.ex`
-
-Add a new line to the `live_session :default` block:
+**Sidebar (`lib/elixir_katas_web/components/layouts.ex`):**
+Add a link in the `app/1` function using the same slug format.
 
 ```elixir
-live "/katas/XX-name", KataXXNameLive
-```
-
-### 4. Update the Index Page
-**Path:** `lib/elixir_katas_web/live/katas_index_live.ex`
-
-Add a new `<.link>` card to the grid in `render/1`. Follow the existing pattern.
-
-```elixir
-<.link navigate="/katas/XX-name" class="card ...">
-  ...
-</.link>
-```
-
-### 5. Update the Sidebar
-**Path:** `lib/elixir_katas_web/components/layouts.ex`
-
-Add a new navigation link to the standard app layout in the `app/1` function.
-
-```elixir
-<.link navigate="/katas/XX-name" class="...">
-  ...
+<.link navigate={~p"/katas/XX-name"} class="...">
+  XX - Name
 </.link>
 ```
 
@@ -137,8 +98,8 @@ Add a new navigation link to the standard app layout in the `app/1` function.
 The application supports a multi-user environment where logged-in users can edit and run their own versions of any kata without affecting others or the original source code.
 
 ### 1. The Host (`KataHostLive`)
-Instead of accessing katas directly, they are served through `KataHostLive`.
-- **Responsibility**: Manages the multi-user session, loads/saves user-specific source code, and handles the "Interactive" tab by rendering the dynamically compiled module.
+Katas are served through a single dynamic route: `live "/katas/:slug", KataHostLive, :index`.
+- **Responsibility**: Extracts `kata_id` from the slug, manages the session, loads/saves user-specific source code, and renders the kata as a dynamic `LiveComponent`.
 - **Loading Logic**: 
   1. Checks if the user is logged in.
   2. If yes, attempts to load the user's custom version from the `user_katas` table.
@@ -146,27 +107,28 @@ Instead of accessing katas directly, they are served through `KataHostLive`.
 
 ### 2. Dynamic Compilation (`DynamicCompiler`)
 To allow users to run modified code simultaneously, each user gets their own ephemeral module.
-- **Module Rewriting**: The compiler takes the source code and replaces the original module name (e.g., `ElixirKatasWeb.Kata01HelloWorldLive`) with a unique name based on the `user_id` (e.g., `ElixirKatas.U123.Kata01`).
+- **Module Rewriting**: The compiler takes the source code and replaces the original module name (e.g., `ElixirKatasWeb.Kata01HelloWorldLive`) with a unique name based on the `user_id` (e.g., `ElixirKatas.User2.Kata01`).
 - **In-Memory Compilation**: Uses `Code.compile_string/1` to load the new module into the BEAM in real-time.
-- **Lifecycle**: Old versions of the user's module are purged/deleted before new ones are compiled to prevent memory bloat and stale state.
+- **Cleanup**: Old versions of the user's module are purged/deleted before new ones are compiled to prevent memory bloat.
 
 ### 3. Asynchronous Workflow
-Compilation is CPU-intensive (~400ms). To maintain UI responsiveness:
-- **Background Task**: `save_source` events trigger a `Task.async` to handle compilation and database persistence.
-- **Status Indicators**: The UI shows a "Compiling..." spinner and a temporary "✓ Saved!" indicator in the header once complete.
-- **Non-Disruptive Errors**: Compilation errors are caught and displayed in an absolutely positioned banner at the bottom of the editor, preventing layout shifts and focus loss.
+Compilation and database persistence are handled asynchronously:
+- **Background Task**: `save_source` events trigger a `Task.async`.
+- **UX Feedback**: The UI shows "Compiling..." and "✓ Saved!" indicators in the header.
+- **Focus Preservation**: Compilation is designed to be non-disruptive, maintaining editor focus and layout stability.
 
-### 4. Persistence Layer
-- **Schema**: `ElixirKatas.Katas.UserKata` stores `user_id`, `kata_name`, and `source_code`.
-- **Constraint**: A unique index on `[user_id, kata_name]` ensures each user has exactly one personal version of each kata.
+### 4. Strip Logic (Migration Cleanup)
+When loading source code for editing, the system automatically strips:
+- `File.read!` calls (unsupported in dynamic context).
+- Assignments for `source_code` and `notes_content` (handled by the Host).
+- `<.kata_viewer>` wrappers (the Host provides this).
 
 ---
 
 ## Verification Checklist
-- [x] Server compiles without errors (`mix phx.server`).
-- [x] Route `/katas/01-hello-world` is accessible.
-- [x] Compilation works for guests (In-memory only).
-- [x] Compilation works for logged-in users (In-memory + DB persistence).
-- [x] "Revert to Original" restores the source from disk and deletes DB record.
-- [x] Editor focus is maintained during auto-saves.
-- [x] Syntax errors show up in the non-disruptive banner.
+- [x] Server compiles without errors (`mix compile`).
+- [x] All katas accessible via `/katas/:slug`.
+- [x] Interactive logic works (tested with Counter, Mirror, etc.).
+- [x] Source Code view correctly shows the component code.
+- [x] User-specific edits persist and compile in-memory.
+- [x] "Revert to Original" works correctly.

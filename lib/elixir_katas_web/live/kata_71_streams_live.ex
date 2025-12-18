@@ -1,19 +1,17 @@
 defmodule ElixirKatasWeb.Kata71StreamsLive do
-  use ElixirKatasWeb, :live_view
+  use ElixirKatasWeb, :live_component
   import ElixirKatasWeb.KataComponents
 
-  def mount(_params, _session, socket) do
-    source_code = File.read!(__ENV__.file)
-    notes_content = File.read!("notes/kata_71_streams_notes.md")
-
+  def update(assigns, socket) do
+    socket = assign(socket, assigns)
     # Generate initial items
     items = for i <- 1..20, do: %{id: i, name: "Item #{i}", created_at: DateTime.utc_now()}
 
     socket =
       socket
       |> assign(active_tab: "notes")
-      |> assign(source_code: source_code)
-      |> assign(notes_content: notes_content)
+      
+      
       |> assign(:next_id, 21)
       |> stream(:items, items)
 
@@ -22,12 +20,7 @@ defmodule ElixirKatasWeb.Kata71StreamsLive do
 
   def render(assigns) do
     ~H"""
-    <.kata_viewer 
-      active_tab={@active_tab} 
-      title="Kata 71: Streams Basic" 
-      source_code={@source_code} 
-      notes_content={@notes_content}
-    >
+    
       <div class="p-6 max-w-4xl mx-auto">
         <div class="mb-6 text-sm text-gray-500">
           Streams efficiently handle large lists by only sending diffs to the client.
@@ -36,13 +29,13 @@ defmodule ElixirKatasWeb.Kata71StreamsLive do
         <div class="bg-white p-6 rounded-lg shadow-sm border">
           <div class="flex gap-2 mb-4">
             <button 
-              phx-click="add_item" 
+              phx-click="add_item" phx-target={@myself} 
               class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
             >
               Add Item
             </button>
             <button 
-              phx-click="add_bulk" 
+              phx-click="add_bulk" phx-target={@myself} 
               class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
             >
               Add 10 Items
@@ -65,7 +58,7 @@ defmodule ElixirKatasWeb.Kata71StreamsLive do
                   <span class="text-xs text-gray-500 ml-2">ID: <%= item.id %></span>
                 </div>
                 <button 
-                  phx-click="delete_item" 
+                  phx-click="delete_item" phx-target={@myself} 
                   phx-value-id={item.id}
                   class="px-3 py-1 bg-red-500 text-white rounded text-sm hover:bg-red-600"
                 >
@@ -76,7 +69,7 @@ defmodule ElixirKatasWeb.Kata71StreamsLive do
           </div>
         </div>
       </div>
-    </.kata_viewer>
+    
     """
   end
 

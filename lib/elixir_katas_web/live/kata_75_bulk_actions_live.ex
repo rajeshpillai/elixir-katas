@@ -1,18 +1,16 @@
 defmodule ElixirKatasWeb.Kata75BulkActionsLive do
-  use ElixirKatasWeb, :live_view
+  use ElixirKatasWeb, :live_component
   import ElixirKatasWeb.KataComponents
 
-  def mount(_params, _session, socket) do
-    source_code = File.read!(__ENV__.file)
-    notes_content = File.read!("notes/kata_75_bulk_actions_notes.md")
-
+  def update(assigns, socket) do
+    socket = assign(socket, assigns)
     items = for i <- 1..10, do: %{id: i, name: "Item #{i}", selected: false}
 
     socket =
       socket
       |> assign(active_tab: "notes")
-      |> assign(source_code: source_code)
-      |> assign(notes_content: notes_content)
+      
+      
       |> assign(:selected_ids, MapSet.new())
       |> stream(:items, items)
 
@@ -21,12 +19,7 @@ defmodule ElixirKatasWeb.Kata75BulkActionsLive do
 
   def render(assigns) do
     ~H"""
-    <.kata_viewer 
-      active_tab={@active_tab} 
-      title="Kata 75: Bulk Actions" 
-      source_code={@source_code} 
-      notes_content={@notes_content}
-    >
+    
       <div class="p-6 max-w-4xl mx-auto">
         <div class="mb-6 text-sm text-gray-500">
           Select multiple items and perform bulk operations.
@@ -34,13 +27,13 @@ defmodule ElixirKatasWeb.Kata75BulkActionsLive do
 
         <div class="bg-white p-6 rounded-lg shadow-sm border">
           <div class="flex gap-2 mb-4">
-            <button phx-click="select_all" class="px-4 py-2 bg-indigo-600 text-white rounded">
+            <button phx-click="select_all" phx-target={@myself} class="px-4 py-2 bg-indigo-600 text-white rounded">
               Select All
             </button>
-            <button phx-click="deselect_all" class="px-4 py-2 bg-gray-600 text-white rounded">
+            <button phx-click="deselect_all" phx-target={@myself} class="px-4 py-2 bg-gray-600 text-white rounded">
               Deselect All
             </button>
-            <button phx-click="delete_selected" disabled={MapSet.size(@selected_ids) == 0}
+            <button phx-click="delete_selected" phx-target={@myself} disabled={MapSet.size(@selected_ids) == 0}
                     class="px-4 py-2 bg-red-600 text-white rounded disabled:opacity-50">
               Delete Selected (<%= MapSet.size(@selected_ids) %>)
             </button>
@@ -52,7 +45,7 @@ defmodule ElixirKatasWeb.Kata75BulkActionsLive do
                                       if MapSet.member?(@selected_ids, item.id), do: "bg-indigo-50 border-2 border-indigo-500", else: "bg-gray-50"}>
                 <input type="checkbox" 
                        checked={MapSet.member?(@selected_ids, item.id)}
-                       phx-click="toggle_select" 
+                       phx-click="toggle_select" phx-target={@myself} 
                        phx-value-id={item.id}
                        class="w-4 h-4" />
                 <span class="flex-1"><%= item.name %></span>
@@ -61,7 +54,7 @@ defmodule ElixirKatasWeb.Kata75BulkActionsLive do
           </div>
         </div>
       </div>
-    </.kata_viewer>
+    
     """
   end
 

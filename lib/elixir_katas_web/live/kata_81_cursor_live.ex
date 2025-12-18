@@ -1,13 +1,11 @@
 defmodule ElixirKatasWeb.Kata81LiveCursorLive do
-  use ElixirKatasWeb, :live_view
+  use ElixirKatasWeb, :live_component
   import ElixirKatasWeb.KataComponents
 
   @topic "cursor:demo"
 
-  def mount(_params, _session, socket) do
-    source_code = File.read!(__ENV__.file)
-    notes_content = File.read!("notes/kata_81_cursor_notes.md")
-
+  def update(assigns, socket) do
+    socket = assign(socket, assigns)
     username = "User#{:rand.uniform(9999)}"
     color = generate_color(username)
 
@@ -18,8 +16,8 @@ defmodule ElixirKatasWeb.Kata81LiveCursorLive do
     socket =
       socket
       |> assign(active_tab: "notes")
-      |> assign(source_code: source_code)
-      |> assign(notes_content: notes_content)
+      
+      
       |> assign(:username, username)
       |> assign(:color, color)
       |> assign(:cursors, %{})
@@ -29,12 +27,7 @@ defmodule ElixirKatasWeb.Kata81LiveCursorLive do
 
   def render(assigns) do
     ~H"""
-    <.kata_viewer 
-      active_tab={@active_tab} 
-      title="Kata 81: Live Cursor" 
-      source_code={@source_code} 
-      notes_content={@notes_content}
-    >
+    
       <div class="p-6 max-w-4xl mx-auto">
         <div class="mb-6 text-sm text-gray-500">
           Multi-user cursor tracking with PubSub. Open in multiple tabs and move your mouse!
@@ -96,7 +89,7 @@ defmodule ElixirKatasWeb.Kata81LiveCursorLive do
           </div>
         </div>
       </div>
-    </.kata_viewer>
+    
     """
   end
 

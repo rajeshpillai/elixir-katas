@@ -1,11 +1,9 @@
 defmodule ElixirKatasWeb.Kata42PathParamsLive do
-  use ElixirKatasWeb, :live_view
+  use ElixirKatasWeb, :live_component
   import ElixirKatasWeb.KataComponents
 
-  def mount(_params, _session, socket) do
-    source_code = File.read!(__ENV__.file)
-    notes_content = File.read!("notes/kata_42_path_params_notes.md")
-
+  def update(assigns, socket) do
+    socket = assign(socket, assigns)
     items = [
       %{id: 1, name: "Phoenix Framework", description: "Web framework for Elixir"},
       %{id: 2, name: "LiveView", description: "Real-time server-rendered apps"},
@@ -16,8 +14,8 @@ defmodule ElixirKatasWeb.Kata42PathParamsLive do
     socket =
       socket
       |> assign(active_tab: "notes")
-      |> assign(source_code: source_code)
-      |> assign(notes_content: notes_content)
+      
+      
       |> assign(:items, items)
       |> assign(:selected_item, nil)
 
@@ -35,12 +33,7 @@ defmodule ElixirKatasWeb.Kata42PathParamsLive do
 
   def render(assigns) do
     ~H"""
-    <.kata_viewer 
-      active_tab={@active_tab} 
-      title="Kata 42: Path Params" 
-      source_code={@source_code} 
-      notes_content={@notes_content}
-    >
+    
       <div class="p-6 max-w-2xl mx-auto">
         <div class="mb-6 text-sm text-gray-500">
            Click an item below. Notice the URL changes to <code>/katas/42-path-params/:id</code>
@@ -98,7 +91,7 @@ defmodule ElixirKatasWeb.Kata42PathParamsLive do
           </div>
         </div>
       </div>
-    </.kata_viewer>
+    
     """
   end
 

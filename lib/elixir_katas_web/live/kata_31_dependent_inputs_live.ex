@@ -1,11 +1,9 @@
 defmodule ElixirKatasWeb.Kata31DependentInputsLive do
-  use ElixirKatasWeb, :live_view
+  use ElixirKatasWeb, :live_component
   import ElixirKatasWeb.KataComponents
 
-  def mount(_params, _session, socket) do
-    source_code = File.read!(__ENV__.file)
-    notes_content = File.read!("notes/kata_31_dependent_inputs_notes.md")
-
+  def update(assigns, socket) do
+    socket = assign(socket, assigns)
     # Initial Data
     countries = ["USA", "Germany", "Japan"]
     
@@ -13,8 +11,8 @@ defmodule ElixirKatasWeb.Kata31DependentInputsLive do
     socket =
       socket
       |> assign(active_tab: "notes")
-      |> assign(source_code: source_code)
-      |> assign(notes_content: notes_content)
+      
+      
       |> assign(:countries, countries)
       |> assign(:cities, []) # Empty initially until country selected
       |> assign(:form, to_form(%{"country" => "", "city" => ""}))
@@ -25,12 +23,7 @@ defmodule ElixirKatasWeb.Kata31DependentInputsLive do
 
   def render(assigns) do
     ~H"""
-    <.kata_viewer 
-      active_tab={@active_tab} 
-      title="Kata 31: Dependent Inputs" 
-      source_code={@source_code} 
-      notes_content={@notes_content}
-    >
+    
       <div class="p-6 max-w-lg mx-auto">
         <div class="mb-6 text-sm text-gray-500">
            Select a Country to populate the City dropdown.
@@ -97,7 +90,7 @@ defmodule ElixirKatasWeb.Kata31DependentInputsLive do
           </div>
         </div>
       </div>
-    </.kata_viewer>
+    
     """
   end
 

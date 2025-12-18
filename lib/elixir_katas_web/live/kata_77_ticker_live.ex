@@ -1,13 +1,11 @@
 defmodule ElixirKatasWeb.Kata77TheTickerLive do
-  use ElixirKatasWeb, :live_view
+  use ElixirKatasWeb, :live_component
   import ElixirKatasWeb.KataComponents
 
   @topic "stock:ticker"
 
-  def mount(_params, _session, socket) do
-    source_code = File.read!(__ENV__.file)
-    notes_content = File.read!("notes/kata_77_ticker_notes.md")
-
+  def update(assigns, socket) do
+    socket = assign(socket, assigns)
     if connected?(socket) do
       Phoenix.PubSub.subscribe(ElixirKatas.PubSub, @topic)
       
@@ -20,8 +18,8 @@ defmodule ElixirKatasWeb.Kata77TheTickerLive do
     socket =
       socket
       |> assign(active_tab: "notes")
-      |> assign(source_code: source_code)
-      |> assign(notes_content: notes_content)
+      
+      
       |> assign(:stocks, stocks)
       |> assign(:market_open, true)
 
@@ -30,12 +28,7 @@ defmodule ElixirKatasWeb.Kata77TheTickerLive do
 
   def render(assigns) do
     ~H"""
-    <.kata_viewer 
-      active_tab={@active_tab} 
-      title="Kata 77: The Ticker" 
-      source_code={@source_code} 
-      notes_content={@notes_content}
-    >
+    
       <div class="p-6 max-w-4xl mx-auto">
         <div class="mb-6 text-sm text-gray-500">
           Real-time stock price updates synchronized across all connected clients via PubSub.
@@ -86,7 +79,7 @@ defmodule ElixirKatasWeb.Kata77TheTickerLive do
           </div>
         </div>
       </div>
-    </.kata_viewer>
+    
     """
   end
 

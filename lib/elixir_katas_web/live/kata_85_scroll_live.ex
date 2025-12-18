@@ -1,11 +1,9 @@
 defmodule ElixirKatasWeb.Kata85ScrollToBottomLive do
-  use ElixirKatasWeb, :live_view
+  use ElixirKatasWeb, :live_component
   import ElixirKatasWeb.KataComponents
 
-  def mount(_params, _session, socket) do
-    source_code = File.read!(__ENV__.file)
-    notes_content = File.read!("notes/kata_85_scroll_notes.md")
-
+  def update(assigns, socket) do
+    socket = assign(socket, assigns)
     messages = for i <- 1..5 do
       %{id: i, text: "Message #{i}", time: "12:0#{i}"}
     end
@@ -13,8 +11,8 @@ defmodule ElixirKatasWeb.Kata85ScrollToBottomLive do
     socket =
       socket
       |> assign(active_tab: "notes")
-      |> assign(source_code: source_code)
-      |> assign(notes_content: notes_content)
+      
+      
       |> assign(:messages, messages)
       |> assign(:next_id, 6)
       |> assign(:auto_scroll, true)
@@ -24,12 +22,7 @@ defmodule ElixirKatasWeb.Kata85ScrollToBottomLive do
 
   def render(assigns) do
     ~H"""
-    <.kata_viewer 
-      active_tab={@active_tab} 
-      title="Kata 85: Scroll to Bottom" 
-      source_code={@source_code} 
-      notes_content={@notes_content}
-    >
+    
       <div class="p-6 max-w-2xl mx-auto">
         <div class="mb-6 text-sm text-gray-500">
           Auto-scroll chat interface demonstration.
@@ -42,7 +35,7 @@ defmodule ElixirKatasWeb.Kata85ScrollToBottomLive do
               <input 
                 type="checkbox" 
                 checked={@auto_scroll}
-                phx-click="toggle_auto_scroll"
+                phx-click="toggle_auto_scroll" phx-target={@myself}
                 class="rounded"
               />
               Auto-scroll
@@ -66,13 +59,13 @@ defmodule ElixirKatasWeb.Kata85ScrollToBottomLive do
 
           <div class="mt-4 flex gap-2">
             <button 
-              phx-click="add_message"
+              phx-click="add_message" phx-target={@myself}
               class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
             >
               Add Message
             </button>
             <button 
-              phx-click="scroll_to_bottom"
+              phx-click="scroll_to_bottom" phx-target={@myself}
               class="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700"
             >
               Scroll to Bottom
@@ -80,7 +73,7 @@ defmodule ElixirKatasWeb.Kata85ScrollToBottomLive do
           </div>
         </div>
       </div>
-    </.kata_viewer>
+    
     """
   end
 

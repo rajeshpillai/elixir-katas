@@ -1,28 +1,21 @@
 defmodule ElixirKatasWeb.Kata14KeybindingsLive do
-  use ElixirKatasWeb, :live_view
+  use ElixirKatasWeb, :live_component
   import ElixirKatasWeb.KataComponents
 
-  def mount(_params, _session, socket) do
-    source_code = File.read!(__ENV__.file)
-    notes_content = File.read!("notes/kata_14_keybindings_notes.md")
-
+  def update(assigns, socket) do
+    socket = assign(socket, assigns)
     {:ok, 
      socket
      |> assign(active_tab: "notes")
-     |> assign(source_code: source_code)
-     |> assign(notes_content: notes_content)
+     
+     
      |> assign(count: 0)
      |> assign(last_key: nil)}
   end
 
   def render(assigns) do
     ~H"""
-    <.kata_viewer 
-      active_tab={@active_tab} 
-      title="Kata 14: Keybindings" 
-      source_code={@source_code} 
-      notes_content={@notes_content}
-    >
+    
       <div 
         class="flex flex-col items-center justify-center p-8 gap-8 min-h-[400px]"
         phx-window-keydown="keydown_event"
@@ -46,7 +39,7 @@ defmodule ElixirKatasWeb.Kata14KeybindingsLive do
           <div class="stat-desc">Last Key: <span class="badge badge-outline font-mono">{@last_key || "-"}</span></div>
         </div>
       </div>
-    </.kata_viewer>
+    
     """
   end
 

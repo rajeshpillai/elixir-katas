@@ -1,16 +1,14 @@
 defmodule ElixirKatasWeb.Kata52ButtonLive do
-  use ElixirKatasWeb, :live_view
+  use ElixirKatasWeb, :live_component
   import ElixirKatasWeb.KataComponents
 
-  def mount(_params, _session, socket) do
-    source_code = File.read!(__ENV__.file)
-    notes_content = File.read!("notes/kata_52_button_notes.md")
-
+  def update(assigns, socket) do
+    socket = assign(socket, assigns)
     socket =
       socket
       |> assign(active_tab: "notes")
-      |> assign(source_code: source_code)
-      |> assign(notes_content: notes_content)
+      
+      
       |> assign(:loading, false)
 
     {:ok, socket}
@@ -18,12 +16,7 @@ defmodule ElixirKatasWeb.Kata52ButtonLive do
 
   def render(assigns) do
     ~H"""
-    <.kata_viewer 
-      active_tab={@active_tab} 
-      title="Kata 52: The Button" 
-      source_code={@source_code} 
-      notes_content={@notes_content}
-    >
+    
       <div class="p-6 max-w-4xl mx-auto space-y-8">
         <div class="text-sm text-gray-500 mb-6">
            Reusable button component with variants, sizes, and loading states.
@@ -80,7 +73,7 @@ defmodule ElixirKatasWeb.Kata52ButtonLive do
           </div>
         </div>
       </div>
-    </.kata_viewer>
+    
     """
   end
 

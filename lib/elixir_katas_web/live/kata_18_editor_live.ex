@@ -1,11 +1,9 @@
 defmodule ElixirKatasWeb.Kata18EditorLive do
-  use ElixirKatasWeb, :live_view
+  use ElixirKatasWeb, :live_component
   import ElixirKatasWeb.KataComponents
 
-  def mount(_params, _session, socket) do
-    source_code = File.read!(__ENV__.file)
-    notes_content = File.read!("notes/kata_18_editor_notes.md")
-
+  def update(assigns, socket) do
+    socket = assign(socket, assigns)
     initial_items = [
       %{id: "1", text: "Buy Milk"},
       %{id: "2", text: "Walk the Dog"},
@@ -15,20 +13,15 @@ defmodule ElixirKatasWeb.Kata18EditorLive do
     {:ok, 
      socket
      |> assign(active_tab: "notes")
-     |> assign(source_code: source_code)
-     |> assign(notes_content: notes_content)
+     
+     
      |> assign(items: initial_items)
      |> assign(editing_id: nil)}
   end
 
   def render(assigns) do
     ~H"""
-    <.kata_viewer 
-      active_tab={@active_tab} 
-      title="Kata 18: The Editor" 
-      source_code={@source_code} 
-      notes_content={@notes_content}
-    >
+    
       <div class="flex flex-col items-center p-8 gap-8">
         <div class="w-full max-w-md">
            <h3 class="text-lg font-semibold mb-4 text-center">Click to Edit</h3>
@@ -37,7 +30,7 @@ defmodule ElixirKatasWeb.Kata18EditorLive do
              <%= for item <- @items do %>
                <li class="p-4 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 min-h-[4rem] flex items-center">
                  <%= if @editing_id == item.id do %>
-                   <form phx-submit="save" phx-change="validate" class="w-full flex gap-2">
+                   <form phx-submit="save" phx-target={@myself} phx-change="validate" phx-target={@myself} class="w-full flex gap-2">
                      <input type="hidden" name="id" value={item.id} />
                      <input 
                        type="text" 
@@ -45,13 +38,13 @@ defmodule ElixirKatasWeb.Kata18EditorLive do
                        value={item.text} 
                        class="input input-sm input-bordered flex-1" 
                        autofocus 
-                       phx-blur="cancel"
+                       phx-blur="cancel" phx-target={@myself}
                      />
                      <button type="submit" class="btn btn-sm btn-primary">Save</button>
                    </form>
                  <% else %>
                    <div 
-                     phx-click="edit" 
+                     phx-click="edit" phx-target={@myself} 
                      phx-value-id={item.id} 
                      class="w-full cursor-text hover:bg-gray-50 dark:hover:bg-gray-700 p-2 rounded transition-colors"
                    >
@@ -67,7 +60,7 @@ defmodule ElixirKatasWeb.Kata18EditorLive do
            </div>
         </div>
       </div>
-    </.kata_viewer>
+    
     """
   end
 

@@ -1,16 +1,14 @@
 defmodule ElixirKatasWeb.Kata59SkeletonLive do
-  use ElixirKatasWeb, :live_view
+  use ElixirKatasWeb, :live_component
   import ElixirKatasWeb.KataComponents
 
-  def mount(_params, _session, socket) do
-    source_code = File.read!(__ENV__.file)
-    notes_content = File.read!("notes/kata_59_skeleton_notes.md")
-
+  def update(assigns, socket) do
+    socket = assign(socket, assigns)
     socket =
       socket
       |> assign(active_tab: "notes")
-      |> assign(source_code: source_code)
-      |> assign(notes_content: notes_content)
+      
+      
       |> assign(:loading, true)
 
     {:ok, socket}
@@ -18,12 +16,7 @@ defmodule ElixirKatasWeb.Kata59SkeletonLive do
 
   def render(assigns) do
     ~H"""
-    <.kata_viewer 
-      active_tab={@active_tab} 
-      title="Kata 59: The Skeleton" 
-      source_code={@source_code} 
-      notes_content={@notes_content}
-    >
+    
       <div class="p-6 max-w-2xl mx-auto">
         <div class="mb-6 text-sm text-gray-500">
            Loading state placeholders.
@@ -31,7 +24,7 @@ defmodule ElixirKatasWeb.Kata59SkeletonLive do
 
         <div class="space-y-6">
           <button
-            phx-click="toggle_loading"
+            phx-click="toggle_loading" phx-target={@myself}
             class="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700"
           >
             Toggle Loading
@@ -62,7 +55,7 @@ defmodule ElixirKatasWeb.Kata59SkeletonLive do
           <% end %>
         </div>
       </div>
-    </.kata_viewer>
+    
     """
   end
 

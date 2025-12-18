@@ -1,16 +1,14 @@
 defmodule ElixirKatasWeb.Kata64SendSelfLive do
-  use ElixirKatasWeb, :live_view
+  use ElixirKatasWeb, :live_component
   import ElixirKatasWeb.KataComponents
 
-  def mount(_params, _session, socket) do
-    source_code = File.read!(__ENV__.file)
-    notes_content = File.read!("notes/kata_64_send_self_notes.md")
-
+  def update(assigns, socket) do
+    socket = assign(socket, assigns)
     socket =
       socket
       |> assign(active_tab: "notes")
-      |> assign(source_code: source_code)
-      |> assign(notes_content: notes_content)
+      
+      
       |> assign(:clicks, 0)
 
     {:ok, socket}
@@ -18,12 +16,7 @@ defmodule ElixirKatasWeb.Kata64SendSelfLive do
 
   def render(assigns) do
     ~H"""
-    <.kata_viewer 
-      active_tab={@active_tab} 
-      title="Kata 64: Send Self" 
-      source_code={@source_code} 
-      notes_content={@notes_content}
-    >
+    
       <div class="p-6 max-w-2xl mx-auto">
         <div class="mb-6 text-sm text-gray-500">
            Interactive send self demonstration.
@@ -33,14 +26,14 @@ defmodule ElixirKatasWeb.Kata64SendSelfLive do
 
           <div class="text-center space-y-4">
             <div class="text-3xl font-bold"><%= @clicks %> clicks</div>
-            <button phx-click="self_click" class="px-4 py-2 bg-indigo-600 text-white rounded">
+            <button phx-click="self_click" phx-target={@myself} class="px-4 py-2 bg-indigo-600 text-white rounded">
               Click Me (Self Update)
             </button>
           </div>
     
         </div>
       </div>
-    </.kata_viewer>
+    
     """
   end
 

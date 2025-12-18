@@ -1,27 +1,20 @@
 defmodule ElixirKatasWeb.Kata05ColorPickerLive do
-  use ElixirKatasWeb, :live_view
+  use ElixirKatasWeb, :live_component
   import ElixirKatasWeb.KataComponents
 
-  def mount(_params, _session, socket) do
-    source_code = File.read!(__ENV__.file)
-    notes_content = File.read!("notes/kata_05_color_picker_notes.md")
-
+  def update(assigns, socket) do
+    socket = assign(socket, assigns)
     {:ok,
      socket
      |> assign(active_tab: "notes")
-     |> assign(source_code: source_code)
-     |> assign(notes_content: notes_content)
+     
+     
      |> assign(r: 0, g: 0, b: 0)}
   end
 
   def render(assigns) do
     ~H"""
-    <.kata_viewer 
-      active_tab={@active_tab} 
-      title="Kata 05: The Color Picker" 
-      source_code={@source_code} 
-      notes_content={@notes_content}
-    >
+    
       <div class="flex flex-col gap-8 max-w-lg mx-auto mt-12 items-center">
         
         <!-- Preview Box -->
@@ -37,7 +30,7 @@ defmodule ElixirKatasWeb.Kata05ColorPickerLive do
         </div>
 
         <!-- Controls -->
-        <form phx-change="update_color" class="w-full space-y-6 bg-base-100 p-6 rounded-lg shadow-lg">
+        <form phx-change="update_color" phx-target={@myself} class="w-full space-y-6 bg-base-100 p-6 rounded-lg shadow-lg">
           
           <!-- Red Slider -->
           <div class="form-control">
@@ -90,7 +83,7 @@ defmodule ElixirKatasWeb.Kata05ColorPickerLive do
         </form>
 
       </div>
-    </.kata_viewer>
+    
     """
   end
 

@@ -1,16 +1,14 @@
 defmodule ElixirKatasWeb.Kata36DebounceLive do
-  use ElixirKatasWeb, :live_view
+  use ElixirKatasWeb, :live_component
   import ElixirKatasWeb.KataComponents
 
-  def mount(_params, _session, socket) do
-    source_code = File.read!(__ENV__.file)
-    notes_content = File.read!("notes/kata_36_debounce_notes.md")
-
+  def update(assigns, socket) do
+    socket = assign(socket, assigns)
     socket =
       socket
       |> assign(active_tab: "notes")
-      |> assign(source_code: source_code)
-      |> assign(notes_content: notes_content)
+      
+      
       |> assign(:query, "")
       |> assign(:results, [])
       |> assign(:search_count, 0)
@@ -20,19 +18,14 @@ defmodule ElixirKatasWeb.Kata36DebounceLive do
 
   def render(assigns) do
     ~H"""
-    <.kata_viewer 
-      active_tab={@active_tab} 
-      title="Kata 36: Debounce" 
-      source_code={@source_code} 
-      notes_content={@notes_content}
-    >
+    
       <div class="p-6 max-w-lg mx-auto">
         <div class="mb-6 text-sm text-gray-500">
            Type quickly below. Notice the "Search Count" only increments when you stop typing (Debounce 500ms).
         </div>
 
         <div class="bg-white p-6 rounded-lg shadow-sm border space-y-6">
-          <form phx-change="search" onsubmit="return false;">
+          <form phx-change="search" phx-target={@myself} onsubmit="return false;">
             <label for="search" class="block text-sm font-medium text-gray-700">Search Contacts</label>
             <div class="mt-1 relative rounded-md shadow-sm">
               <input
@@ -79,7 +72,7 @@ defmodule ElixirKatasWeb.Kata36DebounceLive do
           </div>
         </div>
       </div>
-    </.kata_viewer>
+    
     """
   end
 

@@ -162,3 +162,34 @@ This file tracks your progress through the Phoenix LiveView Katas.
 - `refactor: integrate status indicators into kata header`
 - `docs: update architecture and history for multi-user editing`
 
+
+### 2025-12-18 - Bulk Kata Migration & Dynamic Hosting
+
+**Objective**: Convert all 100+ LiveView katas into dynamically hosted `LiveComponent`s to support user-specific editing and execution.
+
+**Changes Made**:
+
+1.  **Dynamic Routing Refinement**
+    - Updated `KataHostLive.mount/3` to robustly extract `kata_id` from URL slugs (e.g., `03-mirror`).
+    - Standardized all kata URLs to use the `/katas/:slug` pattern.
+
+2.  **Automated Migration Script**
+    - Developed and refined `priv/scripts/migrate_katas.exs` to perform bulk transformations.
+    - Converted `use :live_view` to `use :live_component`.
+    - Renamed `mount/3` to `update/2` and injected automatic socket assignments.
+    - Stripped problematic `File.read!` calls and their corresponding `source_code`/`notes_content` assignments that caused runtime compilation errors in the dynamic context.
+    - Automated the injection of `phx-target={@myself}` into all interactive elements (buttons, forms, etc.).
+
+3.  **Stability & Verification**
+    - Verified that 100% of migrated katas compile successfully.
+    - Manually verified representative katas (01, 03, 35, 42) in the browser, confirming that the interactive logic, source code viewer, and tab switching are functional.
+
+**Files Modified**:
+- `lib/elixir_katas_web/live/kata_host_live.ex`
+- `priv/scripts/migrate_katas.exs`
+- `lib/elixir_katas_web/live/kata_*.ex` (bulk migration)
+
+**Commits**:
+- `feat: dynamic kata_id resolution from URL slugs`
+- `tool: refined bulk migration script with aggressive variable stripping`
+- `refactor: migrate all katas to dynamically hosted LiveComponents`

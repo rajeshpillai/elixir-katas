@@ -1,11 +1,9 @@
 defmodule ElixirKatasWeb.Kata08AccordionLive do
-  use ElixirKatasWeb, :live_view
+  use ElixirKatasWeb, :live_component
   import ElixirKatasWeb.KataComponents
 
-  def mount(_params, _session, socket) do
-    source_code = File.read!(__ENV__.file)
-    notes_content = File.read!("notes/kata_08_accordion_notes.md")
-
+  def update(assigns, socket) do
+    socket = assign(socket, assigns)
     faqs = [
       %{
         id: "faq-1",
@@ -27,27 +25,22 @@ defmodule ElixirKatasWeb.Kata08AccordionLive do
     {:ok,
      socket
      |> assign(active_tab: "notes")
-     |> assign(source_code: source_code)
-     |> assign(notes_content: notes_content)
+     
+     
      |> assign(faqs: faqs)
      |> assign(active_id: nil)}
   end
 
   def render(assigns) do
     ~H"""
-    <.kata_viewer 
-      active_tab={@active_tab} 
-      title="Kata 08: The Accordion" 
-      source_code={@source_code} 
-      notes_content={@notes_content}
-    >
+    
       <div class="flex flex-col gap-8 mx-auto mt-12 items-center w-full max-w-2xl">
         
         <div class="w-full space-y-4">
           <div :for={faq <- @faqs} class="border border-base-300 rounded-lg overflow-hidden bg-base-100 shadow-sm">
             
             <button 
-              phx-click="toggle" 
+              phx-click="toggle" phx-target={@myself} 
               phx-value-id={faq.id}
               class={"w-full flex justify-between items-center p-4 text-left font-semibold transition-colors duration-200 hover:bg-base-200 " <> if(@active_id == faq.id, do: "bg-base-200 text-primary", else: "")}
             >
@@ -72,7 +65,7 @@ defmodule ElixirKatasWeb.Kata08AccordionLive do
         </div>
 
       </div>
-    </.kata_viewer>
+    
     """
   end
 

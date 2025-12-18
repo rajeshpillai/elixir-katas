@@ -1,11 +1,9 @@
 defmodule ElixirKatasWeb.Kata46SearchUrlLive do
-  use ElixirKatasWeb, :live_view
+  use ElixirKatasWeb, :live_component
   import ElixirKatasWeb.KataComponents
 
-  def mount(_params, _session, socket) do
-    source_code = File.read!(__ENV__.file)
-    notes_content = File.read!("notes/kata_46_search_url_notes.md")
-
+  def update(assigns, socket) do
+    socket = assign(socket, assigns)
     all_items = [
       "Elixir", "Phoenix", "LiveView", "Ecto", "Plug",
       "Erlang", "OTP", "GenServer", "Supervisor", "ETS",
@@ -15,8 +13,8 @@ defmodule ElixirKatasWeb.Kata46SearchUrlLive do
     socket =
       socket
       |> assign(active_tab: "notes")
-      |> assign(source_code: source_code)
-      |> assign(notes_content: notes_content)
+      
+      
       |> assign(:all_items, all_items)
       |> assign(:results, all_items)
       |> assign(:query, "")
@@ -46,12 +44,7 @@ defmodule ElixirKatasWeb.Kata46SearchUrlLive do
 
   def render(assigns) do
     ~H"""
-    <.kata_viewer 
-      active_tab={@active_tab} 
-      title="Kata 46: Search with URL" 
-      source_code={@source_code} 
-      notes_content={@notes_content}
-    >
+    
       <div class="p-6 max-w-lg mx-auto">
         <div class="mb-6 text-sm text-gray-500">
            Type to search. The URL updates with <code>?q=...</code> so you can share/bookmark results.
@@ -59,7 +52,7 @@ defmodule ElixirKatasWeb.Kata46SearchUrlLive do
 
         <div class="bg-white p-6 rounded-lg shadow-sm border">
           <!-- Search Input -->
-          <form phx-change="search" phx-submit="search">
+          <form phx-change="search" phx-target={@myself} phx-submit="search" phx-target={@myself}>
             <input
               type="text"
               name="q"
@@ -96,7 +89,7 @@ defmodule ElixirKatasWeb.Kata46SearchUrlLive do
           </div>
         </div>
       </div>
-    </.kata_viewer>
+    
     """
   end
 

@@ -1,28 +1,21 @@
 defmodule ElixirKatasWeb.Kata11StopwatchLive do
-  use ElixirKatasWeb, :live_view
+  use ElixirKatasWeb, :live_component
   import ElixirKatasWeb.KataComponents
 
-  def mount(_params, _session, socket) do
-    source_code = File.read!(__ENV__.file)
-    notes_content = File.read!("notes/kata_11_stopwatch_notes.md")
-
+  def update(assigns, socket) do
+    socket = assign(socket, assigns)
     {:ok, 
      socket
      |> assign(active_tab: "notes")
-     |> assign(source_code: source_code)
-     |> assign(notes_content: notes_content)
+     
+     
      |> assign(time: 0)
      |> assign(running: false)}
   end
 
   def render(assigns) do
     ~H"""
-    <.kata_viewer 
-      active_tab={@active_tab} 
-      title="Kata 11: The Stopwatch" 
-      source_code={@source_code} 
-      notes_content={@notes_content}
-    >
+    
       <div class="flex flex-col items-center justify-center p-8 gap-8 min-h-[400px]">
         <div class="flex flex-col items-center gap-8">
           <!-- Digital Display -->
@@ -34,14 +27,14 @@ defmodule ElixirKatasWeb.Kata11StopwatchLive do
           <div class="flex gap-4">
             <%= if @running do %>
               <button 
-                phx-click="stop" 
+                phx-click="stop" phx-target={@myself} 
                 class="btn btn-error btn-lg w-32 shadow-lg hover:scale-105 transition-transform"
               >
                 Stop
               </button>
             <% else %>
               <button 
-                phx-click="start" 
+                phx-click="start" phx-target={@myself} 
                 class="btn btn-primary btn-lg w-32 shadow-lg hover:scale-105 transition-transform"
               >
                 Start
@@ -49,7 +42,7 @@ defmodule ElixirKatasWeb.Kata11StopwatchLive do
             <% end %>
 
             <button 
-              phx-click="reset" 
+              phx-click="reset" phx-target={@myself} 
               class="btn btn-outline btn-lg w-32 hover:scale-105 transition-transform"
               disabled={@running}
             >
@@ -58,7 +51,7 @@ defmodule ElixirKatasWeb.Kata11StopwatchLive do
           </div>
         </div>
       </div>
-    </.kata_viewer>
+    
     """
   end
 

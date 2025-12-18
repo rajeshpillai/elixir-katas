@@ -1,16 +1,14 @@
 defmodule ElixirKatasWeb.Kata44BreadcrumbLive do
-  use ElixirKatasWeb, :live_view
+  use ElixirKatasWeb, :live_component
   import ElixirKatasWeb.KataComponents
 
-  def mount(_params, _session, socket) do
-    source_code = File.read!(__ENV__.file)
-    notes_content = File.read!("notes/kata_44_breadcrumb_notes.md")
-
+  def update(assigns, socket) do
+    socket = assign(socket, assigns)
     socket =
       socket
       |> assign(active_tab: "notes")
-      |> assign(source_code: source_code)
-      |> assign(notes_content: notes_content)
+      
+      
       |> assign(:breadcrumbs, [{"Home", ~p"/katas/44-breadcrumb"}])
       |> assign(:current_content, "Home Page")
 
@@ -52,12 +50,7 @@ defmodule ElixirKatasWeb.Kata44BreadcrumbLive do
 
   def render(assigns) do
     ~H"""
-    <.kata_viewer 
-      active_tab={@active_tab} 
-      title="Kata 44: The Breadcrumb" 
-      source_code={@source_code} 
-      notes_content={@notes_content}
-    >
+    
       <div class="p-6 max-w-2xl mx-auto">
         <div class="mb-6 text-sm text-gray-500">
            Navigate through sections. Watch the breadcrumb trail update.
@@ -127,7 +120,7 @@ defmodule ElixirKatasWeb.Kata44BreadcrumbLive do
           </div>
         </div>
       </div>
-    </.kata_viewer>
+    
     """
   end
 

@@ -1,11 +1,9 @@
 defmodule ElixirKatasWeb.Kata41UrlParamsLive do
-  use ElixirKatasWeb, :live_view
+  use ElixirKatasWeb, :live_component
   import ElixirKatasWeb.KataComponents
 
-  def mount(_params, _session, socket) do
-    source_code = File.read!(__ENV__.file)
-    notes_content = File.read!("notes/kata_41_url_params_notes.md")
-
+  def update(assigns, socket) do
+    socket = assign(socket, assigns)
     all_items = [
       %{id: 1, name: "Elixir", category: "language"},
       %{id: 2, name: "Phoenix", category: "framework"},
@@ -20,8 +18,8 @@ defmodule ElixirKatasWeb.Kata41UrlParamsLive do
     socket =
       socket
       |> assign(active_tab: "notes")
-      |> assign(source_code: source_code)
-      |> assign(notes_content: notes_content)
+      
+      
       |> assign(:all_items, all_items)
       |> assign(:items, all_items)
       |> assign(:current_filter, "all")
@@ -48,12 +46,7 @@ defmodule ElixirKatasWeb.Kata41UrlParamsLive do
 
   def render(assigns) do
     ~H"""
-    <.kata_viewer 
-      active_tab={@active_tab} 
-      title="Kata 41: URL Params" 
-      source_code={@source_code} 
-      notes_content={@notes_content}
-    >
+    
       <div class="p-6 max-w-lg mx-auto">
         <div class="mb-6 text-sm text-gray-500">
            Click filters below. Notice the URL changes with <code>?filter=...</code> and the list updates.
@@ -63,7 +56,7 @@ defmodule ElixirKatasWeb.Kata41UrlParamsLive do
           <!-- Filter Buttons -->
           <div class="flex gap-2 mb-6 flex-wrap">
             <button
-              phx-click="set_filter"
+              phx-click="set_filter" phx-target={@myself}
               phx-value-filter="all"
               class={"px-4 py-2 rounded-md text-sm font-medium transition-colors " <> 
                      if(@current_filter == "all", do: "bg-indigo-600 text-white", else: "bg-gray-100 text-gray-700 hover:bg-gray-200")}
@@ -71,7 +64,7 @@ defmodule ElixirKatasWeb.Kata41UrlParamsLive do
               All (<%= length(@all_items) %>)
             </button>
             <button
-              phx-click="set_filter"
+              phx-click="set_filter" phx-target={@myself}
               phx-value-filter="language"
               class={"px-4 py-2 rounded-md text-sm font-medium transition-colors " <> 
                      if(@current_filter == "language", do: "bg-indigo-600 text-white", else: "bg-gray-100 text-gray-700 hover:bg-gray-200")}
@@ -79,7 +72,7 @@ defmodule ElixirKatasWeb.Kata41UrlParamsLive do
               Languages
             </button>
             <button
-              phx-click="set_filter"
+              phx-click="set_filter" phx-target={@myself}
               phx-value-filter="framework"
               class={"px-4 py-2 rounded-md text-sm font-medium transition-colors " <> 
                      if(@current_filter == "framework", do: "bg-indigo-600 text-white", else: "bg-gray-100 text-gray-700 hover:bg-gray-200")}
@@ -87,7 +80,7 @@ defmodule ElixirKatasWeb.Kata41UrlParamsLive do
               Frameworks
             </button>
             <button
-              phx-click="set_filter"
+              phx-click="set_filter" phx-target={@myself}
               phx-value-filter="database"
               class={"px-4 py-2 rounded-md text-sm font-medium transition-colors " <> 
                      if(@current_filter == "database", do: "bg-indigo-600 text-white", else: "bg-gray-100 text-gray-700 hover:bg-gray-200")}
@@ -117,7 +110,7 @@ defmodule ElixirKatasWeb.Kata41UrlParamsLive do
           </div>
         </div>
       </div>
-    </.kata_viewer>
+    
     """
   end
 

@@ -8,10 +8,20 @@ defmodule ElixirKatasWeb.KataHostLive do
       case socket.assigns.live_action do
         action when is_atom(action) ->
           action_str = Atom.to_string(action)
-          if String.starts_with?(action_str, "kata_") do
-             String.replace(action_str, "kata_", "")
-          else
-             Map.get(params, "kata_id", "01")
+          cond do
+            String.starts_with?(action_str, "kata_") ->
+              String.replace(action_str, "kata_", "")
+
+            action == :index ->
+              slug = Map.get(params, "slug", "01")
+              # Extract XX from "XX-name" or just use slug if it's "XX"
+              case Regex.run(~r/^(\d+)/, slug) do
+                [_, id] -> id
+                _ -> "01"
+              end
+
+            true ->
+              Map.get(params, "kata_id", "01")
           end
         _ -> 
           Map.get(params, "kata_id", "01")

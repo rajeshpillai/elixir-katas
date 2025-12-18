@@ -1,29 +1,22 @@
 defmodule ElixirKatasWeb.Kata03MirrorLive do
-  use ElixirKatasWeb, :live_view
+  use ElixirKatasWeb, :live_component
   import ElixirKatasWeb.KataComponents
 
-  def mount(_params, _session, socket) do
-    source_code = File.read!(__ENV__.file)
-    notes_content = File.read!("notes/kata_03_mirror_notes.md")
-
+  def update(assigns, socket) do
+    socket = assign(socket, assigns)
     {:ok,
      socket
      |> assign(active_tab: "notes")
-     |> assign(source_code: source_code)
-     |> assign(notes_content: notes_content)
+     
+     
      |> assign(text: "")}
   end
 
   def render(assigns) do
     ~H"""
-    <.kata_viewer 
-      active_tab={@active_tab} 
-      title="Kata 03: The Mirror" 
-      source_code={@source_code} 
-      notes_content={@notes_content}
-    >
+    
       <div class="flex flex-col gap-8 max-w-lg mx-auto mt-12">
-        <form phx-change="mirror" class="flex flex-col gap-4">
+        <form phx-change="mirror" phx-target={@myself} class="flex flex-col gap-4">
           <label class="form-control w-full">
             <div class="label">
               <span class="label-text">Type something here:</span>
@@ -52,7 +45,7 @@ defmodule ElixirKatasWeb.Kata03MirrorLive do
           </div>
         </div>
       </div>
-    </.kata_viewer>
+    
     """
   end
 

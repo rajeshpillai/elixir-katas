@@ -1,16 +1,14 @@
 defmodule ElixirKatasWeb.Kata95AsyncAssignsLive do
-  use ElixirKatasWeb, :live_view
+  use ElixirKatasWeb, :live_component
   import ElixirKatasWeb.KataComponents
 
-  def mount(_params, _session, socket) do
-    source_code = File.read!(__ENV__.file)
-    notes_content = File.read!("notes/kata_95_async_notes.md")
-
+  def update(assigns, socket) do
+    socket = assign(socket, assigns)
     socket =
       socket
       |> assign(active_tab: "notes")
-      |> assign(source_code: source_code)
-      |> assign(notes_content: notes_content)
+      
+      
       |> load_async_data()
 
     {:ok, socket}
@@ -18,12 +16,7 @@ defmodule ElixirKatasWeb.Kata95AsyncAssignsLive do
 
   def render(assigns) do
     ~H"""
-    <.kata_viewer 
-      active_tab={@active_tab} 
-      title="Kata 95: Async Assigns" 
-      source_code={@source_code} 
-      notes_content={@notes_content}
-    >
+    
       <div class="p-6 max-w-2xl mx-auto">
         <div class="mb-6 text-sm text-gray-500">
           Loading data asynchronously with loading states and error handling
@@ -33,7 +26,7 @@ defmodule ElixirKatasWeb.Kata95AsyncAssignsLive do
           <div class="flex justify-between items-center mb-6">
             <h3 class="text-lg font-medium">Async Dashboard</h3>
             <button 
-              phx-click="reload" 
+              phx-click="reload" phx-target={@myself} 
               class="px-4 py-2 bg-indigo-600 text-white text-sm rounded hover:bg-indigo-700 transition"
             >
               Reload Data
@@ -70,7 +63,7 @@ defmodule ElixirKatasWeb.Kata95AsyncAssignsLive do
               <:failed :let={_failure}>
                  <div class="bg-red-50 p-4 rounded-lg text-red-600 text-sm flex items-center justify-between">
                    <span>Failed to load user data.</span>
-                   <button phx-click="reload" class="text-red-800 underline">Retry</button>
+                   <button phx-click="reload" phx-target={@myself} class="text-red-800 underline">Retry</button>
                  </div>
               </:failed>
               
@@ -100,7 +93,7 @@ defmodule ElixirKatasWeb.Kata95AsyncAssignsLive do
           </div>
         </div>
       </div>
-    </.kata_viewer>
+    
     """
   end
 

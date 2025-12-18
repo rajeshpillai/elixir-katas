@@ -1,21 +1,19 @@
 defmodule ElixirKatasWeb.Kata78ChatRoomLive do
-  use ElixirKatasWeb, :live_view
+  use ElixirKatasWeb, :live_component
   import ElixirKatasWeb.KataComponents
 
   @topic "chat:lobby"
 
-  def mount(_params, _session, socket) do
-    source_code = File.read!(__ENV__.file)
-    notes_content = File.read!("notes/kata_78_chat_notes.md")
-
+  def update(assigns, socket) do
+    socket = assign(socket, assigns)
     # Generate a random username
     username = "User#{:rand.uniform(9999)}"
 
     socket =
       socket
       |> assign(active_tab: "notes")
-      |> assign(source_code: source_code)
-      |> assign(notes_content: notes_content)
+      
+      
       |> assign(:messages, [])
       |> assign(:message_input, "")
       |> assign(:username, username)
@@ -26,12 +24,7 @@ defmodule ElixirKatasWeb.Kata78ChatRoomLive do
 
   def render(assigns) do
     ~H"""
-    <.kata_viewer 
-      active_tab={@active_tab} 
-      title="Kata 78: Chat Room" 
-      source_code={@source_code} 
-      notes_content={@notes_content}
-    >
+    
       <div class="p-6 max-w-2xl mx-auto">
         <div class="mb-6 text-sm text-gray-500">
           Multi-user chat room with PubSub broadcasting. Open in multiple tabs to test!
@@ -40,7 +33,7 @@ defmodule ElixirKatasWeb.Kata78ChatRoomLive do
         <%= if !@username_set do %>
           <div class="bg-white p-6 rounded-lg shadow-sm border">
             <h3 class="text-lg font-medium mb-4">Enter the Chat Room</h3>
-            <form phx-submit="set_username" class="space-y-4">
+            <form phx-submit="set_username" phx-target={@myself} class="space-y-4">
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">Your Username</label>
                 <input 
@@ -96,12 +89,12 @@ defmodule ElixirKatasWeb.Kata78ChatRoomLive do
             </div>
             
             <div class="border-t p-4">
-              <form phx-submit="send_message" class="flex gap-2">
+              <form phx-submit="send_message" phx-target={@myself} class="flex gap-2">
                 <input 
                   type="text" 
                   name="message" 
                   value={@message_input}
-                  phx-change="update_input"
+                  phx-change="update_input" phx-target={@myself}
                   placeholder="Type a message..."
                   class="flex-1 px-4 py-2 border rounded"
                   autocomplete="off"
@@ -114,7 +107,7 @@ defmodule ElixirKatasWeb.Kata78ChatRoomLive do
           </div>
         <% end %>
       </div>
-    </.kata_viewer>
+    
     """
   end
 

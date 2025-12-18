@@ -1,16 +1,14 @@
 defmodule ElixirKatasWeb.Kata63SendUpdateLive do
-  use ElixirKatasWeb, :live_view
+  use ElixirKatasWeb, :live_component
   import ElixirKatasWeb.KataComponents
 
-  def mount(_params, _session, socket) do
-    source_code = File.read!(__ENV__.file)
-    notes_content = File.read!("notes/kata_63_send_update_notes.md")
-
+  def update(assigns, socket) do
+    socket = assign(socket, assigns)
     socket =
       socket
       |> assign(active_tab: "notes")
-      |> assign(source_code: source_code)
-      |> assign(notes_content: notes_content)
+      
+      
       |> assign(:message, "")
 
     {:ok, socket}
@@ -18,12 +16,7 @@ defmodule ElixirKatasWeb.Kata63SendUpdateLive do
 
   def render(assigns) do
     ~H"""
-    <.kata_viewer 
-      active_tab={@active_tab} 
-      title="Kata 63: Send Update" 
-      source_code={@source_code} 
-      notes_content={@notes_content}
-    >
+    
       <div class="p-6 max-w-2xl mx-auto">
         <div class="mb-6 text-sm text-gray-500">
            Interactive send update demonstration.
@@ -32,7 +25,7 @@ defmodule ElixirKatasWeb.Kata63SendUpdateLive do
         <div class="bg-white p-6 rounded-lg shadow-sm border">
 
           <div class="space-y-4">
-            <input type="text" phx-keyup="update_message" phx-debounce="300" value={@message} 
+            <input type="text" phx-keyup="update_message" phx-target={@myself} phx-debounce="300" value={@message} 
                    class="w-full px-4 py-2 border rounded" placeholder="Type something..."/>
             <div class="p-4 bg-gray-50 rounded">
               <div class="text-sm text-gray-500">Live Update:</div>
@@ -42,7 +35,7 @@ defmodule ElixirKatasWeb.Kata63SendUpdateLive do
     
         </div>
       </div>
-    </.kata_viewer>
+    
     """
   end
 

@@ -1,16 +1,14 @@
 defmodule ElixirKatasWeb.Kata96FileUploadsLive do
-  use ElixirKatasWeb, :live_view
+  use ElixirKatasWeb, :live_component
   import ElixirKatasWeb.KataComponents
 
-  def mount(_params, _session, socket) do
-    source_code = File.read!(__ENV__.file)
-    notes_content = File.read!("notes/kata_96_uploads_notes.md")
-
+  def update(assigns, socket) do
+    socket = assign(socket, assigns)
     socket =
       socket
       |> assign(active_tab: "notes")
-      |> assign(source_code: source_code)
-      |> assign(notes_content: notes_content)
+      
+      
       |> assign(:uploaded_files, [])
       |> allow_upload(:avatar, accept: ~w(.jpg .jpeg .png), max_entries: 2)
 
@@ -19,12 +17,7 @@ defmodule ElixirKatasWeb.Kata96FileUploadsLive do
 
   def render(assigns) do
     ~H"""
-    <.kata_viewer 
-      active_tab={@active_tab} 
-      title="Kata 96: File Uploads" 
-      source_code={@source_code} 
-      notes_content={@notes_content}
-    >
+    
       <div class="p-6 max-w-2xl mx-auto">
         <div class="mb-6 text-sm text-gray-500">
           File upload with progress tracking and validation
@@ -33,7 +26,7 @@ defmodule ElixirKatasWeb.Kata96FileUploadsLive do
         <div class="bg-white p-6 rounded-lg shadow-sm border">
           <h3 class="text-lg font-medium mb-4">Upload Files</h3>
           
-          <form phx-submit="save" phx-change="validate">
+          <form phx-submit="save" phx-target={@myself} phx-change="validate" phx-target={@myself}>
             <div class="mb-4" phx-drop-target={@uploads.avatar.ref}>
               <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-indigo-500 transition-colors">
                 <.live_file_input upload={@uploads.avatar} class="block w-full text-sm text-gray-500
@@ -68,7 +61,7 @@ defmodule ElixirKatasWeb.Kata96FileUploadsLive do
                       <div class="bg-indigo-600 h-1.5 rounded-full transition-all duration-300" style={"width: #{entry.progress}%"}></div>
                     </div>
                   </div>
-                  <button type="button" phx-click="cancel-upload" phx-value-ref={entry.ref} class="text-gray-400 hover:text-red-500">
+                  <button type="button" phx-click="cancel-upload" phx-target={@myself} phx-value-ref={entry.ref} class="text-gray-400 hover:text-red-500">
                     <.icon name="hero-x-mark" class="w-5 h-5" />
                   </button>
                   
@@ -101,7 +94,7 @@ defmodule ElixirKatasWeb.Kata96FileUploadsLive do
           </div>
         </div>
       </div>
-    </.kata_viewer>
+    
     """
   end
 

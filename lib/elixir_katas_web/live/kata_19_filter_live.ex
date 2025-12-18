@@ -1,11 +1,9 @@
 defmodule ElixirKatasWeb.Kata19FilterLive do
-  use ElixirKatasWeb, :live_view
+  use ElixirKatasWeb, :live_component
   import ElixirKatasWeb.KataComponents
 
-  def mount(_params, _session, socket) do
-    source_code = File.read!(__ENV__.file)
-    notes_content = File.read!("notes/kata_19_filter_notes.md")
-
+  def update(assigns, socket) do
+    socket = assign(socket, assigns)
     items = [
       "Phoenix LiveView",
       "Elixir Language",
@@ -24,23 +22,18 @@ defmodule ElixirKatasWeb.Kata19FilterLive do
     {:ok, 
      socket
      |> assign(active_tab: "notes")
-     |> assign(source_code: source_code)
-     |> assign(notes_content: notes_content)
+     
+     
      |> assign(items: items)
      |> assign(query: "")}
   end
 
   def render(assigns) do
     ~H"""
-    <.kata_viewer 
-      active_tab={@active_tab} 
-      title="Kata 19: The Filter" 
-      source_code={@source_code} 
-      notes_content={@notes_content}
-    >
+    
       <div class="flex flex-col items-center p-8 gap-8">
         <div class="w-full max-w-md space-y-4">
-           <form phx-change="filter" phx-submit="filter" onsubmit="return false;">
+           <form phx-change="filter" phx-target={@myself} phx-submit="filter" phx-target={@myself} onsubmit="return false;">
              <input 
                type="text" 
                name="query" 
@@ -68,7 +61,7 @@ defmodule ElixirKatasWeb.Kata19FilterLive do
            </div>
         </div>
       </div>
-    </.kata_viewer>
+    
     """
   end
 

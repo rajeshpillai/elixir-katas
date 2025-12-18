@@ -1,11 +1,9 @@
 defmodule ElixirKatasWeb.Kata20SorterLive do
-  use ElixirKatasWeb, :live_view
+  use ElixirKatasWeb, :live_component
   import ElixirKatasWeb.KataComponents
 
-  def mount(_params, _session, socket) do
-    source_code = File.read!(__ENV__.file)
-    notes_content = File.read!("notes/kata_20_sorter_notes.md")
-
+  def update(assigns, socket) do
+    socket = assign(socket, assigns)
     items = [
       %{id: 1, name: "Alice", age: 28, role: "Admin"},
       %{id: 2, name: "Bob", age: 34, role: "User"},
@@ -17,8 +15,8 @@ defmodule ElixirKatasWeb.Kata20SorterLive do
     {:ok, 
      socket
      |> assign(active_tab: "notes")
-     |> assign(source_code: source_code)
-     |> assign(notes_content: notes_content)
+     
+     
      |> assign(items: items)
      |> assign(sort_by: :id)
      |> assign(sort_order: :asc)}
@@ -26,12 +24,7 @@ defmodule ElixirKatasWeb.Kata20SorterLive do
 
   def render(assigns) do
     ~H"""
-    <.kata_viewer 
-      active_tab={@active_tab} 
-      title="Kata 20: The Sorter" 
-      source_code={@source_code} 
-      notes_content={@notes_content}
-    >
+    
       <div class="flex flex-col items-center p-8 gap-8">
         <div class="overflow-x-auto w-full max-w-lg">
           <table class="table w-full">
@@ -83,7 +76,7 @@ defmodule ElixirKatasWeb.Kata20SorterLive do
           </div>
         </div>
       </div>
-    </.kata_viewer>
+    
     """
   end
 

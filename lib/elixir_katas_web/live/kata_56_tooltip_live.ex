@@ -1,16 +1,14 @@
 defmodule ElixirKatasWeb.Kata56TooltipLive do
-  use ElixirKatasWeb, :live_view
+  use ElixirKatasWeb, :live_component
   import ElixirKatasWeb.KataComponents
 
-  def mount(_params, _session, socket) do
-    source_code = File.read!(__ENV__.file)
-    notes_content = File.read!("notes/kata_56_tooltip_notes.md")
-
+  def update(assigns, socket) do
+    socket = assign(socket, assigns)
     socket =
       socket
       |> assign(active_tab: "notes")
-      |> assign(source_code: source_code)
-      |> assign(notes_content: notes_content)
+      
+      
       |> assign(:show_tooltip, false)
 
     {:ok, socket}
@@ -18,12 +16,7 @@ defmodule ElixirKatasWeb.Kata56TooltipLive do
 
   def render(assigns) do
     ~H"""
-    <.kata_viewer 
-      active_tab={@active_tab} 
-      title="Kata 56: Tooltip" 
-      source_code={@source_code} 
-      notes_content={@notes_content}
-    >
+    
       <div class="p-6 max-w-2xl mx-auto">
         <div class="mb-6 text-sm text-gray-500">
            Interactive tooltip demonstration.
@@ -33,7 +26,7 @@ defmodule ElixirKatasWeb.Kata56TooltipLive do
 
           <div class="space-y-4">
             <div class="relative inline-block">
-              <button class="px-4 py-2 bg-indigo-600 text-white rounded" phx-click="toggle_tooltip">
+              <button class="px-4 py-2 bg-indigo-600 text-white rounded" phx-click="toggle_tooltip" phx-target={@myself}>
                 Hover me
               </button>
               <%= if @show_tooltip do %>
@@ -46,7 +39,7 @@ defmodule ElixirKatasWeb.Kata56TooltipLive do
     
         </div>
       </div>
-    </.kata_viewer>
+    
     """
   end
 

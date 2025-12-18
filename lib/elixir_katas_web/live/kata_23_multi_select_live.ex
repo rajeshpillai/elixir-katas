@@ -1,18 +1,16 @@
 defmodule ElixirKatasWeb.Kata23MultiSelectLive do
-  use ElixirKatasWeb, :live_view
+  use ElixirKatasWeb, :live_component
   import ElixirKatasWeb.KataComponents
 
-  def mount(_params, _session, socket) do
-    source_code = File.read!(__ENV__.file)
-    notes_content = File.read!("notes/kata_23_multi_select_notes.md")
-
+  def update(assigns, socket) do
+    socket = assign(socket, assigns)
     items = ["Apple", "Banana", "Cherry", "Date", "Elderberry", "Fig", "Grape"]
     
     socket =
       socket
       |> assign(active_tab: "notes")
-      |> assign(source_code: source_code)
-      |> assign(notes_content: notes_content)
+      
+      
       |> assign(:items, items)
       |> assign(:selected, MapSet.new())
 
@@ -21,12 +19,7 @@ defmodule ElixirKatasWeb.Kata23MultiSelectLive do
 
   def render(assigns) do
     ~H"""
-    <.kata_viewer 
-      active_tab={@active_tab} 
-      title="Kata 23: The Multi-Select" 
-      source_code={@source_code} 
-      notes_content={@notes_content}
-    >
+    
       <div class="p-6 max-w-lg mx-auto">
         <div class="mb-6 text-sm text-gray-500">
            Selecting multiple items from a list
@@ -39,7 +32,7 @@ defmodule ElixirKatasWeb.Kata23MultiSelectLive do
             <div class="flex flex-wrap gap-2">
               <%= for item <- @items do %>
                 <button
-                  phx-click="toggle"
+                  phx-click="toggle" phx-target={@myself}
                   phx-value-item={item}
                   class={[
                     "px-3 py-1 rounded-full border text-sm font-medium transition-colors",
@@ -73,7 +66,7 @@ defmodule ElixirKatasWeb.Kata23MultiSelectLive do
           
           <!-- Action -->
           <div>
-            <button phx-click="clear" class="text-sm text-red-600 hover:underline">
+            <button phx-click="clear" phx-target={@myself} class="text-sm text-red-600 hover:underline">
               Clear Selection
             </button>
           </div>
@@ -88,7 +81,7 @@ defmodule ElixirKatasWeb.Kata23MultiSelectLive do
           </p>
         </div>
       </div>
-    </.kata_viewer>
+    
     """
   end
 

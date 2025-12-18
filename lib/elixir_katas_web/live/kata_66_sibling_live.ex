@@ -1,16 +1,14 @@
 defmodule ElixirKatasWeb.Kata66SiblingLive do
-  use ElixirKatasWeb, :live_view
+  use ElixirKatasWeb, :live_component
   import ElixirKatasWeb.KataComponents
 
-  def mount(_params, _session, socket) do
-    source_code = File.read!(__ENV__.file)
-    notes_content = File.read!("notes/kata_66_sibling_notes.md")
-
+  def update(assigns, socket) do
+    socket = assign(socket, assigns)
     socket =
       socket
       |> assign(active_tab: "notes")
-      |> assign(source_code: source_code)
-      |> assign(notes_content: notes_content)
+      
+      
       |> assign(:sibling_data, "")
 
     {:ok, socket}
@@ -18,12 +16,7 @@ defmodule ElixirKatasWeb.Kata66SiblingLive do
 
   def render(assigns) do
     ~H"""
-    <.kata_viewer 
-      active_tab={@active_tab} 
-      title="Kata 66: Sibling Communication" 
-      source_code={@source_code} 
-      notes_content={@notes_content}
-    >
+    
       <div class="p-6 max-w-2xl mx-auto">
         <div class="mb-6 text-sm text-gray-500">
            Demonstrating sibling components communicating via parent coordinator.
@@ -33,7 +26,7 @@ defmodule ElixirKatasWeb.Kata66SiblingLive do
           <div class="grid grid-cols-2 gap-4">
             <div class="p-4 bg-green-50 border border-green-200 rounded">
               <div class="text-sm font-medium mb-3">Sibling A</div>
-              <button phx-click="sibling_a_send" class="px-4 py-2 bg-green-600 text-white rounded text-sm hover:bg-green-700">
+              <button phx-click="sibling_a_send" phx-target={@myself} class="px-4 py-2 bg-green-600 text-white rounded text-sm hover:bg-green-700">
                 Send to Sibling B
               </button>
             </div>
@@ -50,7 +43,7 @@ defmodule ElixirKatasWeb.Kata66SiblingLive do
           </div>
         </div>
       </div>
-    </.kata_viewer>
+    
     """
   end
 

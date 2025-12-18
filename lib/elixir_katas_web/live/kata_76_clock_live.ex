@@ -1,11 +1,9 @@
 defmodule ElixirKatasWeb.Kata76ClockLive do
-  use ElixirKatasWeb, :live_view
+  use ElixirKatasWeb, :live_component
   import ElixirKatasWeb.KataComponents
 
-  def mount(_params, _session, socket) do
-    source_code = File.read!(__ENV__.file)
-    notes_content = File.read!("notes/kata_76_clock_notes.md")
-
+  def update(assigns, socket) do
+    socket = assign(socket, assigns)
     if connected?(socket) do
       :timer.send_interval(1000, self(), :tick)
     end
@@ -13,8 +11,8 @@ defmodule ElixirKatasWeb.Kata76ClockLive do
     socket =
       socket
       |> assign(active_tab: "notes")
-      |> assign(source_code: source_code)
-      |> assign(notes_content: notes_content)
+      
+      
       |> assign(:current_time, DateTime.utc_now())
 
     {:ok, socket}
@@ -22,12 +20,7 @@ defmodule ElixirKatasWeb.Kata76ClockLive do
 
   def render(assigns) do
     ~H"""
-    <.kata_viewer 
-      active_tab={@active_tab} 
-      title="Kata 76: The Clock" 
-      source_code={@source_code} 
-      notes_content={@notes_content}
-    >
+    
       <div class="p-6 max-w-2xl mx-auto">
         <div class="mb-6 text-sm text-gray-500">
           Server-driven clock that updates every second.
@@ -45,7 +38,7 @@ defmodule ElixirKatasWeb.Kata76ClockLive do
           </div>
         </div>
       </div>
-    </.kata_viewer>
+    
     """
   end
 

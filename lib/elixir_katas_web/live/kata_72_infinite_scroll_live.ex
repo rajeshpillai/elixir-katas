@@ -1,18 +1,16 @@
 defmodule ElixirKatasWeb.Kata72InfiniteScrollLive do
-  use ElixirKatasWeb, :live_view
+  use ElixirKatasWeb, :live_component
   import ElixirKatasWeb.KataComponents
 
   @per_page 10
 
-  def mount(_params, _session, socket) do
-    source_code = File.read!(__ENV__.file)
-    notes_content = File.read!("notes/kata_72_infinite_scroll_notes.md")
-
+  def update(assigns, socket) do
+    socket = assign(socket, assigns)
     socket =
       socket
       |> assign(active_tab: "notes")
-      |> assign(source_code: source_code)
-      |> assign(notes_content: notes_content)
+      
+      
       |> assign(:page, 1)
       |> assign(:has_more, true)
       |> load_items(1)
@@ -22,12 +20,7 @@ defmodule ElixirKatasWeb.Kata72InfiniteScrollLive do
 
   def render(assigns) do
     ~H"""
-    <.kata_viewer 
-      active_tab={@active_tab} 
-      title="Kata 72: Infinite Scroll" 
-      source_code={@source_code} 
-      notes_content={@notes_content}
-    >
+    
       <div class="p-6 max-w-4xl mx-auto">
         <div class="mb-6 text-sm text-gray-500">
           Scroll down to automatically load more items. Uses IntersectionObserver for efficient detection.
@@ -79,7 +72,7 @@ defmodule ElixirKatasWeb.Kata72InfiniteScrollLive do
           </div>
         </div>
       </div>
-    </.kata_viewer>
+    
     """
   end
 

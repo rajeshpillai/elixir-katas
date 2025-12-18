@@ -1,16 +1,14 @@
 defmodule ElixirKatasWeb.Kata47ProtectedLive do
-  use ElixirKatasWeb, :live_view
+  use ElixirKatasWeb, :live_component
   import ElixirKatasWeb.KataComponents
 
-  def mount(_params, _session, socket) do
-    source_code = File.read!(__ENV__.file)
-    notes_content = File.read!("notes/kata_47_protected_notes.md")
-
+  def update(assigns, socket) do
+    socket = assign(socket, assigns)
     socket =
       socket
       |> assign(active_tab: "notes")
-      |> assign(source_code: source_code)
-      |> assign(notes_content: notes_content)
+      
+      
       |> assign(:authenticated, false)
       |> assign(:current_view, "login")
 
@@ -19,12 +17,7 @@ defmodule ElixirKatasWeb.Kata47ProtectedLive do
 
   def render(assigns) do
     ~H"""
-    <.kata_viewer 
-      active_tab={@active_tab} 
-      title="Kata 47: Protected Routes" 
-      source_code={@source_code} 
-      notes_content={@notes_content}
-    >
+    
       <div class="p-6 max-w-lg mx-auto">
         <div class="mb-6 text-sm text-gray-500">
            Simulated protected route. Toggle authentication to access protected content.
@@ -56,7 +49,7 @@ defmodule ElixirKatasWeb.Kata47ProtectedLive do
             </div>
             
             <button
-              phx-click="logout"
+              phx-click="logout" phx-target={@myself}
               class="mt-4 w-full px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
             >
               Logout
@@ -83,7 +76,7 @@ defmodule ElixirKatasWeb.Kata47ProtectedLive do
             </div>
             
             <button
-              phx-click="login"
+              phx-click="login" phx-target={@myself}
               class="w-full px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700"
             >
               Simulate Login
@@ -91,7 +84,7 @@ defmodule ElixirKatasWeb.Kata47ProtectedLive do
           </div>
         <% end %>
       </div>
-    </.kata_viewer>
+    
     """
   end
 

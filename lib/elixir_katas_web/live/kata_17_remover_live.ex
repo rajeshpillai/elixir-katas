@@ -1,11 +1,9 @@
 defmodule ElixirKatasWeb.Kata17RemoverLive do
-  use ElixirKatasWeb, :live_view
+  use ElixirKatasWeb, :live_component
   import ElixirKatasWeb.KataComponents
 
-  def mount(_params, _session, socket) do
-    source_code = File.read!(__ENV__.file)
-    notes_content = File.read!("notes/kata_17_remover_notes.md")
-
+  def update(assigns, socket) do
+    socket = assign(socket, assigns)
     initial_items = [
       %{id: Ecto.UUID.generate(), text: "Learn LiveView"},
       %{id: Ecto.UUID.generate(), text: "Build a Side Project"},
@@ -15,26 +13,21 @@ defmodule ElixirKatasWeb.Kata17RemoverLive do
     {:ok, 
      socket
      |> assign(active_tab: "notes")
-     |> assign(source_code: source_code)
-     |> assign(notes_content: notes_content)
+     
+     
      |> assign(items: initial_items)}
   end
 
   def render(assigns) do
     ~H"""
-    <.kata_viewer 
-      active_tab={@active_tab} 
-      title="Kata 17: The Remover" 
-      source_code={@source_code} 
-      notes_content={@notes_content}
-    >
+    
       <div class="flex flex-col items-center p-8 gap-8">
         <div class="w-full max-w-md">
            <h3 class="text-lg font-semibold mb-4 text-center">Todo List ({length(@items)})</h3>
            
            <%= if Enum.empty?(@items) do %>
              <div class="text-center text-gray-500 py-8">
-               Nothing left to do! <button phx-click="reset" class="link link-primary">Reset</button>
+               Nothing left to do! <button phx-click="reset" phx-target={@myself} class="link link-primary">Reset</button>
              </div>
            <% else %>
              <ul class="space-y-2">
@@ -42,7 +35,7 @@ defmodule ElixirKatasWeb.Kata17RemoverLive do
                  <li class="flex items-center justify-between p-4 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
                    <span>{item.text}</span>
                    <button 
-                     phx-click="remove" 
+                     phx-click="remove" phx-target={@myself} 
                      phx-value-id={item.id} 
                      class="btn btn-sm btn-circle btn-ghost text-error"
                      aria-label="Remove"
@@ -55,7 +48,7 @@ defmodule ElixirKatasWeb.Kata17RemoverLive do
            <% end %>
         </div>
       </div>
-    </.kata_viewer>
+    
     """
   end
 

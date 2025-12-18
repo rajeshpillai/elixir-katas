@@ -1,28 +1,21 @@
 defmodule ElixirKatasWeb.Kata09TabsLive do
-  use ElixirKatasWeb, :live_view
+  use ElixirKatasWeb, :live_component
 
   import ElixirKatasWeb.KataComponents
 
-  def mount(_params, _session, socket) do
-    source_code = File.read!(__ENV__.file)
-    notes_content = File.read!("notes/kata_09_tabs_notes.md")
-
+  def update(assigns, socket) do
+    socket = assign(socket, assigns)
     {:ok, 
      socket
      |> assign(active_tab: "notes")
      |> assign(selected_tab: :home)
-     |> assign(source_code: source_code)
-     |> assign(notes_content: notes_content)}
+     
+     }
   end
 
   def render(assigns) do
     ~H"""
-    <.kata_viewer 
-      active_tab={@active_tab} 
-      title="Kata 09: The Tabs" 
-      source_code={@source_code} 
-      notes_content={@notes_content}
-    >
+    
       <div class="flex flex-col h-full text-gray-900 dark:text-gray-100 p-4">
         <div class="max-w-4xl mx-auto w-full">
           
@@ -30,21 +23,21 @@ defmodule ElixirKatasWeb.Kata09TabsLive do
             <!-- Tab Navigation -->
             <div class="flex border-b border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-900">
               <button
-                phx-click="set_tab"
+                phx-click="set_tab" phx-target={@myself}
                 phx-value-tab="home"
                 class={"flex-1 px-6 py-4 font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-inset #{if @selected_tab == :home, do: "bg-white dark:bg-gray-800 text-primary border-t-2 border-primary", else: "text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"}"}
               >
                 Home
               </button>
               <button
-                phx-click="set_tab"
+                phx-click="set_tab" phx-target={@myself}
                 phx-value-tab="pricing"
                 class={"flex-1 px-6 py-4 font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-inset #{if @selected_tab == :pricing, do: "bg-white dark:bg-gray-800 text-primary border-t-2 border-primary", else: "text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"}"}
               >
                 Pricing
               </button>
               <button
-                phx-click="set_tab"
+                phx-click="set_tab" phx-target={@myself}
                 phx-value-tab="about"
                 class={"flex-1 px-6 py-4 font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-inset #{if @selected_tab == :about, do: "bg-white dark:bg-gray-800 text-primary border-t-2 border-primary", else: "text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"}"}
               >
@@ -109,7 +102,7 @@ defmodule ElixirKatasWeb.Kata09TabsLive do
           </div>
         </div>
       </div>
-    </.kata_viewer>
+    
     """
   end
 

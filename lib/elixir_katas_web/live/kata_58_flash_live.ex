@@ -1,16 +1,14 @@
 defmodule ElixirKatasWeb.Kata58FlashLive do
-  use ElixirKatasWeb, :live_view
+  use ElixirKatasWeb, :live_component
   import ElixirKatasWeb.KataComponents
 
-  def mount(_params, _session, socket) do
-    source_code = File.read!(__ENV__.file)
-    notes_content = File.read!("notes/kata_58_flash_notes.md")
-
+  def update(assigns, socket) do
+    socket = assign(socket, assigns)
     socket =
       socket
       |> assign(active_tab: "notes")
-      |> assign(source_code: source_code)
-      |> assign(notes_content: notes_content)
+      
+      
       |> assign(:show_flash, false)
 
     {:ok, socket}
@@ -18,12 +16,7 @@ defmodule ElixirKatasWeb.Kata58FlashLive do
 
   def render(assigns) do
     ~H"""
-    <.kata_viewer 
-      active_tab={@active_tab} 
-      title="Kata 58: Flash" 
-      source_code={@source_code} 
-      notes_content={@notes_content}
-    >
+    
       <div class="p-6 max-w-2xl mx-auto">
         <div class="mb-6 text-sm text-gray-500">
            Interactive flash demonstration.
@@ -31,19 +24,19 @@ defmodule ElixirKatasWeb.Kata58FlashLive do
 
         <div class="bg-white p-6 rounded-lg shadow-sm border">
 
-          <button phx-click="show_message" class="px-4 py-2 bg-indigo-600 text-white rounded">
+          <button phx-click="show_message" phx-target={@myself} class="px-4 py-2 bg-indigo-600 text-white rounded">
             Show Flash Message
           </button>
           <%= if @show_flash do %>
             <div class="mt-4 p-4 bg-green-50 border border-green-200 rounded flex justify-between">
               <span class="text-green-800">Success! Your action was completed.</span>
-              <button phx-click="hide_flash" class="text-green-600">×</button>
+              <button phx-click="hide_flash" phx-target={@myself} class="text-green-600">×</button>
             </div>
           <% end %>
     
         </div>
       </div>
-    </.kata_viewer>
+    
     """
   end
 

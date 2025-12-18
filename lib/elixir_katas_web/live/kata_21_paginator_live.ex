@@ -1,19 +1,17 @@
 defmodule ElixirKatasWeb.Kata21PaginatorLive do
-  use ElixirKatasWeb, :live_view
+  use ElixirKatasWeb, :live_component
   import ElixirKatasWeb.KataComponents
 
-  def mount(_params, _session, socket) do
-    source_code = File.read!(__ENV__.file)
-    notes_content = File.read!("notes/kata_21_paginator_notes.md")
-    
+  def update(assigns, socket) do
+    socket = assign(socket, assigns)
     # Let's generate a list of items to paginate.
     items = Enum.map(1..100, fn i -> "Item ##{i}" end)
     
     socket =
       socket
       |> assign(active_tab: "notes")
-      |> assign(source_code: source_code)
-      |> assign(notes_content: notes_content)
+      
+      
       |> assign(:items, items)
       |> assign(:page, 1)
       |> assign(:per_page, 5)
@@ -23,12 +21,7 @@ defmodule ElixirKatasWeb.Kata21PaginatorLive do
 
   def render(assigns) do
     ~H"""
-    <.kata_viewer 
-      active_tab={@active_tab} 
-      title="Kata 21: The Paginator" 
-      source_code={@source_code} 
-      notes_content={@notes_content}
-    >
+    
       <div class="p-6 max-w-lg mx-auto">
         <div class="mb-6 text-sm text-gray-500">
            Simple offset-based pagination Logic
@@ -42,14 +35,14 @@ defmodule ElixirKatasWeb.Kata21PaginatorLive do
             </div>
             <div class="space-x-2">
                <button
-                phx-click="prev"
+                phx-click="prev" phx-target={@myself}
                 disabled={@page <= 1}
                 class="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed"
               >
                 Previous
               </button>
               <button
-                phx-click="next"
+                phx-click="next" phx-target={@myself}
                 disabled={@page >= total_pages(@items, @per_page)}
                 class="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed"
               >
@@ -80,7 +73,7 @@ defmodule ElixirKatasWeb.Kata21PaginatorLive do
           </p>
         </div>
       </div>
-    </.kata_viewer>
+    
     """
   end
 

@@ -1,11 +1,9 @@
 defmodule ElixirKatasWeb.Kata24GridLive do
-  use ElixirKatasWeb, :live_view
+  use ElixirKatasWeb, :live_component
   import ElixirKatasWeb.KataComponents
 
-  def mount(_params, _session, socket) do
-    source_code = File.read!(__ENV__.file)
-    notes_content = File.read!("notes/kata_24_grid_notes.md")
-
+  def update(assigns, socket) do
+    socket = assign(socket, assigns)
     # Simulating a dataset
     data = [
       %{id: 1, name: "Alice", role: "Admin", status: "Active"},
@@ -18,8 +16,8 @@ defmodule ElixirKatasWeb.Kata24GridLive do
     socket =
       socket
       |> assign(active_tab: "notes")
-      |> assign(source_code: source_code)
-      |> assign(notes_content: notes_content)
+      
+      
       |> assign(:data, data)
       |> assign(:grid_cols, 3) # Controls how many columns in grid view
 
@@ -28,12 +26,7 @@ defmodule ElixirKatasWeb.Kata24GridLive do
 
   def render(assigns) do
     ~H"""
-    <.kata_viewer 
-      active_tab={@active_tab} 
-      title="Kata 24: The Grid" 
-      source_code={@source_code} 
-      notes_content={@notes_content}
-    >
+    
       <div class="p-6 max-w-4xl mx-auto">
         <div class="mb-6 text-sm text-gray-500">
           Rendering data in a responsive grid layout
@@ -45,10 +38,10 @@ defmodule ElixirKatasWeb.Kata24GridLive do
           <div class="flex items-center gap-4">
             <label class="text-sm font-medium text-gray-700">Grid Columns:</label>
             <div class="flex gap-2">
-              <button phx-click="set_cols" phx-value-cols="1" class={"px-3 py-1 rounded border " <> if(@grid_cols == 1, do: "bg-blue-500 text-white", else: "bg-white")}>1</button>
-              <button phx-click="set_cols" phx-value-cols="2" class={"px-3 py-1 rounded border " <> if(@grid_cols == 2, do: "bg-blue-500 text-white", else: "bg-white")}>2</button>
-              <button phx-click="set_cols" phx-value-cols="3" class={"px-3 py-1 rounded border " <> if(@grid_cols == 3, do: "bg-blue-500 text-white", else: "bg-white")}>3</button>
-              <button phx-click="set_cols" phx-value-cols="4" class={"px-3 py-1 rounded border " <> if(@grid_cols == 4, do: "bg-blue-500 text-white", else: "bg-white")}>4</button>
+              <button phx-click="set_cols" phx-target={@myself} phx-value-cols="1" class={"px-3 py-1 rounded border " <> if(@grid_cols == 1, do: "bg-blue-500 text-white", else: "bg-white")}>1</button>
+              <button phx-click="set_cols" phx-target={@myself} phx-value-cols="2" class={"px-3 py-1 rounded border " <> if(@grid_cols == 2, do: "bg-blue-500 text-white", else: "bg-white")}>2</button>
+              <button phx-click="set_cols" phx-target={@myself} phx-value-cols="3" class={"px-3 py-1 rounded border " <> if(@grid_cols == 3, do: "bg-blue-500 text-white", else: "bg-white")}>3</button>
+              <button phx-click="set_cols" phx-target={@myself} phx-value-cols="4" class={"px-3 py-1 rounded border " <> if(@grid_cols == 4, do: "bg-blue-500 text-white", else: "bg-white")}>4</button>
             </div>
           </div>
 
@@ -84,7 +77,7 @@ defmodule ElixirKatasWeb.Kata24GridLive do
           </p>
         </div>
       </div>
-    </.kata_viewer>
+    
     """
   end
 

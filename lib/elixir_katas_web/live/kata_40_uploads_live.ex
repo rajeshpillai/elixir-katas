@@ -1,16 +1,14 @@
 defmodule ElixirKatasWeb.Kata40UploadsLive do
-  use ElixirKatasWeb, :live_view
+  use ElixirKatasWeb, :live_component
   import ElixirKatasWeb.KataComponents
 
-  def mount(_params, _session, socket) do
-    source_code = File.read!(__ENV__.file)
-    notes_content = File.read!("notes/kata_40_uploads_notes.md")
-
+  def update(assigns, socket) do
+    socket = assign(socket, assigns)
     socket =
       socket
       |> assign(active_tab: "notes")
-      |> assign(source_code: source_code)
-      |> assign(notes_content: notes_content)
+      
+      
       |> assign(:uploaded_files, [])
       |> allow_upload(:avatar, accept: ~w(.jpg .jpeg .png), max_entries: 2)
 
@@ -19,19 +17,14 @@ defmodule ElixirKatasWeb.Kata40UploadsLive do
 
   def render(assigns) do
     ~H"""
-    <.kata_viewer 
-      active_tab={@active_tab} 
-      title="Kata 40: File Uploads" 
-      source_code={@source_code} 
-      notes_content={@notes_content}
-    >
+    
       <div class="p-6 max-w-lg mx-auto">
         <div class="mb-6 text-sm text-gray-500">
            Drag and drop image files (jpg, png) below.
         </div>
 
         <div class="bg-white p-6 rounded-lg shadow-sm border">
-          <form phx-submit="save" phx-change="validate">
+          <form phx-submit="save" phx-target={@myself} phx-change="validate" phx-target={@myself}>
           
             <!-- Drop Target -->
             <div 
@@ -73,7 +66,7 @@ defmodule ElixirKatasWeb.Kata40UploadsLive do
                     <p class="text-xs text-red-600 mt-1"><%= error_to_string(err) %></p>
                   <% end %>
                   
-                   <button type="button" phx-click="cancel-upload" phx-value-ref={entry.ref} class="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1 m-1 opacity-75 hover:opacity-100">
+                   <button type="button" phx-click="cancel-upload" phx-target={@myself} phx-value-ref={entry.ref} class="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1 m-1 opacity-75 hover:opacity-100">
                     <span class="sr-only">Remove</span>
                     <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -108,7 +101,7 @@ defmodule ElixirKatasWeb.Kata40UploadsLive do
         <% end %>
 
       </div>
-    </.kata_viewer>
+    
     """
   end
 

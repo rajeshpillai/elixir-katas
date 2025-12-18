@@ -1,16 +1,14 @@
 defmodule ElixirKatasWeb.Kata68ChangesetsLive do
-  use ElixirKatasWeb, :live_view
+  use ElixirKatasWeb, :live_component
   import ElixirKatasWeb.KataComponents
 
-  def mount(_params, _session, socket) do
-    source_code = File.read!(__ENV__.file)
-    notes_content = File.read!("notes/kata_68_changesets_notes.md")
-
+  def update(assigns, socket) do
+    socket = assign(socket, assigns)
     socket =
       socket
       |> assign(active_tab: "notes")
-      |> assign(source_code: source_code)
-      |> assign(notes_content: notes_content)
+      
+      
       |> assign(:form_data, %{"name" => "", "email" => "", "age" => ""})
       |> assign(:errors, %{})
       |> assign(:submitted_data, nil)
@@ -20,12 +18,7 @@ defmodule ElixirKatasWeb.Kata68ChangesetsLive do
 
   def render(assigns) do
     ~H"""
-    <.kata_viewer 
-      active_tab={@active_tab} 
-      title="Kata 68: Changesets 101" 
-      source_code={@source_code} 
-      notes_content={@notes_content}
-    >
+    
       <div class="p-6 max-w-2xl mx-auto">
         <div class="mb-6 text-sm text-gray-500">
            Schema-less changesets for form validation without database schemas.
@@ -34,7 +27,7 @@ defmodule ElixirKatasWeb.Kata68ChangesetsLive do
         <div class="bg-white p-6 rounded-lg shadow-sm border">
           <h3 class="text-lg font-medium mb-4">User Registration Form</h3>
           
-          <form phx-submit="submit_form" class="space-y-4">
+          <form phx-submit="submit_form" phx-target={@myself} class="space-y-4">
             <div>
               <label class="block text-sm font-medium mb-1">Name *</label>
               <input 
@@ -106,7 +99,7 @@ defmodule ElixirKatasWeb.Kata68ChangesetsLive do
           </div>
         </div>
       </div>
-    </.kata_viewer>
+    
     """
   end
 

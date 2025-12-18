@@ -1,16 +1,14 @@
 defmodule ElixirKatasWeb.Kata34LiveFeedbackLive do
-  use ElixirKatasWeb, :live_view
+  use ElixirKatasWeb, :live_component
   import ElixirKatasWeb.KataComponents
 
-  def mount(_params, _session, socket) do
-    source_code = File.read!(__ENV__.file)
-    notes_content = File.read!("notes/kata_34_live_feedback_notes.md")
-
+  def update(assigns, socket) do
+    socket = assign(socket, assigns)
     socket =
       socket
       |> assign(active_tab: "notes")
-      |> assign(source_code: source_code)
-      |> assign(notes_content: notes_content)
+      
+      
       |> assign(:form, to_form(%{"username" => "", "email" => ""}))
       |> assign(:touched, MapSet.new()) # Track touched fields
       |> assign(:submitted_data, nil)
@@ -20,12 +18,7 @@ defmodule ElixirKatasWeb.Kata34LiveFeedbackLive do
 
   def render(assigns) do
     ~H"""
-    <.kata_viewer 
-      active_tab={@active_tab} 
-      title="Kata 34: Live Feedback" 
-      source_code={@source_code} 
-      notes_content={@notes_content}
-    >
+    
       <div class="p-6 max-w-lg mx-auto">
         <div class="mb-6 text-sm text-gray-500">
            Errors are only shown after you leave a field (blur) or try to submit.
@@ -42,7 +35,7 @@ defmodule ElixirKatasWeb.Kata34LiveFeedbackLive do
                   type="text"
                   name="username"
                   id="username"
-                  phx-blur="blur"
+                  phx-blur="blur" phx-target={@myself}
                   phx-value-field="username"
                   value={@form[:username].value}
                   class={"shadow-sm block w-full sm:text-sm rounded-md p-2 border " <> 
@@ -62,7 +55,7 @@ defmodule ElixirKatasWeb.Kata34LiveFeedbackLive do
                   type="text"
                   name="email"
                   id="email"
-                  phx-blur="blur"
+                  phx-blur="blur" phx-target={@myself}
                   phx-value-field="email"
                   value={@form[:email].value}
                   class={"shadow-sm block w-full sm:text-sm rounded-md p-2 border " <> 
@@ -105,7 +98,7 @@ defmodule ElixirKatasWeb.Kata34LiveFeedbackLive do
           </div>
         </div>
       </div>
-    </.kata_viewer>
+    
     """
   end
 

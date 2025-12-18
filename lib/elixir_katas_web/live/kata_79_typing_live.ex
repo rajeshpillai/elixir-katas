@@ -1,14 +1,12 @@
 defmodule ElixirKatasWeb.Kata79TypingIndicatorLive do
-  use ElixirKatasWeb, :live_view
+  use ElixirKatasWeb, :live_component
   import ElixirKatasWeb.KataComponents
 
   @topic "typing:demo"
   @typing_timeout 3000
 
-  def mount(_params, _session, socket) do
-    source_code = File.read!(__ENV__.file)
-    notes_content = File.read!("notes/kata_79_typing_notes.md")
-
+  def update(assigns, socket) do
+    socket = assign(socket, assigns)
     username = "User#{:rand.uniform(9999)}"
 
     if connected?(socket) do
@@ -18,8 +16,8 @@ defmodule ElixirKatasWeb.Kata79TypingIndicatorLive do
     socket =
       socket
       |> assign(active_tab: "notes")
-      |> assign(source_code: source_code)
-      |> assign(notes_content: notes_content)
+      
+      
       |> assign(:typing_users, MapSet.new())
       |> assign(:message, "")
       |> assign(:username, username)
@@ -30,12 +28,7 @@ defmodule ElixirKatasWeb.Kata79TypingIndicatorLive do
 
   def render(assigns) do
     ~H"""
-    <.kata_viewer 
-      active_tab={@active_tab} 
-      title="Kata 79: Typing Indicator" 
-      source_code={@source_code} 
-      notes_content={@notes_content}
-    >
+    
       <div class="p-6 max-w-2xl mx-auto">
         <div class="mb-6 text-sm text-gray-500">
           Multi-user typing indicators with PubSub. Open in multiple tabs to test!
@@ -65,7 +58,7 @@ defmodule ElixirKatasWeb.Kata79TypingIndicatorLive do
           
           <input 
             type="text" 
-            phx-keyup="typing"
+            phx-keyup="typing" phx-target={@myself}
             phx-debounce="300"
             value={@message}
             placeholder="Type something to broadcast typing indicator..."
@@ -77,7 +70,7 @@ defmodule ElixirKatasWeb.Kata79TypingIndicatorLive do
           </div>
         </div>
       </div>
-    </.kata_viewer>
+    
     """
   end
 

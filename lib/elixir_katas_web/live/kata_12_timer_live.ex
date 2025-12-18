@@ -1,28 +1,21 @@
 defmodule ElixirKatasWeb.Kata12TimerLive do
-  use ElixirKatasWeb, :live_view
+  use ElixirKatasWeb, :live_component
   import ElixirKatasWeb.KataComponents
 
-  def mount(_params, _session, socket) do
-    source_code = File.read!(__ENV__.file)
-    notes_content = File.read!("notes/kata_12_timer_notes.md")
-
+  def update(assigns, socket) do
+    socket = assign(socket, assigns)
     {:ok, 
      socket
      |> assign(active_tab: "notes")
-     |> assign(source_code: source_code)
-     |> assign(notes_content: notes_content)
+     
+     
      |> assign(seconds: 60)
      |> assign(running: false)}
   end
 
   def render(assigns) do
     ~H"""
-    <.kata_viewer 
-      active_tab={@active_tab} 
-      title="Kata 12: The Timer" 
-      source_code={@source_code} 
-      notes_content={@notes_content}
-    >
+    
       <div class="flex flex-col items-center justify-center p-8 gap-8 min-h-[400px]">
         <div class="flex flex-col items-center gap-8">
           <div class="countdown font-mono text-8xl text-gray-800 dark:text-gray-100">
@@ -31,18 +24,18 @@ defmodule ElixirKatasWeb.Kata12TimerLive do
           
           <div class="flex gap-4">
              <%= if @running do %>
-              <button phx-click="stop" class="btn btn-error btn-lg">Stop</button>
+              <button phx-click="stop" phx-target={@myself} class="btn btn-error btn-lg">Stop</button>
              <% else %>
                <%= if @seconds > 0 do %>
-                 <button phx-click="start" class="btn btn-primary btn-lg">Start</button>
+                 <button phx-click="start" phx-target={@myself} class="btn btn-primary btn-lg">Start</button>
                <% end %>
              <% end %>
              
-             <button phx-click="reset" class="btn btn-ghost btn-lg">Reset</button>
+             <button phx-click="reset" phx-target={@myself} class="btn btn-ghost btn-lg">Reset</button>
           </div>
         </div>
       </div>
-    </.kata_viewer>
+    
     """
   end
 

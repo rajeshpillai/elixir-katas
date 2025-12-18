@@ -1,31 +1,24 @@
 defmodule ElixirKatasWeb.Kata06ResizerLive do
-  use ElixirKatasWeb, :live_view
+  use ElixirKatasWeb, :live_component
   import ElixirKatasWeb.KataComponents
 
-  def mount(_params, _session, socket) do
-    source_code = File.read!(__ENV__.file)
-    notes_content = File.read!("notes/kata_06_resizer_notes.md")
-
+  def update(assigns, socket) do
+    socket = assign(socket, assigns)
     {:ok,
      socket
      |> assign(active_tab: "notes")
-     |> assign(source_code: source_code)
-     |> assign(notes_content: notes_content)
+     
+     
      |> assign(width: 200, height: 200)}
   end
 
   def render(assigns) do
     ~H"""
-    <.kata_viewer 
-      active_tab={@active_tab} 
-      title="Kata 06: The Resizer" 
-      source_code={@source_code} 
-      notes_content={@notes_content}
-    >
+    
       <div class="flex flex-col gap-8 mx-auto mt-12 items-center w-full">
         
         <!-- Controls -->
-        <form phx-change="update_size" class="flex flex-wrap gap-4 bg-base-100 p-6 rounded-lg shadow-lg justify-center w-full max-w-lg">
+        <form phx-change="update_size" phx-target={@myself} class="flex flex-wrap gap-4 bg-base-100 p-6 rounded-lg shadow-lg justify-center w-full max-w-lg">
           
           <div class="form-control">
             <label class="label">
@@ -82,7 +75,7 @@ defmodule ElixirKatasWeb.Kata06ResizerLive do
         </div>
 
       </div>
-    </.kata_viewer>
+    
     """
   end
 

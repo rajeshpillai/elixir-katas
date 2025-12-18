@@ -1,28 +1,21 @@
 defmodule ElixirKatasWeb.Kata10CharacterCounterLive do
-  use ElixirKatasWeb, :live_view
+  use ElixirKatasWeb, :live_component
   import ElixirKatasWeb.KataComponents
 
-  def mount(_params, _session, socket) do
-    source_code = File.read!(__ENV__.file)
-    notes_content = File.read!("notes/kata_10_character_counter_notes.md")
-
+  def update(assigns, socket) do
+    socket = assign(socket, assigns)
     {:ok, 
      socket
      |> assign(active_tab: "notes")
-     |> assign(source_code: source_code)
-     |> assign(notes_content: notes_content)
+     
+     
      |> assign(text: "Type something...")
      |> assign(limit: 100)}
   end
 
   def render(assigns) do
     ~H"""
-    <.kata_viewer 
-      active_tab={@active_tab} 
-      title="Kata 10: Character Counter" 
-      source_code={@source_code} 
-      notes_content={@notes_content}
-    >
+    
       <div class="flex flex-col items-center justify-center p-8 gap-8">
         <div class="w-full max-w-lg">
           <label class="form-control">
@@ -33,7 +26,7 @@ defmodule ElixirKatasWeb.Kata10CharacterCounterLive do
               </span>
             </div>
             <textarea 
-              phx-keyup="update_text"
+              phx-keyup="update_text" phx-target={@myself}
               class="textarea textarea-bordered h-40 text-lg leading-relaxed focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-300"
               placeholder="Tell us about yourself"
             >{@text}</textarea>
@@ -52,7 +45,7 @@ defmodule ElixirKatasWeb.Kata10CharacterCounterLive do
           </div>
         </div>
       </div>
-    </.kata_viewer>
+    
     """
   end
 

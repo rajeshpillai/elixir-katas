@@ -1,16 +1,14 @@
 defmodule ElixirKatasWeb.Kata37WizardLive do
-  use ElixirKatasWeb, :live_view
+  use ElixirKatasWeb, :live_component
   import ElixirKatasWeb.KataComponents
 
-  def mount(_params, _session, socket) do
-    source_code = File.read!(__ENV__.file)
-    notes_content = File.read!("notes/kata_37_wizard_notes.md")
-
+  def update(assigns, socket) do
+    socket = assign(socket, assigns)
     socket =
       socket
       |> assign(active_tab: "notes")
-      |> assign(source_code: source_code)
-      |> assign(notes_content: notes_content)
+      
+      
       |> assign(:current_step, 1)
       |> assign(:wizard_data, %{"name" => "", "email" => "", "role" => "", "bio" => ""})
       |> assign(:submitted_data, nil)
@@ -23,12 +21,7 @@ defmodule ElixirKatasWeb.Kata37WizardLive do
 
   def render(assigns) do
     ~H"""
-    <.kata_viewer 
-      active_tab={@active_tab} 
-      title="Kata 37: The Wizard" 
-      source_code={@source_code} 
-      notes_content={@notes_content}
-    >
+    
       <div class="p-6 max-w-lg mx-auto">
         <div class="mb-6 text-sm text-gray-500">
            Step <%= @current_step %> of 3.
@@ -77,7 +70,7 @@ defmodule ElixirKatasWeb.Kata37WizardLive do
                     <textarea name="bio" rows="3" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm border p-2"><%= @step2_form[:bio].value %></textarea>
                   </div>
                   <div class="flex justify-between">
-                    <button type="button" phx-click="prev_step" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300">Back</button>
+                    <button type="button" phx-click="prev_step" phx-target={@myself} class="bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300">Back</button>
                     <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700">Review</button>
                   </div>
                 </.form>
@@ -93,8 +86,8 @@ defmodule ElixirKatasWeb.Kata37WizardLive do
                   <p><strong>Bio:</strong> <%= @wizard_data["bio"] %></p>
                 </div>
                  <div class="flex justify-between">
-                    <button type="button" phx-click="prev_step" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300">Back</button>
-                    <button type="button" phx-click="save" class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700">Confirm & Save</button>
+                    <button type="button" phx-click="prev_step" phx-target={@myself} class="bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300">Back</button>
+                    <button type="button" phx-click="save" phx-target={@myself} class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700">Confirm & Save</button>
                   </div>
               </div>
           <% end %>
@@ -107,7 +100,7 @@ defmodule ElixirKatasWeb.Kata37WizardLive do
           </div>
         <% end %>
       </div>
-    </.kata_viewer>
+    
     """
   end
 

@@ -1,16 +1,14 @@
 defmodule ElixirKatasWeb.Kata94AudioPlayerLive do
-  use ElixirKatasWeb, :live_view
+  use ElixirKatasWeb, :live_component
   import ElixirKatasWeb.KataComponents
 
-  def mount(_params, _session, socket) do
-    source_code = File.read!(__ENV__.file)
-    notes_content = File.read!("notes/kata_94_audio_notes.md")
-
+  def update(assigns, socket) do
+    socket = assign(socket, assigns)
     socket =
       socket
       |> assign(active_tab: "notes")
-      |> assign(source_code: source_code)
-      |> assign(notes_content: notes_content)
+      
+      
       |> assign(:is_playing, false)
 
     {:ok, socket}
@@ -18,12 +16,7 @@ defmodule ElixirKatasWeb.Kata94AudioPlayerLive do
 
   def render(assigns) do
     ~H"""
-    <.kata_viewer 
-      active_tab={@active_tab} 
-      title="Kata 94: Audio Player" 
-      source_code={@source_code} 
-      notes_content={@notes_content}
-    >
+    
       <div class="p-6 max-w-2xl mx-auto">
         <div class="mb-6 text-sm text-gray-500">
           Audio controls using LiveView and JavaScript Hooks
@@ -39,7 +32,7 @@ defmodule ElixirKatasWeb.Kata94AudioPlayerLive do
              <div class="flex items-center justify-between bg-gray-50 p-4 rounded-lg border">
                 <div class="flex items-center gap-4">
                   <button 
-                    phx-click="toggle_playback" 
+                    phx-click="toggle_playback" phx-target={@myself} 
                     class="w-12 h-12 flex items-center justify-center bg-indigo-600 text-white rounded-full hover:bg-indigo-700 transition"
                   >
                     <%= if @is_playing do %>
@@ -66,7 +59,7 @@ defmodule ElixirKatasWeb.Kata94AudioPlayerLive do
           </div>
         </div>
       </div>
-    </.kata_viewer>
+    
     """
   end
 

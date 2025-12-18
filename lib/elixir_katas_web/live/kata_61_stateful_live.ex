@@ -1,16 +1,14 @@
 defmodule ElixirKatasWeb.Kata61StatefulLive do
-  use ElixirKatasWeb, :live_view
+  use ElixirKatasWeb, :live_component
   import ElixirKatasWeb.KataComponents
 
-  def mount(_params, _session, socket) do
-    source_code = File.read!(__ENV__.file)
-    notes_content = File.read!("notes/kata_61_stateful_notes.md")
-
+  def update(assigns, socket) do
+    socket = assign(socket, assigns)
     socket =
       socket
       |> assign(active_tab: "notes")
-      |> assign(source_code: source_code)
-      |> assign(notes_content: notes_content)
+      
+      
       |> assign(:count, 0)
 
     {:ok, socket}
@@ -18,12 +16,7 @@ defmodule ElixirKatasWeb.Kata61StatefulLive do
 
   def render(assigns) do
     ~H"""
-    <.kata_viewer 
-      active_tab={@active_tab} 
-      title="Kata 61: Stateful Component" 
-      source_code={@source_code} 
-      notes_content={@notes_content}
-    >
+    
       <div class="p-6 max-w-2xl mx-auto">
         <div class="mb-6 text-sm text-gray-500">
            Interactive stateful component demonstration.
@@ -37,14 +30,14 @@ defmodule ElixirKatasWeb.Kata61StatefulLive do
               <div class="text-sm text-gray-500">Counter (LiveComponent state)</div>
             </div>
             <div class="flex gap-2 justify-center">
-              <button phx-click="decrement" class="px-4 py-2 bg-gray-200 rounded">-</button>
-              <button phx-click="increment" class="px-4 py-2 bg-indigo-600 text-white rounded">+</button>
+              <button phx-click="decrement" phx-target={@myself} class="px-4 py-2 bg-gray-200 rounded">-</button>
+              <button phx-click="increment" phx-target={@myself} class="px-4 py-2 bg-indigo-600 text-white rounded">+</button>
             </div>
           </div>
     
         </div>
       </div>
-    </.kata_viewer>
+    
     """
   end
 

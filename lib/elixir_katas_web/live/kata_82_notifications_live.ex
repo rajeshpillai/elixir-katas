@@ -1,16 +1,14 @@
 defmodule ElixirKatasWeb.Kata82DistributedNotificationsLive do
-  use ElixirKatasWeb, :live_view
+  use ElixirKatasWeb, :live_component
   import ElixirKatasWeb.KataComponents
 
-  def mount(_params, _session, socket) do
-    source_code = File.read!(__ENV__.file)
-    notes_content = File.read!("notes/kata_82_notifications_notes.md")
-
+  def update(assigns, socket) do
+    socket = assign(socket, assigns)
     socket =
       socket
       |> assign(active_tab: "notes")
-      |> assign(source_code: source_code)
-      |> assign(notes_content: notes_content)
+      
+      
       |> assign(:notifications, [])
 
     {:ok, socket}
@@ -18,12 +16,7 @@ defmodule ElixirKatasWeb.Kata82DistributedNotificationsLive do
 
   def render(assigns) do
     ~H"""
-    <.kata_viewer 
-      active_tab={@active_tab} 
-      title="Kata 82: Distributed Notifications" 
-      source_code={@source_code} 
-      notes_content={@notes_content}
-    >
+    
       <div class="p-6 max-w-2xl mx-auto">
         <div class="mb-6 text-sm text-gray-500">
           Trigger notifications that could be broadcast across nodes.
@@ -32,28 +25,28 @@ defmodule ElixirKatasWeb.Kata82DistributedNotificationsLive do
         <div class="bg-white p-6 rounded-lg shadow-sm border space-y-4">
           <div class="flex gap-2">
             <button 
-              phx-click="send_notification" 
+              phx-click="send_notification" phx-target={@myself} 
               phx-value-type="info"
               class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
             >
               Info Notification
             </button>
             <button 
-              phx-click="send_notification" 
+              phx-click="send_notification" phx-target={@myself} 
               phx-value-type="success"
               class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
             >
               Success Notification
             </button>
             <button 
-              phx-click="send_notification" 
+              phx-click="send_notification" phx-target={@myself} 
               phx-value-type="warning"
               class="px-4 py-2 bg-yellow-600 text-white rounded hover:bg-yellow-700"
             >
               Warning Notification
             </button>
             <button 
-              phx-click="send_notification" 
+              phx-click="send_notification" phx-target={@myself} 
               phx-value-type="error"
               class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
             >
@@ -66,7 +59,7 @@ defmodule ElixirKatasWeb.Kata82DistributedNotificationsLive do
               <h3 class="font-medium">Notifications</h3>
               <%= if length(@notifications) > 0 do %>
                 <button 
-                  phx-click="clear_all"
+                  phx-click="clear_all" phx-target={@myself}
                   class="text-sm text-gray-500 hover:text-gray-700"
                 >
                   Clear All
@@ -94,7 +87,7 @@ defmodule ElixirKatasWeb.Kata82DistributedNotificationsLive do
                       <div class="text-xs text-gray-400 mt-1"><%= notif.time %></div>
                     </div>
                     <button 
-                      phx-click="dismiss" 
+                      phx-click="dismiss" phx-target={@myself} 
                       phx-value-idx={idx}
                       class="text-gray-400 hover:text-gray-600"
                     >
@@ -107,7 +100,7 @@ defmodule ElixirKatasWeb.Kata82DistributedNotificationsLive do
           </div>
         </div>
       </div>
-    </.kata_viewer>
+    
     """
   end
 

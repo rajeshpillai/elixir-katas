@@ -1,16 +1,14 @@
 defmodule ElixirKatasWeb.Kata62ComponentIdLive do
-  use ElixirKatasWeb, :live_view
+  use ElixirKatasWeb, :live_component
   import ElixirKatasWeb.KataComponents
 
-  def mount(_params, _session, socket) do
-    source_code = File.read!(__ENV__.file)
-    notes_content = File.read!("notes/kata_62_component_id_notes.md")
-
+  def update(assigns, socket) do
+    socket = assign(socket, assigns)
     socket =
       socket
       |> assign(active_tab: "notes")
-      |> assign(source_code: source_code)
-      |> assign(notes_content: notes_content)
+      
+      
       |> assign(:items, [])
 
     {:ok, socket}
@@ -18,12 +16,7 @@ defmodule ElixirKatasWeb.Kata62ComponentIdLive do
 
   def render(assigns) do
     ~H"""
-    <.kata_viewer 
-      active_tab={@active_tab} 
-      title="Kata 62: Component ID" 
-      source_code={@source_code} 
-      notes_content={@notes_content}
-    >
+    
       <div class="p-6 max-w-2xl mx-auto">
         <div class="mb-6 text-sm text-gray-500">
            Interactive component id demonstration.
@@ -32,18 +25,18 @@ defmodule ElixirKatasWeb.Kata62ComponentIdLive do
         <div class="bg-white p-6 rounded-lg shadow-sm border">
 
           <div class="space-y-2">
-            <button phx-click="add_item" class="px-4 py-2 bg-indigo-600 text-white rounded">Add Item</button>
+            <button phx-click="add_item" phx-target={@myself} class="px-4 py-2 bg-indigo-600 text-white rounded">Add Item</button>
             <%= for {item, idx} <- Enum.with_index(@items) do %>
               <div class="p-3 bg-gray-50 rounded flex justify-between items-center">
                 <span>Item <%= idx + 1 %>: <%= item %></span>
-                <button phx-click="remove_item" phx-value-idx={idx} class="text-red-600">×</button>
+                <button phx-click="remove_item" phx-target={@myself} phx-value-idx={idx} class="text-red-600">×</button>
               </div>
             <% end %>
           </div>
     
         </div>
       </div>
-    </.kata_viewer>
+    
     """
   end
 

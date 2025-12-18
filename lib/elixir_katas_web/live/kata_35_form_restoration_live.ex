@@ -1,16 +1,14 @@
 defmodule ElixirKatasWeb.Kata35FormRestorationLive do
-  use ElixirKatasWeb, :live_view
+  use ElixirKatasWeb, :live_component
   import ElixirKatasWeb.KataComponents
 
-  def mount(_params, _session, socket) do
-    source_code = File.read!(__ENV__.file)
-    notes_content = File.read!("notes/kata_35_form_restoration_notes.md")
-
+  def update(assigns, socket) do
+    socket = assign(socket, assigns)
     socket =
       socket
       |> assign(active_tab: "notes")
-      |> assign(source_code: source_code)
-      |> assign(notes_content: notes_content)
+      
+      
       |> assign(:form, to_form(%{"essay" => ""}))
       |> assign(:word_count, 0)
       |> assign(:pid, inspect(self())) # To show process change on crash
@@ -20,12 +18,7 @@ defmodule ElixirKatasWeb.Kata35FormRestorationLive do
 
   def render(assigns) do
     ~H"""
-    <.kata_viewer 
-      active_tab={@active_tab} 
-      title="Kata 35: Form Restoration" 
-      source_code={@source_code} 
-      notes_content={@notes_content}
-    >
+    
       <div class="p-6 max-w-lg mx-auto">
         <div class="mb-6 text-sm text-gray-500">
            Type something, then crash the server. LiveView will reconnect and restore your text automatically.
@@ -57,7 +50,7 @@ defmodule ElixirKatasWeb.Kata35FormRestorationLive do
             <div class="flex gap-4">
               <button
                 type="button"
-                phx-click="crash"
+                phx-click="crash" phx-target={@myself}
                 class="flex-1 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
               >
                 💥 Crash Process
@@ -66,7 +59,7 @@ defmodule ElixirKatasWeb.Kata35FormRestorationLive do
           </.form>
         </div>
       </div>
-    </.kata_viewer>
+    
     """
   end
 

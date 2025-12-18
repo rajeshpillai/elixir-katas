@@ -1,16 +1,14 @@
 defmodule ElixirKatasWeb.Kata92FileDropzoneLive do
-  use ElixirKatasWeb, :live_view
+  use ElixirKatasWeb, :live_component
   import ElixirKatasWeb.KataComponents
 
-  def mount(_params, _session, socket) do
-    source_code = File.read!(__ENV__.file)
-    notes_content = File.read!("notes/kata_92_dropzone_notes.md")
-
+  def update(assigns, socket) do
+    socket = assign(socket, assigns)
     socket =
       socket
       |> assign(active_tab: "notes")
-      |> assign(source_code: source_code)
-      |> assign(notes_content: notes_content)
+      
+      
       |> assign(:uploaded_files, [])
       |> allow_upload(:files, accept: :any, max_entries: 3)
 
@@ -19,12 +17,7 @@ defmodule ElixirKatasWeb.Kata92FileDropzoneLive do
 
   def render(assigns) do
     ~H"""
-    <.kata_viewer 
-      active_tab={@active_tab} 
-      title="Kata 92: File Dropzone" 
-      source_code={@source_code} 
-      notes_content={@notes_content}
-    >
+    
       <div class="p-6 max-w-2xl mx-auto">
         <div class="mb-6 text-sm text-gray-500">
           Advanced file dropzone with management
@@ -33,7 +26,7 @@ defmodule ElixirKatasWeb.Kata92FileDropzoneLive do
         <div class="bg-white p-6 rounded-lg shadow-sm border">
           <h3 class="text-lg font-medium mb-4">File Dropzone</h3>
           
-          <form phx-submit="save" phx-change="validate">
+          <form phx-submit="save" phx-target={@myself} phx-change="validate" phx-target={@myself}>
             <!-- Dropzone -->
             <div 
               phx-drop-target={@uploads.files.ref}
@@ -66,7 +59,7 @@ defmodule ElixirKatasWeb.Kata92FileDropzoneLive do
                       </div>
                       <button 
                         type="button" 
-                        phx-click="cancel-upload" 
+                        phx-click="cancel-upload" phx-target={@myself} 
                         phx-value-ref={entry.ref}
                         class="text-gray-400 hover:text-red-500 p-1"
                       >
@@ -101,7 +94,7 @@ defmodule ElixirKatasWeb.Kata92FileDropzoneLive do
           <% end %>
         </div>
       </div>
-    </.kata_viewer>
+    
     """
   end
 

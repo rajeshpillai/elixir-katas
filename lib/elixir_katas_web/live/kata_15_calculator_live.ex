@@ -1,16 +1,14 @@
 defmodule ElixirKatasWeb.Kata15CalculatorLive do
-  use ElixirKatasWeb, :live_view
+  use ElixirKatasWeb, :live_component
   import ElixirKatasWeb.KataComponents
 
-  def mount(_params, _session, socket) do
-    source_code = File.read!(__ENV__.file)
-    notes_content = File.read!("notes/kata_15_calculator_notes.md")
-
+  def update(assigns, socket) do
+    socket = assign(socket, assigns)
     {:ok, 
      socket
      |> assign(active_tab: "notes")
-     |> assign(source_code: source_code)
-     |> assign(notes_content: notes_content)
+     
+     
      |> assign(display: "0")
      |> assign(acc: nil)
      |> assign(op: nil)
@@ -19,12 +17,7 @@ defmodule ElixirKatasWeb.Kata15CalculatorLive do
 
   def render(assigns) do
     ~H"""
-    <.kata_viewer 
-      active_tab={@active_tab} 
-      title="Kata 15: The Calculator" 
-      source_code={@source_code} 
-      notes_content={@notes_content}
-    >
+    
       <div class="flex items-center justify-center p-8 h-full">
         <div class="w-72 bg-gray-900 rounded-2xl p-4 shadow-2xl">
           <!-- Display -->
@@ -40,36 +33,36 @@ defmodule ElixirKatasWeb.Kata15CalculatorLive do
           <!-- Keypad -->
           <div class="grid grid-cols-4 gap-3">
              <!-- Row 1 -->
-             <button phx-click="clear" class="btn btn-warning w-full">C</button>
-             <button phx-click="op" phx-value-op="/" class="btn btn-secondary w-full">÷</button>
-             <button phx-click="op" phx-value-op="*" class="btn btn-secondary w-full">×</button>
-             <button phx-click="backspace" class="btn btn-ghost w-full">⌫</button>
+             <button phx-click="clear" phx-target={@myself} class="btn btn-warning w-full">C</button>
+             <button phx-click="op" phx-target={@myself} phx-value-op="/" class="btn btn-secondary w-full">÷</button>
+             <button phx-click="op" phx-target={@myself} phx-value-op="*" class="btn btn-secondary w-full">×</button>
+             <button phx-click="backspace" phx-target={@myself} class="btn btn-ghost w-full">⌫</button>
 
              <!-- Row 2 -->
-             <button phx-click="num" phx-value-n="7" class="btn btn-neutral w-full text-xl">7</button>
-             <button phx-click="num" phx-value-n="8" class="btn btn-neutral w-full text-xl">8</button>
-             <button phx-click="num" phx-value-n="9" class="btn btn-neutral w-full text-xl">9</button>
-             <button phx-click="op" phx-value-op="-" class="btn btn-secondary w-full text-xl">-</button>
+             <button phx-click="num" phx-target={@myself} phx-value-n="7" class="btn btn-neutral w-full text-xl">7</button>
+             <button phx-click="num" phx-target={@myself} phx-value-n="8" class="btn btn-neutral w-full text-xl">8</button>
+             <button phx-click="num" phx-target={@myself} phx-value-n="9" class="btn btn-neutral w-full text-xl">9</button>
+             <button phx-click="op" phx-target={@myself} phx-value-op="-" class="btn btn-secondary w-full text-xl">-</button>
 
              <!-- Row 3 -->
-             <button phx-click="num" phx-value-n="4" class="btn btn-neutral w-full text-xl">4</button>
-             <button phx-click="num" phx-value-n="5" class="btn btn-neutral w-full text-xl">5</button>
-             <button phx-click="num" phx-value-n="6" class="btn btn-neutral w-full text-xl">6</button>
-             <button phx-click="op" phx-value-op="+" class="btn btn-secondary w-full text-xl">+</button>
+             <button phx-click="num" phx-target={@myself} phx-value-n="4" class="btn btn-neutral w-full text-xl">4</button>
+             <button phx-click="num" phx-target={@myself} phx-value-n="5" class="btn btn-neutral w-full text-xl">5</button>
+             <button phx-click="num" phx-target={@myself} phx-value-n="6" class="btn btn-neutral w-full text-xl">6</button>
+             <button phx-click="op" phx-target={@myself} phx-value-op="+" class="btn btn-secondary w-full text-xl">+</button>
 
              <!-- Row 4 -->
-             <button phx-click="num" phx-value-n="1" class="btn btn-neutral w-full text-xl">1</button>
-             <button phx-click="num" phx-value-n="2" class="btn btn-neutral w-full text-xl">2</button>
-             <button phx-click="num" phx-value-n="3" class="btn btn-neutral w-full text-xl">3</button>
-             <button phx-click="eval" class="btn btn-primary w-full text-xl row-span-2">=</button>
+             <button phx-click="num" phx-target={@myself} phx-value-n="1" class="btn btn-neutral w-full text-xl">1</button>
+             <button phx-click="num" phx-target={@myself} phx-value-n="2" class="btn btn-neutral w-full text-xl">2</button>
+             <button phx-click="num" phx-target={@myself} phx-value-n="3" class="btn btn-neutral w-full text-xl">3</button>
+             <button phx-click="eval" phx-target={@myself} class="btn btn-primary w-full text-xl row-span-2">=</button>
 
              <!-- Row 5 -->
-             <button phx-click="num" phx-value-n="0" class="btn btn-neutral w-full text-xl col-span-2">0</button>
-             <button phx-click="dot" class="btn btn-neutral w-full text-xl">.</button>
+             <button phx-click="num" phx-target={@myself} phx-value-n="0" class="btn btn-neutral w-full text-xl col-span-2">0</button>
+             <button phx-click="dot" phx-target={@myself} class="btn btn-neutral w-full text-xl">.</button>
           </div>
         </div>
       </div>
-    </.kata_viewer>
+    
     """
   end
 

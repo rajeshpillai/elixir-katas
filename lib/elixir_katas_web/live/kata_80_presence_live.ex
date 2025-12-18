@@ -1,22 +1,20 @@
 defmodule ElixirKatasWeb.Kata80PresenceListLive do
-  use ElixirKatasWeb, :live_view
+  use ElixirKatasWeb, :live_component
   import ElixirKatasWeb.KataComponents
 
   alias ElixirKatasWeb.Presence
 
   @topic "presence:demo"
 
-  def mount(_params, _session, socket) do
-    source_code = File.read!(__ENV__.file)
-    notes_content = File.read!("notes/kata_80_presence_notes.md")
-
+  def update(assigns, socket) do
+    socket = assign(socket, assigns)
     username = "User#{:rand.uniform(9999)}"
 
     socket =
       socket
       |> assign(active_tab: "notes")
-      |> assign(source_code: source_code)
-      |> assign(notes_content: notes_content)
+      
+      
       |> assign(:username, username)
       |> assign(:online_users, [])
 
@@ -45,12 +43,7 @@ defmodule ElixirKatasWeb.Kata80PresenceListLive do
 
   def render(assigns) do
     ~H"""
-    <.kata_viewer 
-      active_tab={@active_tab} 
-      title="Kata 80: Presence List" 
-      source_code={@source_code} 
-      notes_content={@notes_content}
-    >
+    
       <div class="p-6 max-w-2xl mx-auto">
         <div class="mb-6 text-sm text-gray-500">
           Track who is online using Phoenix.Presence. Open in multiple tabs to see real-time updates!
@@ -106,7 +99,7 @@ defmodule ElixirKatasWeb.Kata80PresenceListLive do
           </div>
         </div>
       </div>
-    </.kata_viewer>
+    
     """
   end
 

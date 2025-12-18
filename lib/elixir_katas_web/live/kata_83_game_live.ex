@@ -1,16 +1,14 @@
 defmodule ElixirKatasWeb.Kata83TheGameStateLive do
-  use ElixirKatasWeb, :live_view
+  use ElixirKatasWeb, :live_component
   import ElixirKatasWeb.KataComponents
 
-  def mount(_params, _session, socket) do
-    source_code = File.read!(__ENV__.file)
-    notes_content = File.read!("notes/kata_83_game_notes.md")
-
+  def update(assigns, socket) do
+    socket = assign(socket, assigns)
     socket =
       socket
       |> assign(active_tab: "notes")
-      |> assign(source_code: source_code)
-      |> assign(notes_content: notes_content)
+      
+      
       |> assign(:player1_score, 0)
       |> assign(:player2_score, 0)
       |> assign(:current_turn, :player1)
@@ -21,12 +19,7 @@ defmodule ElixirKatasWeb.Kata83TheGameStateLive do
 
   def render(assigns) do
     ~H"""
-    <.kata_viewer 
-      active_tab={@active_tab} 
-      title="Kata 83: The Game State" 
-      source_code={@source_code} 
-      notes_content={@notes_content}
-    >
+    
       <div class="p-6 max-w-4xl mx-auto">
         <div class="mb-6 text-sm text-gray-500">
           Simple multiplayer game state management demonstration.
@@ -44,7 +37,7 @@ defmodule ElixirKatasWeb.Kata83TheGameStateLive do
                 <% end %>
               </div>
               <button 
-                phx-click="score_point" 
+                phx-click="score_point" phx-target={@myself} 
                 phx-value-player="player1"
                 disabled={@current_turn != :player1}
                 class="w-full px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
@@ -63,7 +56,7 @@ defmodule ElixirKatasWeb.Kata83TheGameStateLive do
                 <% end %>
               </div>
               <button 
-                phx-click="score_point" 
+                phx-click="score_point" phx-target={@myself} 
                 phx-value-player="player2"
                 disabled={@current_turn != :player2}
                 class="w-full px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
@@ -75,7 +68,7 @@ defmodule ElixirKatasWeb.Kata83TheGameStateLive do
 
           <div class="flex gap-2 mb-4">
             <button 
-              phx-click="reset_game"
+              phx-click="reset_game" phx-target={@myself}
               class="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700"
             >
               Reset Game
@@ -97,7 +90,7 @@ defmodule ElixirKatasWeb.Kata83TheGameStateLive do
           </div>
         </div>
       </div>
-    </.kata_viewer>
+    
     """
   end
 

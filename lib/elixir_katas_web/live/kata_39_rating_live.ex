@@ -1,16 +1,14 @@
 defmodule ElixirKatasWeb.Kata39RatingLive do
-  use ElixirKatasWeb, :live_view
+  use ElixirKatasWeb, :live_component
   import ElixirKatasWeb.KataComponents
 
-  def mount(_params, _session, socket) do
-    source_code = File.read!(__ENV__.file)
-    notes_content = File.read!("notes/kata_39_rating_notes.md")
-
+  def update(assigns, socket) do
+    socket = assign(socket, assigns)
     socket =
       socket
       |> assign(active_tab: "notes")
-      |> assign(source_code: source_code)
-      |> assign(notes_content: notes_content)
+      
+      
       |> assign(:rating, 0) # 0 to 5
       |> assign(:submitted_rating, nil)
 
@@ -19,12 +17,7 @@ defmodule ElixirKatasWeb.Kata39RatingLive do
 
   def render(assigns) do
     ~H"""
-    <.kata_viewer 
-      active_tab={@active_tab} 
-      title="Kata 39: Rating Input" 
-      source_code={@source_code} 
-      notes_content={@notes_content}
-    >
+    
       <div class="p-6 max-w-lg mx-auto">
         <div class="mb-6 text-sm text-gray-500">
            Click a star to rate. The hidden input's value updates automatically.
@@ -37,7 +30,7 @@ defmodule ElixirKatasWeb.Kata39RatingLive do
              <%= for i <- 1..5 do %>
                 <button
                   type="button"
-                  phx-click="rate"
+                  phx-click="rate" phx-target={@myself}
                   phx-value-score={i}
                   class="focus:outline-none focus:scale-110 transition-transform"
                 >
@@ -46,7 +39,7 @@ defmodule ElixirKatasWeb.Kata39RatingLive do
              <% end %>
           </div>
           
-          <form phx-submit="save">
+          <form phx-submit="save" phx-target={@myself}>
             <!-- The actual source of truth for the form submission -->
             <input type="hidden" name="rating" value={@rating} />
             
@@ -80,7 +73,7 @@ defmodule ElixirKatasWeb.Kata39RatingLive do
           </div>
         <% end %>
       </div>
-    </.kata_viewer>
+    
     """
   end
 

@@ -1,16 +1,14 @@
 defmodule ElixirKatasWeb.Kata33FormatsLive do
-  use ElixirKatasWeb, :live_view
+  use ElixirKatasWeb, :live_component
   import ElixirKatasWeb.KataComponents
 
-  def mount(_params, _session, socket) do
-    source_code = File.read!(__ENV__.file)
-    notes_content = File.read!("notes/kata_33_formats_notes.md")
-
+  def update(assigns, socket) do
+    socket = assign(socket, assigns)
     socket =
       socket
       |> assign(active_tab: "notes")
-      |> assign(source_code: source_code)
-      |> assign(notes_content: notes_content)
+      
+      
       |> assign(:form, to_form(%{"email" => "", "phone" => ""}))
       |> assign(:submitted_data, nil)
 
@@ -19,12 +17,7 @@ defmodule ElixirKatasWeb.Kata33FormatsLive do
 
   def render(assigns) do
     ~H"""
-    <.kata_viewer 
-      active_tab={@active_tab} 
-      title="Kata 33: Formats" 
-      source_code={@source_code} 
-      notes_content={@notes_content}
-    >
+    
       <div class="p-6 max-w-lg mx-auto">
         <div class="mb-6 text-sm text-gray-500">
            Validating input formats (Email & Phone) using Regex.
@@ -99,7 +92,7 @@ defmodule ElixirKatasWeb.Kata33FormatsLive do
           </div>
         </div>
       </div>
-    </.kata_viewer>
+    
     """
   end
 

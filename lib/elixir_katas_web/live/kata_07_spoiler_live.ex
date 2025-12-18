@@ -1,27 +1,20 @@
 defmodule ElixirKatasWeb.Kata07SpoilerLive do
-  use ElixirKatasWeb, :live_view
+  use ElixirKatasWeb, :live_component
   import ElixirKatasWeb.KataComponents
 
-  def mount(_params, _session, socket) do
-    source_code = File.read!(__ENV__.file)
-    notes_content = File.read!("notes/kata_07_spoiler_notes.md")
-
+  def update(assigns, socket) do
+    socket = assign(socket, assigns)
     {:ok,
      socket
      |> assign(active_tab: "notes")
-     |> assign(source_code: source_code)
-     |> assign(notes_content: notes_content)
+     
+     
      |> assign(visible: false)}
   end
 
   def render(assigns) do
     ~H"""
-    <.kata_viewer 
-      active_tab={@active_tab} 
-      title="Kata 07: The Spoiler" 
-      source_code={@source_code} 
-      notes_content={@notes_content}
-    >
+    
       <div class="flex flex-col gap-8 mx-auto mt-12 items-center w-full max-w-lg">
         
         <div class="card bg-base-100 shadow-xl w-full border border-base-300">
@@ -40,7 +33,7 @@ defmodule ElixirKatasWeb.Kata07SpoilerLive do
                <!-- The Overlay -->
                <div :if={!@visible} class="absolute inset-0 flex items-center justify-center bg-base-100/50 backdrop-blur-[2px] z-10">
                  <button 
-                   phx-click="toggle_visibility" 
+                   phx-click="toggle_visibility" phx-target={@myself} 
                    class="btn btn-sm btn-primary animate-pulse"
                  >
                    Reveal Spoiler
@@ -52,7 +45,7 @@ defmodule ElixirKatasWeb.Kata07SpoilerLive do
             <div class="card-actions justify-end mt-4">
                <button 
                  :if={@visible}
-                 phx-click="toggle_visibility" 
+                 phx-click="toggle_visibility" phx-target={@myself} 
                  class="btn btn-ghost btn-xs"
                >
                  Hide Spoiler
@@ -62,7 +55,7 @@ defmodule ElixirKatasWeb.Kata07SpoilerLive do
         </div>
 
       </div>
-    </.kata_viewer>
+    
     """
   end
 

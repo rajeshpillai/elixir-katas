@@ -1,33 +1,26 @@
 defmodule ElixirKatasWeb.Kata04TogglerLive do
-  use ElixirKatasWeb, :live_view
+  use ElixirKatasWeb, :live_component
   import ElixirKatasWeb.KataComponents
 
-  def mount(_params, _session, socket) do
-    source_code = File.read!(__ENV__.file)
-    notes_content = File.read!("notes/kata_04_toggler_notes.md")
-
+  def update(assigns, socket) do
+    socket = assign(socket, assigns)
     {:ok,
      socket
      |> assign(active_tab: "notes")
-     |> assign(source_code: source_code)
-     |> assign(notes_content: notes_content)
+     
+     
      |> assign(show_details: false)
      |> assign(is_active: false)}
   end
 
   def render(assigns) do
     ~H"""
-    <.kata_viewer 
-      active_tab={@active_tab} 
-      title="Kata 04: The Toggler" 
-      source_code={@source_code} 
-      notes_content={@notes_content}
-    >
+    
       <div class="flex flex-col gap-8 max-w-lg mx-auto mt-12 items-center">
         
         <!-- Conditional Rendering Example -->
         <div class="flex flex-col items-center gap-4 w-full">
-          <button phx-click="toggle_details" class="btn btn-primary">
+          <button phx-click="toggle_details" phx-target={@myself} class="btn btn-primary">
             {if @show_details, do: "Hide Details", else: "Show Details"}
           </button>
 
@@ -47,7 +40,7 @@ defmodule ElixirKatasWeb.Kata04TogglerLive do
           <h3 class="text-lg font-semibold">Dynamic Styling</h3>
           
           <button 
-            phx-click="toggle_active" 
+            phx-click="toggle_active" phx-target={@myself} 
             class={[
               "card w-full shadow-xl transition-all duration-300 cursor-pointer border-2",
               if(@is_active, do: "bg-secondary text-secondary-content scale-105 border-secondary", else: "bg-base-100 hover:bg-base-200 border-base-300")
@@ -63,7 +56,7 @@ defmodule ElixirKatasWeb.Kata04TogglerLive do
         </div>
 
       </div>
-    </.kata_viewer>
+    
     """
   end
 

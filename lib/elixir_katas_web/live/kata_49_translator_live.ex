@@ -1,5 +1,5 @@
 defmodule ElixirKatasWeb.Kata49TranslatorLive do
-  use ElixirKatasWeb, :live_view
+  use ElixirKatasWeb, :live_component
   import ElixirKatasWeb.KataComponents
 
   @translations %{
@@ -33,15 +33,13 @@ defmodule ElixirKatasWeb.Kata49TranslatorLive do
     }
   }
 
-  def mount(_params, _session, socket) do
-    source_code = File.read!(__ENV__.file)
-    notes_content = File.read!("notes/kata_49_translator_notes.md")
-
+  def update(assigns, socket) do
+    socket = assign(socket, assigns)
     socket =
       socket
       |> assign(active_tab: "notes")
-      |> assign(source_code: source_code)
-      |> assign(notes_content: notes_content)
+      
+      
       |> assign(:locale, "en")
 
     {:ok, socket}
@@ -49,12 +47,7 @@ defmodule ElixirKatasWeb.Kata49TranslatorLive do
 
   def render(assigns) do
     ~H"""
-    <.kata_viewer 
-      active_tab={@active_tab} 
-      title="Kata 49: The Translator (i18n)" 
-      source_code={@source_code} 
-      notes_content={@notes_content}
-    >
+    
       <div class="p-6 max-w-lg mx-auto">
         <div class="mb-6 text-sm text-gray-500">
            Switch languages to see translated content. In production, use Gettext.
@@ -68,7 +61,7 @@ defmodule ElixirKatasWeb.Kata49TranslatorLive do
             </label>
             <div class="flex gap-2">
               <button
-                phx-click="set_locale"
+                phx-click="set_locale" phx-target={@myself}
                 phx-value-locale="en"
                 class={"px-4 py-2 rounded text-sm font-medium " <> 
                        if(@locale == "en", do: "bg-indigo-600 text-white", else: "bg-gray-100 text-gray-700 hover:bg-gray-200")}
@@ -76,7 +69,7 @@ defmodule ElixirKatasWeb.Kata49TranslatorLive do
                 🇬🇧 English
               </button>
               <button
-                phx-click="set_locale"
+                phx-click="set_locale" phx-target={@myself}
                 phx-value-locale="es"
                 class={"px-4 py-2 rounded text-sm font-medium " <> 
                        if(@locale == "es", do: "bg-indigo-600 text-white", else: "bg-gray-100 text-gray-700 hover:bg-gray-200")}
@@ -84,7 +77,7 @@ defmodule ElixirKatasWeb.Kata49TranslatorLive do
                 🇪🇸 Español
               </button>
               <button
-                phx-click="set_locale"
+                phx-click="set_locale" phx-target={@myself}
                 phx-value-locale="fr"
                 class={"px-4 py-2 rounded text-sm font-medium " <> 
                        if(@locale == "fr", do: "bg-indigo-600 text-white", else: "bg-gray-100 text-gray-700 hover:bg-gray-200")}
@@ -92,7 +85,7 @@ defmodule ElixirKatasWeb.Kata49TranslatorLive do
                 🇫🇷 Français
               </button>
               <button
-                phx-click="set_locale"
+                phx-click="set_locale" phx-target={@myself}
                 phx-value-locale="de"
                 class={"px-4 py-2 rounded text-sm font-medium " <> 
                        if(@locale == "de", do: "bg-indigo-600 text-white", else: "bg-gray-100 text-gray-700 hover:bg-gray-200")}
@@ -130,7 +123,7 @@ defmodule ElixirKatasWeb.Kata49TranslatorLive do
           </div>
         </div>
       </div>
-    </.kata_viewer>
+    
     """
   end
 

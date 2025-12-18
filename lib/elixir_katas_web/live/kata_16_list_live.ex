@@ -1,30 +1,23 @@
 defmodule ElixirKatasWeb.Kata16ListLive do
-  use ElixirKatasWeb, :live_view
+  use ElixirKatasWeb, :live_component
   import ElixirKatasWeb.KataComponents
 
-  def mount(_params, _session, socket) do
-    source_code = File.read!(__ENV__.file)
-    notes_content = File.read!("notes/kata_16_list_notes.md")
-
+  def update(assigns, socket) do
+    socket = assign(socket, assigns)
     {:ok, 
      socket
      |> assign(active_tab: "notes")
-     |> assign(source_code: source_code)
-     |> assign(notes_content: notes_content)
+     
+     
      |> assign(items: ["Learn Elixir", "Master LiveView"])
      |> assign(new_item: "")}
   end
 
   def render(assigns) do
     ~H"""
-    <.kata_viewer 
-      active_tab={@active_tab} 
-      title="Kata 16: The List" 
-      source_code={@source_code} 
-      notes_content={@notes_content}
-    >
+    
       <div class="flex flex-col items-center p-8 gap-8">
-        <form phx-submit="add" class="flex gap-2 w-full max-w-md">
+        <form phx-submit="add" phx-target={@myself} class="flex gap-2 w-full max-w-md">
           <input 
             type="text" 
             name="text" 
@@ -46,7 +39,7 @@ defmodule ElixirKatasWeb.Kata16ListLive do
            </ul>
         </div>
       </div>
-    </.kata_viewer>
+    
     """
   end
 

@@ -1,16 +1,14 @@
 defmodule ElixirKatasWeb.Kata91MaskedInputLive do
-  use ElixirKatasWeb, :live_view
+  use ElixirKatasWeb, :live_component
   import ElixirKatasWeb.KataComponents
 
-  def mount(_params, _session, socket) do
-    source_code = File.read!(__ENV__.file)
-    notes_content = File.read!("notes/kata_91_masked_notes.md")
-
+  def update(assigns, socket) do
+    socket = assign(socket, assigns)
     socket =
       socket
       |> assign(active_tab: "notes")
-      |> assign(source_code: source_code)
-      |> assign(notes_content: notes_content)
+      
+      
       |> assign(:form, to_form(%{"phone" => "", "card" => "", "date" => ""}))
 
     {:ok, socket}
@@ -18,12 +16,7 @@ defmodule ElixirKatasWeb.Kata91MaskedInputLive do
 
   def render(assigns) do
     ~H"""
-    <.kata_viewer 
-      active_tab={@active_tab} 
-      title="Kata 91: Masked Input" 
-      source_code={@source_code} 
-      notes_content={@notes_content}
-    >
+    
       <div class="p-6 max-w-2xl mx-auto">
         <div class="mb-6 text-sm text-gray-500">
           Input masking for Phone, Credit Card, and Date using JS Hooks
@@ -92,7 +85,7 @@ defmodule ElixirKatasWeb.Kata91MaskedInputLive do
           </.form>
         </div>
       </div>
-    </.kata_viewer>
+    
     """
   end
 

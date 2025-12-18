@@ -1,16 +1,14 @@
 defmodule ElixirKatasWeb.Kata38TagInputLive do
-  use ElixirKatasWeb, :live_view
+  use ElixirKatasWeb, :live_component
   import ElixirKatasWeb.KataComponents
 
-  def mount(_params, _session, socket) do
-    source_code = File.read!(__ENV__.file)
-    notes_content = File.read!("notes/kata_38_tag_input_notes.md")
-
+  def update(assigns, socket) do
+    socket = assign(socket, assigns)
     socket =
       socket
       |> assign(active_tab: "notes")
-      |> assign(source_code: source_code)
-      |> assign(notes_content: notes_content)
+      
+      
       |> assign(:tags, ["elixir", "phoenix"]) # Initial tags
       |> assign(:current_input, "")
 
@@ -19,12 +17,7 @@ defmodule ElixirKatasWeb.Kata38TagInputLive do
 
   def render(assigns) do
     ~H"""
-    <.kata_viewer 
-      active_tab={@active_tab} 
-      title="Kata 38: Tag Input" 
-      source_code={@source_code} 
-      notes_content={@notes_content}
-    >
+    
       <div class="p-6 max-w-lg mx-auto">
         <div class="mb-6 text-sm text-gray-500">
            Type a tag and press <strong>Enter</strong> or <strong>Comma</strong> to add it.
@@ -42,7 +35,7 @@ defmodule ElixirKatasWeb.Kata38TagInputLive do
                 <%= tag %>
                 <button
                   type="button"
-                  phx-click="remove_tag"
+                  phx-click="remove_tag" phx-target={@myself}
                   phx-value-tag={tag}
                   class="flex-shrink-0 ml-1.5 h-4 w-4 rounded-full inline-flex items-center justify-center text-indigo-400 hover:bg-indigo-200 hover:text-indigo-500 focus:outline-none focus:bg-indigo-500 focus:text-white"
                 >
@@ -55,7 +48,7 @@ defmodule ElixirKatasWeb.Kata38TagInputLive do
             <% end %>
 
             <!-- The Actual Input -->
-            <form phx-submit="add_tag" phx-change="update_input" class="flex-grow min-w-[50px]">
+            <form phx-submit="add_tag" phx-target={@myself} phx-change="update_input" phx-target={@myself} class="flex-grow min-w-[50px]">
               <input
                 type="text"
                 name="value"
@@ -63,7 +56,7 @@ defmodule ElixirKatasWeb.Kata38TagInputLive do
                 class="w-full border-none focus:ring-0 p-0 sm:text-sm"
                 placeholder="Add tag..."
                 autocomplete="off"
-                phx-keydown="keydown"
+                phx-keydown="keydown" phx-target={@myself}
               />
             </form>
           </div>
@@ -73,7 +66,7 @@ defmodule ElixirKatasWeb.Kata38TagInputLive do
           </p>
         </div>
       </div>
-    </.kata_viewer>
+    
     """
   end
 

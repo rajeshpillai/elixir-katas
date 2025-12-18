@@ -1,16 +1,14 @@
 defmodule ElixirKatasWeb.Kata97ImageProcessingLive do
-  use ElixirKatasWeb, :live_view
+  use ElixirKatasWeb, :live_component
   import ElixirKatasWeb.KataComponents
 
-  def mount(_params, _session, socket) do
-    source_code = File.read!(__ENV__.file)
-    notes_content = File.read!("notes/kata_97_images_notes.md")
-
+  def update(assigns, socket) do
+    socket = assign(socket, assigns)
     socket =
       socket
       |> assign(active_tab: "notes")
-      |> assign(source_code: source_code)
-      |> assign(notes_content: notes_content)
+      
+      
       |> assign(:original_path, nil)
       |> assign(:processed_path, nil)
       |> allow_upload(:image, accept: ~w(.jpg .jpeg .png), max_entries: 1)
@@ -20,12 +18,7 @@ defmodule ElixirKatasWeb.Kata97ImageProcessingLive do
 
   def render(assigns) do
     ~H"""
-    <.kata_viewer 
-      active_tab={@active_tab} 
-      title="Kata 97: Image Processing" 
-      source_code={@source_code} 
-      notes_content={@notes_content}
-    >
+    
       <div class="p-6 max-w-2xl mx-auto">
         <div class="mb-6 text-sm text-gray-500">
           Upload and process images using Mogrify (ImageMagick wrapper)
@@ -34,7 +27,7 @@ defmodule ElixirKatasWeb.Kata97ImageProcessingLive do
         <div class="bg-white p-6 rounded-lg shadow-sm border">
           <h3 class="text-lg font-medium mb-4">Resize & Grayscale</h3>
           
-          <form phx-submit="save" phx-change="validate">
+          <form phx-submit="save" phx-target={@myself} phx-change="validate" phx-target={@myself}>
             <div class="mb-4" phx-drop-target={@uploads.image.ref}>
               <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-indigo-500 transition-colors">
                 <.live_file_input upload={@uploads.image} class="block w-full text-sm text-gray-500
@@ -77,7 +70,7 @@ defmodule ElixirKatasWeb.Kata97ImageProcessingLive do
           <% end %>
         </div>
       </div>
-    </.kata_viewer>
+    
     """
   end
 

@@ -1,16 +1,14 @@
 defmodule ElixirKatasWeb.Kata69CrudLive do
-  use ElixirKatasWeb, :live_view
+  use ElixirKatasWeb, :live_component
   import ElixirKatasWeb.KataComponents
 
-  def mount(_params, _session, socket) do
-    source_code = File.read!(__ENV__.file)
-    notes_content = File.read!("notes/kata_69_crud_notes.md")
-
+  def update(assigns, socket) do
+    socket = assign(socket, assigns)
     socket =
       socket
       |> assign(active_tab: "notes")
-      |> assign(source_code: source_code)
-      |> assign(notes_content: notes_content)
+      
+      
       |> assign(:items, ["Item 1", "Item 2"])
 
     {:ok, socket}
@@ -18,12 +16,7 @@ defmodule ElixirKatasWeb.Kata69CrudLive do
 
   def render(assigns) do
     ~H"""
-    <.kata_viewer 
-      active_tab={@active_tab} 
-      title="Kata 69: The CRUD" 
-      source_code={@source_code} 
-      notes_content={@notes_content}
-    >
+    
       <div class="p-6 max-w-2xl mx-auto">
         <div class="mb-6 text-sm text-gray-500">
            Interactive the crud demonstration.
@@ -34,19 +27,19 @@ defmodule ElixirKatasWeb.Kata69CrudLive do
           <div class="space-y-4">
             <div class="flex gap-2">
               <input type="text" id="new-item" class="flex-1 px-4 py-2 border rounded" placeholder="New item..."/>
-              <button phx-click="create_item" class="px-4 py-2 bg-green-600 text-white rounded">Create</button>
+              <button phx-click="create_item" phx-target={@myself} class="px-4 py-2 bg-green-600 text-white rounded">Create</button>
             </div>
             <%= for {item, idx} <- Enum.with_index(@items) do %>
               <div class="p-3 bg-gray-50 rounded flex justify-between">
                 <span><%= item %></span>
-                <button phx-click="delete_item" phx-value-idx={idx} class="text-red-600">Delete</button>
+                <button phx-click="delete_item" phx-target={@myself} phx-value-idx={idx} class="text-red-600">Delete</button>
               </div>
             <% end %>
           </div>
     
         </div>
       </div>
-    </.kata_viewer>
+    
     """
   end
 

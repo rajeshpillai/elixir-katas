@@ -1,16 +1,14 @@
 defmodule ElixirKatasWeb.Kata70OptimisticLive do
-  use ElixirKatasWeb, :live_view
+  use ElixirKatasWeb, :live_component
   import ElixirKatasWeb.KataComponents
 
-  def mount(_params, _session, socket) do
-    source_code = File.read!(__ENV__.file)
-    notes_content = File.read!("notes/kata_70_optimistic_notes.md")
-
+  def update(assigns, socket) do
+    socket = assign(socket, assigns)
     socket =
       socket
       |> assign(active_tab: "notes")
-      |> assign(source_code: source_code)
-      |> assign(notes_content: notes_content)
+      
+      
       |> assign(:saving, false)
 
     {:ok, socket}
@@ -18,12 +16,7 @@ defmodule ElixirKatasWeb.Kata70OptimisticLive do
 
   def render(assigns) do
     ~H"""
-    <.kata_viewer 
-      active_tab={@active_tab} 
-      title="Kata 70: Optimistic UI" 
-      source_code={@source_code} 
-      notes_content={@notes_content}
-    >
+    
       <div class="p-6 max-w-2xl mx-auto">
         <div class="mb-6 text-sm text-gray-500">
            Interactive optimistic ui demonstration.
@@ -32,7 +25,7 @@ defmodule ElixirKatasWeb.Kata70OptimisticLive do
         <div class="bg-white p-6 rounded-lg shadow-sm border">
 
           <div class="space-y-4">
-            <button phx-click="save_optimistic" class="px-4 py-2 bg-indigo-600 text-white rounded">
+            <button phx-click="save_optimistic" phx-target={@myself} class="px-4 py-2 bg-indigo-600 text-white rounded">
               Save (Optimistic)
             </button>
             <%= if @saving do %>
@@ -48,7 +41,7 @@ defmodule ElixirKatasWeb.Kata70OptimisticLive do
     
         </div>
       </div>
-    </.kata_viewer>
+    
     """
   end
 
