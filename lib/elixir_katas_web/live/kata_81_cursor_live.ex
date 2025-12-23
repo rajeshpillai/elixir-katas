@@ -9,6 +9,17 @@ defmodule ElixirKatasWeb.Kata81LiveCursorLive do
     {:ok, socket}
   end
 
+  # Handle forwarded events from KataHostLive (e.g., cursor-move from hooks)
+  def update(%{event: "cursor-move", params: %{"x" => x, "y" => y}}, socket) do
+    # Broadcast cursor position to all subscribers
+    Phoenix.PubSub.broadcast(
+      ElixirKatas.PubSub,
+      @topic,
+      {:cursor_update, socket.assigns.username, x, y, socket.assigns.color}
+    )
+    {:ok, socket}
+  end
+
   def update(assigns, socket) do
     if socket.assigns[:__initialized__] do
       {:ok, assign(socket, assigns)}
@@ -56,6 +67,7 @@ defmodule ElixirKatasWeb.Kata81LiveCursorLive do
             id="cursor-area"
             class="h-96 bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 rounded relative overflow-hidden"
             phx-hook="CursorTracker"
+            phx-target={@myself}
           >
             <div class="absolute top-4 left-4 bg-white/90 backdrop-blur px-4 py-2 rounded-lg shadow-md">
               <div class="text-xs text-gray-500 mb-2">Move your mouse in this area</div>

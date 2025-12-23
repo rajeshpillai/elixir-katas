@@ -254,4 +254,12 @@ defmodule ElixirKatasWeb.KataHostLive do
         {:noreply, put_flash(socket, :error, "Cannot revert as Guest.")}
      end
   end
+
+  # Catch-all to forward hook events to the component  
+  def handle_event(event, params, socket) do
+    if socket.assigns.dynamic_module do
+      send_update(socket.assigns.dynamic_module, id: "kata-sandbox", event: event, params: params)
+    end
+    {:noreply, socket}
+  end
 end

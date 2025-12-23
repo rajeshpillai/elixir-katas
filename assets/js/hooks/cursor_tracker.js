@@ -24,7 +24,7 @@ export const CursorTracker = {
             const x = e.clientX - rect.left
             const y = e.clientY - rect.top
 
-            // Push event to server
+            // Push event to the LiveComponent
             this.pushEvent('cursor-move', { x: Math.round(x), y: Math.round(y) })
         }
 
