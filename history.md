@@ -193,3 +193,77 @@ This file tracks your progress through the Phoenix LiveView Katas.
 - `feat: dynamic kata_id resolution from URL slugs`
 - `tool: refined bulk migration script with aggressive variable stripping`
 - `refactor: migrate all katas to dynamically hosted LiveComponents`
+
+### 2025-12-23 - Real-Time Katas Bug Fixes & Documentation Updates
+
+**Objective**: Fix critical bugs in real-time katas (79-81) and update kata notes with comprehensive problem statements and implementation guides.
+
+**Changes Made**:
+
+1. **Fixed Input Event Handling**
+   - Corrected input binding from `phx-keyup` to `phx-change` with form wrappers in multiple katas
+   - Added `name="value"` attributes for proper value capture
+   - Fixed katas: 10 (Character Counter), 22 (Highlighter), 38 (Tag Input), 63 (Send Update), 79 (Typing Indicator)
+
+2. **Fixed Pattern Matching Bug in KataHostLive**
+   - Added `when is_reference(ref)` guard to `handle_info({ref, result}, socket)` 
+   - Prevented PubSub messages like `{:user_typing, username}` from being incorrectly matched as Task results
+   - Fixed crash: `ArgumentError: cannot invoke demonitor/2 with atom`
+
+3. **Implemented JavaScript Hook Event Forwarding**
+   - Added catch-all `handle_event/3` in `KataHostLive` to forward hook events to LiveComponents
+   - Implemented `update/2` clause in Kata 81 to handle forwarded `cursor-move` events
+   - Fixed cursor tracking by properly routing JavaScript hook events to LiveComponents
+
+4. **Fixed Compilation Errors**
+   - Corrected malformed `update/2` functions in Kata 80 (Presence) and Kata 81 (Cursor)
+   - Fixed duplicate `assign` calls and unbalanced `if/else` blocks from bulk migration script
+
+5. **Added Collapsible Sidebar**
+   - Implemented burger menu toggle for sidebar navigation
+   - Added smooth CSS transitions (300ms) for slide in/out animation
+   - JavaScript `toggleSidebar()` function with `-ml-64` class toggle
+
+6. **Updated Kata Notes Documentation**
+   - Created comprehensive notes for Katas 77-81 and 86
+   - Each note includes: Goal, Problem Statement, Key Concepts with code examples, Implementation Steps, Tips, and Real-World Applications
+   - Followed Kata 01 format for consistency
+
+**Katas Fixed**:
+- ✅ Kata 79 (Typing Indicator) - Real-time typing indicators work across tabs
+- ✅ Kata 81 (Cursor Tracking) - Multi-user cursor tracking fully functional
+- ✅ Kata 80 (Presence List) - Compilation errors resolved
+- ✅ Kata 10, 22, 38, 63 - Input handling corrected
+
+**Files Modified**:
+- `lib/elixir_katas_web/live/kata_host_live.ex` - Pattern matching fix, event forwarding
+- `lib/elixir_katas_web/live/kata_79_typing_live.ex` - Input binding, state preservation
+- `lib/elixir_katas_web/live/kata_80_presence_live.ex` - Fixed update/2 structure
+- `lib/elixir_katas_web/live/kata_81_cursor_live.ex` - Event handling, fixed update/2
+- `lib/elixir_katas_web/live/kata_10_character_counter_live.ex` - Form binding
+- `lib/elixir_katas_web/live/kata_22_highlighter_live.ex` - Form binding
+- `lib/elixir_katas_web/live/kata_38_tag_input_live.ex` - Keydown handler fix
+- `lib/elixir_katas_web/live/kata_63_send_update_live.ex` - Form binding
+- `assets/js/hooks/cursor_tracker.js` - Event targeting fix
+- `lib/elixir_katas_web/components/layouts.ex` - Sidebar toggle
+- `notes/kata_77_ticker_notes.md` - Comprehensive documentation
+- `notes/kata_78_chat_notes.md` - Comprehensive documentation
+- `notes/kata_79_typing_notes.md` - Comprehensive documentation
+- `notes/kata_80_presence_notes.md` - Comprehensive documentation
+- `notes/kata_81_cursor_notes.md` - Comprehensive documentation
+- `notes/kata_86_clipboard_notes.md` - Comprehensive documentation
+
+**Key Learnings**:
+1. **Input Binding**: Always use `phx-change` on forms with `name="value"`, not `phx-keyup` alone
+2. **Pattern Matching**: Be specific with guards to avoid catching unintended message types
+3. **Hook Events**: JavaScript hooks send events to parent LiveView - need explicit forwarding to LiveComponents
+4. **State Preservation**: LiveComponents need initialization guards in `update/2` to prevent state resets
+
+**Commits**:
+- `fix: correct input event handling in multiple katas`
+- `fix: add pattern matching guard for Task results`
+- `fix: implement hook event forwarding to LiveComponents`
+- `fix: resolve compilation errors in Kata 80 and 81`
+- `feat: add collapsible sidebar with burger menu`
+- `docs: update kata notes with problem statements and implementations`
+
