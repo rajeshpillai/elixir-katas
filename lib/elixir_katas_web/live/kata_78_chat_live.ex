@@ -4,8 +4,18 @@ defmodule ElixirKatasWeb.Kata78ChatRoomLive do
 
   @topic "chat:lobby"
 
+  def update(%{info_msg: msg}, socket) do
+    {:noreply, socket} = handle_info(msg, socket)
+    {:ok, socket}
+  end
+
   def update(assigns, socket) do
-    socket = assign(socket, assigns)
+    if socket.assigns[:__initialized__] do
+      {:ok, assign(socket, assigns)}
+    else
+      socket = assign(socket, assigns)
+      socket = assign(socket, :__initialized__, true)
+      socket = assign(socket, assigns)
     # Generate a random username
     username = "User#{:rand.uniform(9999)}"
 
@@ -18,8 +28,9 @@ defmodule ElixirKatasWeb.Kata78ChatRoomLive do
       |> assign(:message_input, "")
       |> assign(:username, username)
       |> assign(:username_set, false)
+      {:ok, socket}
+    end
 
-    {:ok, socket}
   end
 
   def render(assigns) do

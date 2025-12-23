@@ -2,6 +2,11 @@ defmodule ElixirKatasWeb.Kata11StopwatchLive do
   use ElixirKatasWeb, :live_component
   import ElixirKatasWeb.KataComponents
 
+  def update(%{info_msg: msg}, socket) do
+    {:noreply, socket} = handle_info(msg, socket)
+    {:ok, socket}
+  end
+
   def update(assigns, socket) do
     socket = assign(socket, assigns)
     {:ok, 

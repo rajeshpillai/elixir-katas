@@ -5,25 +5,31 @@ defmodule ElixirKatasWeb.Kata79TypingIndicatorLive do
   @topic "typing:demo"
   @typing_timeout 3000
 
-  def update(assigns, socket) do
-    socket = assign(socket, assigns)
-    username = "User#{:rand.uniform(9999)}"
-
-    if connected?(socket) do
-      Phoenix.PubSub.subscribe(ElixirKatas.PubSub, @topic)
-    end
-
-    socket =
-      socket
-      |> assign(active_tab: "notes")
-      
-      
-      |> assign(:typing_users, MapSet.new())
-      |> assign(:message, "")
-      |> assign(:username, username)
-      |> assign(:timer_ref, nil)
-
+  def update(%{info_msg: msg}, socket) do
+    {:noreply, socket} = handle_info(msg, socket)
     {:ok, socket}
+  end
+
+  def update(assigns, socket) do
+    if socket.assigns[:username] do
+      {:ok, assign(socket, assigns)}
+    else
+      username = "User#{:rand.uniform(9999)}"
+
+      if connected?(socket) do
+        Phoenix.PubSub.subscribe(ElixirKatas.PubSub, @topic)
+      end
+
+      socket =
+        socket
+        |> assign(assigns)
+        |> assign(:typing_users, MapSet.new())
+        |> assign(:message, "")
+        |> assign(:username, username)
+        |> assign(:timer_ref, nil)
+
+      {:ok, socket}
+    end
   end
 
   def render(assigns) do
@@ -56,14 +62,17 @@ defmodule ElixirKatasWeb.Kata79TypingIndicatorLive do
             <% end %>
           </div>
           
-          <input 
-            type="text" 
-            phx-keyup="typing" phx-target={@myself}
-            phx-debounce="300"
-            value={@message}
-            placeholder="Type something to broadcast typing indicator..."
-            class="w-full px-4 py-2 border rounded"
-          />
+          <form phx-change="typing" phx-target={@myself}>
+            <input 
+              type="text" 
+              name="value"
+              value={@message}
+              placeholder="Type something to broadcast typing indicator..."
+              class="w-full px-4 py-2 border rounded"
+              phx-debounce="300"
+              autocomplete="off"
+            />
+          </form>
           
           <div class="mt-4 text-xs text-gray-500">
             Open this page in multiple browser tabs and type in different tabs to see typing indicators.

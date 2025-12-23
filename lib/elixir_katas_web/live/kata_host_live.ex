@@ -181,7 +181,7 @@ defmodule ElixirKatasWeb.KataHostLive do
      }
   end
 
-  def handle_info({ref, result}, socket) do
+  def handle_info({ref, result}, socket) when is_reference(ref) do
     Process.demonitor(ref, [:flush])
     
     case result do
@@ -211,6 +211,14 @@ defmodule ElixirKatasWeb.KataHostLive do
       |> assign(:compiling, false)
       |> put_flash(:error, "Compiler crashed: #{inspect(reason)}")
      }
+  end
+
+  # Catch-all to forward messages to the component
+  def handle_info(msg, socket) do
+    if socket.assigns.dynamic_module do
+      send_update(socket.assigns.dynamic_module, id: "kata-sandbox", info_msg: msg)
+    end
+    {:noreply, socket}
   end
   
   def handle_event("revert", _, socket) do

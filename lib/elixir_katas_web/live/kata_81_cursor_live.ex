@@ -4,25 +4,34 @@ defmodule ElixirKatasWeb.Kata81LiveCursorLive do
 
   @topic "cursor:demo"
 
-  def update(assigns, socket) do
-    socket = assign(socket, assigns)
-    username = "User#{:rand.uniform(9999)}"
-    color = generate_color(username)
-
-    if connected?(socket) do
-      Phoenix.PubSub.subscribe(ElixirKatas.PubSub, @topic)
-    end
-
-    socket =
-      socket
-      |> assign(active_tab: "notes")
-      
-      
-      |> assign(:username, username)
-      |> assign(:color, color)
-      |> assign(:cursors, %{})
-
+  def update(%{info_msg: msg}, socket) do
+    {:noreply, socket} = handle_info(msg, socket)
     {:ok, socket}
+  end
+
+  def update(assigns, socket) do
+    if socket.assigns[:__initialized__] do
+      {:ok, assign(socket, assigns)}
+    else
+      socket = assign(socket, assigns)
+      socket = assign(socket, :__initialized__, true)
+      
+      username = "User#{:rand.uniform(9999)}"
+      color = generate_color(username)
+
+      if connected?(socket) do
+        Phoenix.PubSub.subscribe(ElixirKatas.PubSub, @topic)
+      end
+
+      socket =
+        socket
+        |> assign(active_tab: "notes")
+        |> assign(:username, username)
+        |> assign(:color, color)
+        |> assign(:cursors, %{})
+      
+      {:ok, socket}
+    end
   end
 
   def render(assigns) do

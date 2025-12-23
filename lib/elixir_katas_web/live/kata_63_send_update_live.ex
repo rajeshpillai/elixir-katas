@@ -2,16 +2,27 @@ defmodule ElixirKatasWeb.Kata63SendUpdateLive do
   use ElixirKatasWeb, :live_component
   import ElixirKatasWeb.KataComponents
 
+  def update(%{info_msg: msg}, socket) do
+    {:noreply, socket} = handle_info(msg, socket)
+    {:ok, socket}
+  end
+
   def update(assigns, socket) do
-    socket = assign(socket, assigns)
+    if socket.assigns[:__initialized__] do
+      {:ok, assign(socket, assigns)}
+    else
+      socket = assign(socket, assigns)
+      socket = assign(socket, :__initialized__, true)
+      socket = assign(socket, assigns)
     socket =
       socket
       |> assign(active_tab: "notes")
       
       
       |> assign(:message, "")
+      {:ok, socket}
+    end
 
-    {:ok, socket}
   end
 
   def render(assigns) do
@@ -25,8 +36,10 @@ defmodule ElixirKatasWeb.Kata63SendUpdateLive do
         <div class="bg-white p-6 rounded-lg shadow-sm border">
 
           <div class="space-y-4">
-            <input type="text" phx-keyup="update_message" phx-target={@myself} phx-debounce="300" value={@message} 
-                   class="w-full px-4 py-2 border rounded" placeholder="Type something..."/>
+            <form phx-change="update_message" phx-target={@myself}>
+              <input type="text" name="value" phx-debounce="300" value={@message} 
+                     class="w-full px-4 py-2 border rounded" placeholder="Type something..." autocomplete="off"/>
+            </form>
             <div class="p-4 bg-gray-50 rounded">
               <div class="text-sm text-gray-500">Live Update:</div>
               <div class="font-medium"><%= if @message == "", do: "(empty)", else: @message %></div>

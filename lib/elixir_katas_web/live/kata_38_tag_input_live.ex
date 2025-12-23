@@ -85,7 +85,7 @@ defmodule ElixirKatasWeb.Kata38TagInputLive do
   end
 
   # Capture keydown to prevent default form submit if needed or handle specific keys
-  def handle_event("keydown", %{"key" => key, "value" => value}, socket) do
+  def handle_event("keydown", %{"key" => _key}, socket) do
     # We mainly rely on form submit (Enter) or the comma check in update_input
     # But could handle Space or specific keys here.
     {:noreply, socket} 

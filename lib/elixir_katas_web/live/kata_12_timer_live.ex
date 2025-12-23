@@ -2,15 +2,25 @@ defmodule ElixirKatasWeb.Kata12TimerLive do
   use ElixirKatasWeb, :live_component
   import ElixirKatasWeb.KataComponents
 
+  def update(%{info_msg: msg}, socket) do
+    {:noreply, socket} = handle_info(msg, socket)
+    {:ok, socket}
+  end
+
   def update(assigns, socket) do
-    socket = assign(socket, assigns)
-    {:ok, 
-     socket
-     |> assign(active_tab: "notes")
-     
-     
-     |> assign(seconds: 60)
-     |> assign(running: false)}
+    if socket.assigns[:__initialized__] do
+      {:ok, assign(socket, assigns)}
+    else
+      socket = assign(socket, assigns)
+      socket = assign(socket, :__initialized__, true)
+      {:ok, 
+       socket
+       |> assign(active_tab: "notes")
+       
+       
+       |> assign(seconds: 60)
+       |> assign(running: false)}
+    end
   end
 
   def render(assigns) do

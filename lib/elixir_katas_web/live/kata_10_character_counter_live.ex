@@ -25,11 +25,13 @@ defmodule ElixirKatasWeb.Kata10CharacterCounterLive do
                 {String.length(@text)} / {@limit}
               </span>
             </div>
+          <form phx-change="update_text" phx-target={@myself}>
             <textarea 
-              phx-keyup="update_text" phx-target={@myself}
-              class="textarea textarea-bordered h-40 text-lg leading-relaxed focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-300"
+              name="value"
+              class="textarea textarea-bordered h-40 text-lg leading-relaxed focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-300 w-full"
               placeholder="Tell us about yourself"
             >{@text}</textarea>
+          </form>
             <div class="label">
               <span class="label-text-alt text-gray-400">
                 {if String.length(@text) > @limit, do: "You have exceeded the limit!", else: "Keep it concise."}

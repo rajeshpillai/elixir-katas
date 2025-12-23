@@ -2,16 +2,27 @@ defmodule ElixirKatasWeb.Kata70OptimisticLive do
   use ElixirKatasWeb, :live_component
   import ElixirKatasWeb.KataComponents
 
+  def update(%{info_msg: msg}, socket) do
+    {:noreply, socket} = handle_info(msg, socket)
+    {:ok, socket}
+  end
+
   def update(assigns, socket) do
-    socket = assign(socket, assigns)
+    if socket.assigns[:__initialized__] do
+      {:ok, assign(socket, assigns)}
+    else
+      socket = assign(socket, assigns)
+      socket = assign(socket, :__initialized__, true)
+      socket = assign(socket, assigns)
     socket =
       socket
       |> assign(active_tab: "notes")
       
       
       |> assign(:saving, false)
+      {:ok, socket}
+    end
 
-    {:ok, socket}
   end
 
   def render(assigns) do

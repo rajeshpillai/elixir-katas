@@ -32,13 +32,16 @@ defmodule ElixirKatasWeb.Kata22HighlighterLive do
         <div class="mt-6">
           <div class="mb-4">
             <label class="block text-sm font-medium text-gray-700">Search Term</label>
-            <input
-              type="text"
-              phx-keyup="search" phx-target={@myself}
-              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-              placeholder="Type to highlight..."
-              value={@search_term}
-            />
+            <form phx-change="search" phx-target={@myself}>
+              <input
+                type="text"
+                name="value"
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                placeholder="Type to highlight..."
+                value={@search_term}
+                autocomplete="off"
+              />
+            </form>
           </div>
 
           <div class="p-4 bg-gray-50 border rounded-lg text-gray-800 leading-relaxed whitespace-pre-wrap">

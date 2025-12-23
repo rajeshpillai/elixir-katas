@@ -4,8 +4,18 @@ defmodule ElixirKatasWeb.Kata77TheTickerLive do
 
   @topic "stock:ticker"
 
+  def update(%{info_msg: msg}, socket) do
+    {:noreply, socket} = handle_info(msg, socket)
+    {:ok, socket}
+  end
+
   def update(assigns, socket) do
-    socket = assign(socket, assigns)
+    if socket.assigns[:__initialized__] do
+      {:ok, assign(socket, assigns)}
+    else
+      socket = assign(socket, assigns)
+      socket = assign(socket, :__initialized__, true)
+      socket = assign(socket, assigns)
     if connected?(socket) do
       Phoenix.PubSub.subscribe(ElixirKatas.PubSub, @topic)
       
@@ -22,8 +32,9 @@ defmodule ElixirKatasWeb.Kata77TheTickerLive do
       
       |> assign(:stocks, stocks)
       |> assign(:market_open, true)
+      {:ok, socket}
+    end
 
-    {:ok, socket}
   end
 
   def render(assigns) do

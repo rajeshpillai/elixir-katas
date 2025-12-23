@@ -6,38 +6,46 @@ defmodule ElixirKatasWeb.Kata80PresenceListLive do
 
   @topic "presence:demo"
 
+  def update(%{info_msg: msg}, socket) do
+    {:noreply, socket} = handle_info(msg, socket)
+    {:ok, socket}
+  end
+
   def update(assigns, socket) do
-    socket = assign(socket, assigns)
-    username = "User#{:rand.uniform(9999)}"
-
-    socket =
-      socket
-      |> assign(active_tab: "notes")
-      
-      
-      |> assign(:username, username)
-      |> assign(:online_users, [])
-
-    if connected?(socket) do
-      # Subscribe to presence updates
-      Phoenix.PubSub.subscribe(ElixirKatas.PubSub, @topic)
-      
-      # Track this user's presence
-      {:ok, _} = Presence.track(
-        self(),
-        @topic,
-        username,
-        %{
-          joined_at: System.system_time(:second),
-          user_agent: get_connect_info(socket, :user_agent) || "Unknown"
-        }
-      )
-      
-      # Get initial presence list
-      socket = assign(socket, :online_users, list_presences())
-      {:ok, socket}
+    if socket.assigns[:__initialized__] do
+      {:ok, assign(socket, assigns)}
     else
-      {:ok, socket}
+      socket = assign(socket, assigns)
+      socket = assign(socket, :__initialized__, true)
+      
+      username = "User#{:rand.uniform(9999)}"
+
+      socket =
+        socket
+        |> assign(active_tab: "notes")
+        |> assign(:username, username)
+        |> assign(:online_users, [])
+
+      if connected?(socket) do
+        # Subscribe to presence updates
+        Phoenix.PubSub.subscribe(ElixirKatas.PubSub, @topic)
+        
+        # Track this user's presence
+        {:ok, _} = Presence.track(
+          self(),
+          @topic,
+          username,
+          %{
+            joined_at: System.system_time(:second),
+            user_agent: get_connect_info(socket, :user_agent) || "Unknown"
+          }
+        )
+        
+        # Get initial presence list
+        {:ok, assign(socket, :online_users, list_presences())}
+      else
+        {:ok, socket}
+      end
     end
   end
 
