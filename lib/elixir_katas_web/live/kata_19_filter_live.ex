@@ -18,26 +18,26 @@ defmodule ElixirKatasWeb.Kata19FilterLive do
       "PostgreSQL Database"
     ]
 
-    {:ok, 
+    {:ok,
      socket
      |> assign(active_tab: "notes")
-     
-     
+
+
      |> assign(items: items)
      |> assign(query: "")}
   end
 
   def render(assigns) do
     ~H"""
-    
+
       <div class="flex flex-col items-center p-8 gap-8">
         <div class="w-full max-w-md space-y-4">
            <form phx-change="filter" phx-target={@myself} phx-submit="filter" phx-target={@myself} onsubmit="return false;">
-             <input 
-               type="text" 
-               name="query" 
-               value={@query} 
-               placeholder="Search frameworks..." 
+             <input
+               type="text"
+               name="query"
+               value={@query}
+               placeholder="Search frameworks..."
                class="input input-bordered w-full"
                autocomplete="off"
              />
@@ -60,7 +60,7 @@ defmodule ElixirKatasWeb.Kata19FilterLive do
            </div>
         </div>
       </div>
-    
+
     """
   end
 
@@ -71,7 +71,7 @@ defmodule ElixirKatasWeb.Kata19FilterLive do
   def handle_event("set_tab", %{"tab" => tab}, socket) do
     if tab in ["interactive", "source", "notes"] do
        {:noreply, assign(socket, active_tab: tab)}
-    else 
+    else
        {:noreply, socket}
     end
   end

@@ -3,21 +3,21 @@ defmodule ElixirKatasWeb.Kata14KeybindingsLive do
 
   def update(assigns, socket) do
     socket = assign(socket, assigns)
-    {:ok, 
+    {:ok,
      socket
      |> assign(active_tab: "notes")
-     
-     
+
+
      |> assign(count: 0)
      |> assign(last_key: nil)}
   end
 
   def render(assigns) do
     ~H"""
-    
-      <div 
+
+      <div
         class="flex flex-col items-center justify-center p-8 gap-8 min-h-[400px]"
-        phx-window-keydown="keydown_event"
+        phx-window-keydown="keydown_event" phx-target={@myself}
       >
         <div class="text-center space-y-4">
           <h3 class="text-2xl font-bold">Global Keybindings Enabled</h3>
@@ -38,13 +38,14 @@ defmodule ElixirKatasWeb.Kata14KeybindingsLive do
           <div class="stat-desc">Last Key: <span class="badge badge-outline font-mono">{@last_key || "-"}</span></div>
         </div>
       </div>
-    
+
     """
   end
 
   def handle_event("keydown_event", %{"key" => key}, socket) do
     case key do
       "k" -> {:noreply, update(socket, :count, &(&1 + 1)) |> assign(last_key: key)}
+      "K" -> {:noreply, update(socket, :count, &(&1 + 1)) |> assign(last_key: key)}
       "j" -> {:noreply, update(socket, :count, &(&1 - 1)) |> assign(last_key: key)}
       _ -> {:noreply, assign(socket, last_key: key)}
     end
@@ -53,7 +54,7 @@ defmodule ElixirKatasWeb.Kata14KeybindingsLive do
   def handle_event("set_tab", %{"tab" => tab}, socket) do
     if tab in ["interactive", "source", "notes"] do
        {:noreply, assign(socket, active_tab: tab)}
-    else 
+    else
        {:noreply, socket}
     end
   end
