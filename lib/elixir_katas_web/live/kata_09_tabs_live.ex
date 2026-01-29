@@ -4,20 +4,21 @@ defmodule ElixirKatasWeb.Kata09TabsLive do
 
   def update(assigns, socket) do
     socket = assign(socket, assigns)
-    {:ok, 
+    {:ok,
      socket
      |> assign(active_tab: "notes")
      |> assign(selected_tab: :home)
-     
+     |> assign(:show_settings, false)
+
      }
   end
 
   def render(assigns) do
     ~H"""
-    
+
       <div class="flex flex-col h-full text-gray-900 dark:text-gray-100 p-4">
         <div class="max-w-4xl mx-auto w-full">
-          
+
           <div class="bg-gray-50 dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden border border-gray-200 dark:border-gray-700">
             <!-- Tab Navigation -->
             <div class="flex border-b border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-900">
@@ -43,6 +44,9 @@ defmodule ElixirKatasWeb.Kata09TabsLive do
                 About
               </button>
             </div>
+              <%= if @show_settings do %>
+                <.button phx-click="set_tab" phx-value-tab="settings">Settings</.button>
+              <% end %>
 
             <!-- Tab Content -->
             <div class="p-8 min-h-[300px]">
@@ -101,14 +105,21 @@ defmodule ElixirKatasWeb.Kata09TabsLive do
           </div>
         </div>
       </div>
-    
+
     """
   end
 
+  def handle_event("set_tab", %{"tab" => "settings"}, socket) do
+    if socket.assigns.show_settings do
+      {:noreply, assign(socket, selected_tab: :settings)}
+    else
+      {:noreply, socket}
+    end
+  end
   def handle_event("set_tab", %{"tab" => tab}, socket) do
     if tab in ["interactive", "source", "notes"] do
        {:noreply, assign(socket, active_tab: tab)}
-    else 
+    else
        {:noreply, assign(socket, selected_tab: String.to_existing_atom(tab))}
     end
   end

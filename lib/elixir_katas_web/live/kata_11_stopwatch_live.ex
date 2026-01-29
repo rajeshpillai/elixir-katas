@@ -7,19 +7,21 @@ defmodule ElixirKatasWeb.Kata11StopwatchLive do
   end
 
   def update(assigns, socket) do
-    socket = assign(socket, assigns)
-    {:ok, 
-     socket
-     |> assign(active_tab: "notes")
-     
-     
-     |> assign(time: 0)
-     |> assign(running: false)}
-  end
+  socket =
+    socket
+    |> assign(assigns)
+    |> assign_new(:active_tab, fn -> "notes" end)
+    |> assign_new(:time, fn -> 0 end)
+    |> assign_new(:running, fn -> false end)
+    |> assign_new(:laps, fn -> [] end)
+
+  {:ok, socket}
+end
+
 
   def render(assigns) do
     ~H"""
-    
+
       <div class="flex flex-col items-center justify-center p-8 gap-8 min-h-[400px]">
         <div class="flex flex-col items-center gap-8">
           <!-- Digital Display -->
@@ -30,32 +32,51 @@ defmodule ElixirKatasWeb.Kata11StopwatchLive do
           <!-- Controls -->
           <div class="flex gap-4">
             <%= if @running do %>
-              <button 
-                phx-click="stop" phx-target={@myself} 
+              <button
+                phx-click="stop" phx-target={@myself}
                 class="btn btn-error btn-lg w-32 shadow-lg hover:scale-105 transition-transform"
               >
                 Stop
               </button>
             <% else %>
-              <button 
-                phx-click="start" phx-target={@myself} 
+              <button
+                phx-click="start" phx-target={@myself}
                 class="btn btn-primary btn-lg w-32 shadow-lg hover:scale-105 transition-transform"
               >
                 Start
               </button>
             <% end %>
 
-            <button 
-              phx-click="reset" phx-target={@myself} 
+            <button
+              phx-click="reset" phx-target={@myself}
               class="btn btn-outline btn-lg w-32 hover:scale-105 transition-transform"
               disabled={@running}
             >
               Reset
             </button>
+            <button
+              phx-click="lap" phx-target={@myself}
+              class="btn btn-outline btn-lg w-32 hover:scale-105 transition-transform"
+              disabled={!@running}
+            >
+              Lap
+            </button>
+
           </div>
+          <div class="mt-4">
+              <h3 class="font-semibold mb-2">Laps</h3>
+              <ul class="space-y-1">
+                <%= for {lap, index} <- Enum.with_index(@laps, 1) do %>
+                  <li class="text-sm bg-base-200 rounded px-2 py-1 flex justify-between">
+                    <span>Lap <%= index %></span>
+                    <span><%= Float.round(lap / 10, 1) %>s</span>
+                  </li>
+                <% end %>
+              </ul>
+            </div>
         </div>
       </div>
-    
+
     """
   end
 
@@ -73,13 +94,23 @@ defmodule ElixirKatasWeb.Kata11StopwatchLive do
   end
 
   def handle_event("reset", _, socket) do
-    {:noreply, assign(socket, time: 0)}
+    {:noreply, assign(socket, time: 0, laps: [])}
+  end
+  def handle_event("lap", _, socket) do
+    if socket.assigns.running do
+      {:noreply,
+      update(socket, :laps, fn laps ->
+        [socket.assigns.time | laps]
+      end)}
+    else
+      {:noreply, socket}
+    end
   end
 
   def handle_event("set_tab", %{"tab" => tab}, socket) do
     if tab in ["interactive", "source", "notes"] do
        {:noreply, assign(socket, active_tab: tab)}
-    else 
+    else
        {:noreply, socket}
     end
   end
@@ -96,7 +127,7 @@ defmodule ElixirKatasWeb.Kata11StopwatchLive do
   defp format_time(deci_seconds) do
     seconds = div(deci_seconds, 10)
     decis = rem(deci_seconds, 10)
-    
+
     minutes = div(seconds, 60)
     seconds = rem(seconds, 60)
 
