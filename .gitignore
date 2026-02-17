@@ -3,7 +3,8 @@ priv/static/uploads
 
 *.bak
 
-# SQLite temporary files
+# SQLite database files
+*_dev.db
 *_test.db
 *.db-shm
 *.db-wal

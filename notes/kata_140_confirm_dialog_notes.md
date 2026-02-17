@@ -141,9 +141,9 @@ end
 
 ## Challenges
 
-<strong>Challenge 1: Add Loading State</strong>
+<h3>Challenge 1: Add Loading State</h3>
 
-Show a spinner on the "Confirm & Submit" button while processing, disabling both buttons.
+<p>Show a spinner on the "Confirm & Submit" button while processing, disabling both buttons.</p>
 
 <details>
 <summary>View Solution</summary>
@@ -168,9 +168,10 @@ end
 </code></pre>
 </details>
 
-<strong>Challenge 2: Edit from Modal</strong>
 
-Add an "Edit" button in the modal that closes it AND focuses the specific field the user wants to change.
+<h3>Challenge 2: Edit from Modal</h3>
+
+<p>Add an "Edit" button in the modal that closes it AND focuses the specific field the user wants to change.</p>
 
 <details>
 <summary>View Solution</summary>
@@ -197,9 +198,10 @@ Hooks.FocusField = {
 </code></pre>
 </details>
 
-<strong>Challenge 3: Countdown Timer</strong>
 
-Auto-submit after 10 seconds with a visible countdown. User can cancel anytime.
+<h3>Challenge 3: Countdown Timer</h3>
+
+<p>Auto-submit after 10 seconds with a visible countdown. User can cancel anytime.</p>
 
 <details>
 <summary>View Solution</summary>
@@ -225,9 +227,11 @@ end
 </details>
 
 
-## Related Katas
+<h2>Related Katas</h2>
 
-- <strong>Kata 54</strong>: Modal Dialog - Basic modal mechanics
-- <strong>Kata 37</strong>: Wizard - Multi-step form with review step
-- <strong>Kata 68</strong>: Changesets - Form validation patterns
-- <strong>Kata 70</strong>: Optimistic UI - Alternative approach (submit first, undo later)
+<ul>
+<li><strong>Kata 54</strong>: Modal Dialog - Basic modal mechanics</li>
+<li><strong>Kata 37</strong>: Wizard - Multi-step form with review step</li>
+<li><strong>Kata 68</strong>: Changesets - Form validation patterns</li>
+<li><strong>Kata 70</strong>: Optimistic UI - Alternative approach (submit first, undo later)</li>
+</ul>
