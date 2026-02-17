@@ -437,6 +437,7 @@ defmodule ElixirKatasWeb.KatasIndexLive do
       <.kata_card title="104. GenServer Integration" description="Background workers with LiveView" path={~p"/katas/104-genserver"} />
        <.kata_card title="125. State Machine" description="Complex workflows with :gen_statem" path={~p"/katas/125-statemachine"} />
       <.kata_card title="139. Virtual Scrolling" description="Efficiently rendering large datasets with window-based rendering" path={~p"/katas/139-virtual-scrolling"} />
+      <.kata_card title="140. Confirm Dialog" description="Form with data confirmation modal and accept/reject flow" path={~p"/katas/140-confirm-dialog"} />
 
       </div>
     </div>

@@ -470,6 +470,10 @@ defmodule ElixirKatasWeb.Layouts do
                     <span class="w-2 h-2 mr-3 rounded-full bg-orange-500"></span>
                     139 - Virtual Scrolling
                   </.link>
+                  <.link navigate="/katas/140-confirm-dialog" class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white">
+                    <span class="w-2 h-2 mr-3 rounded-full bg-teal-500"></span>
+                    140 - Confirm Dialog
+                  </.link>
 
               </div>
             </div>
