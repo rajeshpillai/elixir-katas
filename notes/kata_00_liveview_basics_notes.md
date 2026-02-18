@@ -275,7 +275,23 @@ end
 
 `update/2` is called whenever the parent sends new assigns to the component. The first argument is the map of assigns passed from the parent; the second is the current socket.
 
-> **Note**: If you define `update/2`, your `mount/1` still runs once for initial setup, but `update/2` is where you'll do most initialization in these katas.
+> **Note**: If you define `update/2`, `mount/1` is **not** called on subsequent re-renders — only on the very first mount. `update/2` is the right place for initialization in LiveComponents.
+
+### `send_update/2` — Parent Pushes New Assigns to a Child
+
+Sometimes a parent LiveView needs to trigger a child component to update without re-rendering itself. Use `send_update/2`:
+
+```elixir
+# From the parent LiveView's handle_event or handle_info:
+def handle_info({:new_data, data}, socket) do
+  send_update(MyAppWeb.MyComponent, id: "my-component", data: data)
+  {:noreply, socket}
+end
+```
+
+The child component's `update/2` will be called with the new assigns. The parent does **not** re-render.
+
+> **When to use**: Real-time updates to a specific child (e.g., a chat message component receiving a PubSub broadcast) without triggering a full parent re-render.
 
 ### Event Targeting
 Event handlers need `phx-target={@myself}`:
@@ -358,6 +374,30 @@ This waits 300ms after the user stops typing before sending the event.
 *   `phx-focus` / `phx-blur` — Input focus events.
 *   `phx-keyup` / `phx-keydown` — Keyboard events (params include `%{"key" => "Enter"}`).
 *   `phx-window-keyup` / `phx-window-keydown` — Keyboard events on the whole window.
+
+### `phx-update` — Controlling DOM Patch Behaviour
+
+By default, LiveView **replaces** an element's children on every render. The `phx-update` attribute changes this:
+
+| Value | Behaviour | Use Case |
+|---|---|---|
+| `replace` | *(default)* Replace children on every render | Most elements |
+| `append` | Add new children **after** existing ones | Infinite scroll, log feeds |
+| `prepend` | Add new children **before** existing ones | Chat (newest at top) |
+| `stream` | LiveView manages a keyed list; only diffs are sent | Large collections (modern) |
+| `ignore` | LiveView **never** touches this element's DOM | JS-managed elements (charts, maps) |
+
+```heex
+<!-- LiveView won't touch this canvas — JS owns it -->
+<canvas id="my-chart" phx-hook="ChartJS" phx-update="ignore"></canvas>
+
+<!-- New log lines are appended; old ones stay in the browser DOM -->
+<div id="logs" phx-update="append">
+  <p :for={line <- @log_lines} id={line.id}>{line.text}</p>
+</div>
+```
+
+> **Key rule**: Any element using `append`, `prepend`, or `stream` **must** have a unique `id` attribute, and each child element must also have a unique `id`. LiveView uses these to track which DOM nodes to update.
 
 ---
 
@@ -636,29 +676,102 @@ assign(socket, current_user: Map.take(user, [:id, :name, :role]))
 As you progress through the katas, you'll encounter these additional LiveView features. Each kata's notes explain them in detail — this is just a preview so nothing catches you off guard.
 
 ### Function Components
-Reusable template fragments defined with `attr` and `slot` declarations. Called with dot syntax:
+
+A **Function Component** is a plain Elixir function that takes `assigns` and returns a HEEx template. It has **no state and no process** — it's just a reusable template fragment.
 
 ```elixir
-attr :variant, :string, default: "primary"
-slot :inner_block, required: true
-
-defp btn(assigns) do
+# Defined with defp (private) or def (public/shared)
+defp alert(assigns) do
   ~H"""
-  <button class={@variant}>{render_slot(@inner_block)}</button>
+  <div class={"alert alert-#{@type}"}>
+    {@message}
+  </div>
   """
 end
 ```
+
+Called in templates with **dot syntax** (`.function_name`):
+
 ```heex
-<.btn variant="danger">Delete</.btn>
+<.alert type="error" message="Something went wrong" />
 ```
 
-Named slots let you pass multiple content blocks:
+#### Declaring Attributes with `attr`
+
+Use `attr` to document and validate the inputs your component accepts:
+
+```elixir
+attr :type, :string, default: "info"   # optional, has a default
+attr :message, :string, required: true  # required — error if missing
+
+defp alert(assigns) do
+  ~H"""
+  <div class={"alert alert-#{@type}"}>{@message}</div>
+  """
+end
+```
+
+#### Slots — Passing Content Blocks
+
+Slots let callers inject HTML content into a component, like children in React:
+
+```elixir
+slot :inner_block, required: true
+
+defp card(assigns) do
+  ~H"""
+  <div class="card">
+    {render_slot(@inner_block)}
+  </div>
+  """
+end
+```
+
 ```heex
 <.card>
-  <:header>Title</:header>
-  <:body>Content</:body>
+  <p>This content is passed as the inner_block slot.</p>
 </.card>
 ```
+
+Named slots let you pass **multiple distinct content areas**:
+
+```elixir
+slot :header
+slot :footer
+slot :inner_block, required: true
+
+defp card(assigns) do
+  ~H"""
+  <div class="card">
+    <div class="card-header">{render_slot(@header)}</div>
+    <div class="card-body">{render_slot(@inner_block)}</div>
+    <div class="card-footer">{render_slot(@footer)}</div>
+  </div>
+  """
+end
+```
+
+```heex
+<.card>
+  <:header>My Title</:header>
+  <p>Main body content here.</p>
+  <:footer>Footer text</:footer>
+</.card>
+```
+
+#### CoreComponents — Pre-built Function Components
+
+Phoenix generates a `CoreComponents` module (`core_components.ex`) with ready-made components like `<.button>`, `<.input>`, `<.modal>`, `<.flash>`, `<.table>`. These are available in every LiveView and template automatically.
+
+```heex
+<!-- These are all function components from CoreComponents -->
+<.button phx-click="save" phx-target={@myself}>Save</.button>
+<.input field={@form[:email]} type="email" label="Email" />
+<.modal id="confirm-modal">Are you sure?</.modal>
+```
+
+> **Key distinction**: Function Components ≠ LiveComponents. Function Components are stateless template helpers. LiveComponents are stateful, have a lifecycle (`mount`, `update`, `handle_event`), and run inside a LiveView process.
+
 *First appears: Kata 25+. Heavy use: Kata 50+.*
 
 ### Forms with `to_form`
