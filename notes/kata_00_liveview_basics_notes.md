@@ -497,7 +497,141 @@ end
 
 ---
 
-## 12. Concepts Ahead (Roadmap)
+## 12. Scaling Up: Assigns in Large Apps
+
+The basics work great for small katas. But as apps grow, three problems appear:
+
+1. **Memory bloat** — assigns accumulate large data structures in the socket.
+2. **Slow diffs** — LiveView diffs the entire assigns map on every render.
+3. **Redundant work** — `update/2` re-fetches data that hasn't changed.
+
+Here's how to handle each.
+
+### `assign_new/3` — Lazy, One-Time Initialization
+
+In a LiveComponent, `update/2` is called every time the parent re-renders. If you naively fetch data inside `update/2`, you'll re-fetch on every parent change.
+
+Use `assign_new/3` to only compute a value if the key doesn't already exist in the socket:
+
+```elixir
+def update(assigns, socket) do
+  socket =
+    socket
+    |> assign(assigns)
+    # Only fetches the user ONCE — skipped on subsequent parent re-renders
+    |> assign_new(:user, fn -> Accounts.get_user!(assigns.user_id) end)
+
+  {:ok, socket}
+end
+```
+
+> **Rule**: Use `assign_new/3` for any expensive computation in `update/2` that only needs to run once (e.g., DB fetches, heavy transformations).
+
+---
+
+### `temporary_assigns` — Clearing Assigns After Render
+
+By default, every assign lives in the socket **forever**. If you push 1,000 messages into `@messages`, all 1,000 stay in memory for the lifetime of the LiveView process.
+
+`temporary_assigns` tells LiveView: *"after each render, reset this key back to its default value."*
+
+```elixir
+def mount(socket) do
+  {:ok,
+   assign(socket, messages: []),
+   temporary_assigns: [messages: []]}
+end
+```
+
+Now the flow works like this:
+
+1. A new message arrives → you `assign(socket, messages: [new_msg])`.
+2. LiveView renders — the browser sees the new message appended.
+3. After render, `messages` is automatically reset to `[]`.
+4. Memory stays flat, no matter how many messages arrive.
+
+> **Important**: `temporary_assigns` only works correctly with `phx-update="append"` or `phx-update="prepend"` in the template, so the browser accumulates the items — not the server.
+
+```heex
+<div id="messages" phx-update="append">
+  <div :for={msg <- @messages} id={"msg-#{msg.id}"}>
+    {msg.text}
+  </div>
+</div>
+```
+
+> **Modern Alternative**: For new code, prefer **Streams** (see below). `temporary_assigns` is the older pattern but is still valid and widely used.
+
+---
+
+### Streams — The Modern Answer for Large Lists
+
+Streams are LiveView's built-in solution for rendering large, dynamic collections **without keeping the full list in the socket**. The server only tracks diffs; the browser owns the full DOM list.
+
+```elixir
+def mount(socket) do
+  items = Repo.all(Item)
+  {:ok, stream(socket, :items, items)}
+end
+```
+
+```heex
+<div id="items" phx-update="stream">
+  <div :for={{dom_id, item} <- @streams.items} id={dom_id}>
+    {item.name}
+  </div>
+</div>
+```
+
+Updating the stream — only the changed item is sent to the browser:
+
+```elixir
+# Add or update an item
+{:noreply, stream_insert(socket, :items, new_item)}
+
+# Remove an item
+{:noreply, stream_delete(socket, :items, item)}
+```
+
+#### Streams vs Plain Assigns — When to Use Which
+
+| Scenario | Use |
+|---|---|
+| Small, static list (< ~50 items, rarely changes) | Plain `assign` |
+| Large list or infinite scroll | `stream` |
+| Real-time feed (chat, notifications, logs) | `stream` |
+| List where you need to sort/filter on the server | `stream` (re-stream on filter change) |
+| Single item or scalar value | Plain `assign` |
+
+---
+
+### Keeping Assigns Lean
+
+Every key in `socket.assigns` is serialized and diffed on every render. Large structs slow things down.
+
+**Don'ts:**
+```elixir
+# Bad — storing the entire user record when you only need the name
+assign(socket, current_user: %User{id: 1, name: "Ada", hashed_password: "...", ...})
+```
+
+**Dos:**
+```elixir
+# Good — store only what the template needs
+assign(socket, user_name: user.name, user_id: user.id)
+
+# Or store the full struct but be intentional about it
+assign(socket, current_user: Map.take(user, [:id, :name, :role]))
+```
+
+**Other tips:**
+- Don't store derived data — compute it in the template or in a function component.
+- Avoid deeply nested maps in assigns; flatten where possible.
+- Use `stream` for collections instead of storing lists in assigns.
+
+---
+
+## 13. Concepts Ahead (Roadmap)
 
 As you progress through the katas, you'll encounter these additional LiveView features. Each kata's notes explain them in detail — this is just a preview so nothing catches you off guard.
 
@@ -643,7 +777,7 @@ end)
 
 ---
 
-## 13. Quick Reference
+## 14. Quick Reference
 
 | Concept | Code |
 |---------|------|
@@ -671,7 +805,7 @@ end)
 
 ---
 
-## 14. What's Next?
+## 15. What's Next?
 
 You now have the foundation to write LiveView code. Here's the progression:
 
