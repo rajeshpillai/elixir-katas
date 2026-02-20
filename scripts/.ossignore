@@ -1,0 +1,20 @@
+# AI agent / LLM config files
+agent.md
+AGENTS.md
+context.md
+
+# Internal project tracking
+history.md
+.history.md.un~
+todo.md
+curriculum.md
+kata_reference.md
+reference.md
+architecture.md
+
+# Internal notes and usecases
+notes/
+usecases/
+
+# Publish scripts (not needed in OSS)
+scripts/
