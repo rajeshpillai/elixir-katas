@@ -66,10 +66,10 @@ defmodule ElixirKatasWeb.ElixirKatasIndexLive do
         Section 4: Control Flow
       </h2>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-        <.kata_card title="25. Case Expressions" description="Pattern matching on values, guards in case" path={~p"/elixir-katas/25-case"} />
-        <.kata_card title="26. Cond Expressions" description="Boolean conditions, first-true-wins" path={~p"/elixir-katas/26-cond"} />
+        <.kata_card title="25. Case Expressions" description="Pattern matching on values, guards in case" path={~p"/elixir-katas/25-case-expressions"} />
+        <.kata_card title="26. Cond Expressions" description="Boolean conditions, first-true-wins" path={~p"/elixir-katas/26-cond-expressions"} />
         <.kata_card title="27. If/Unless" description="Simple conditionals, macros not special forms" path={~p"/elixir-katas/27-if-unless"} />
-        <.kata_card title="28. With Expressions" description="Happy path chaining, else clauses" path={~p"/elixir-katas/28-with"} />
+        <.kata_card title="28. With Expressions" description="Happy path chaining, else clauses" path={~p"/elixir-katas/28-with-expressions"} />
         <.kata_card title="29. Pipe Operator" description="|> pipelines, nested-to-piped refactoring" path={~p"/elixir-katas/29-pipe-operator"} />
         <.kata_card title="30. Comprehensions" description="for generators, filters, :into" path={~p"/elixir-katas/30-comprehensions"} />
         <.kata_card title="31. Try/Rescue" description="Error handling, let it crash philosophy" path={~p"/elixir-katas/31-try-rescue"} />
@@ -86,7 +86,7 @@ defmodule ElixirKatasWeb.ElixirKatasIndexLive do
         <.kata_card title="35. Enum Search" description="find, any?, all?, take_while, drop_while" path={~p"/elixir-katas/35-enum-search"} />
         <.kata_card title="36. Reduce Mastery" description="Step-through animation, implement map/filter with reduce" path={~p"/elixir-katas/36-reduce-mastery"} />
         <.kata_card title="37. MapSet" description="Set operations: union, intersection, difference" path={~p"/elixir-katas/37-mapset"} />
-        <.kata_card title="38. Streams" description="Eager vs lazy, Stream.map/filter/take" path={~p"/elixir-katas/38-streams"} />
+        <.kata_card title="38. Streams" description="Eager vs lazy, Stream.map/filter/take" path={~p"/elixir-katas/38-streams-lazy"} />
         <.kata_card title="39. Stream Generators" description="iterate, unfold, cycle, infinite streams" path={~p"/elixir-katas/39-stream-generators"} />
         <.kata_card title="40. Ranges & Slicing" description="1..10, step ranges, Enum.slice/take/drop" path={~p"/elixir-katas/40-ranges-slicing"} />
       </div>
@@ -97,7 +97,7 @@ defmodule ElixirKatasWeb.ElixirKatasIndexLive do
       </h2>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
         <.kata_card title="41. String Deep Dive" description="UTF-8 binaries, byte_size vs String.length, graphemes" path={~p"/elixir-katas/41-string-deep-dive"} />
-        <.kata_card title="42. Charlists vs Strings" description="Single vs double quotes, conversion" path={~p"/elixir-katas/42-charlists"} />
+        <.kata_card title="42. Charlists vs Strings" description="Single vs double quotes, conversion" path={~p"/elixir-katas/42-charlists-strings"} />
         <.kata_card title="43. String Matching" description="Binary matching <<h::utf8, rest::binary>>" path={~p"/elixir-katas/43-string-matching"} />
         <.kata_card title="44. Regex" description="~r//, Regex.match?/run/scan/replace" path={~p"/elixir-katas/44-regex"} />
         <.kata_card title="45. Sigils" description="~s, ~w, ~D, ~T, ~r, uppercase vs lowercase" path={~p"/elixir-katas/45-sigils"} />
@@ -124,14 +124,14 @@ defmodule ElixirKatasWeb.ElixirKatasIndexLive do
         Section 8: Processes & Message Passing
       </h2>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-        <.kata_card title="55. Spawn & Processes" description="spawn/1, self(), process isolation, PIDs" path={~p"/elixir-katas/55-spawn"} />
+        <.kata_card title="55. Spawn & Processes" description="spawn/1, self(), process isolation, PIDs" path={~p"/elixir-katas/55-spawn-processes"} />
         <.kata_card title="56. Send & Receive" description="Message passing, mailbox visualization" path={~p"/elixir-katas/56-send-receive"} />
         <.kata_card title="57. Process Links" description="spawn_link, bidirectional crash propagation" path={~p"/elixir-katas/57-process-links"} />
         <.kata_card title="58. Process Monitors" description="Process.monitor, :DOWN messages" path={~p"/elixir-katas/58-process-monitors"} />
         <.kata_card title="59. Process State Loop" description="Recursive receive loop (DIY GenServer)" path={~p"/elixir-katas/59-process-state"} />
-        <.kata_card title="60. Trapping Exits" description="trap_exit flag, converting exits to messages" path={~p"/elixir-katas/60-trap-exits"} />
-        <.kata_card title="61. Task Module" description="Task.async/await, async_stream, concurrency" path={~p"/elixir-katas/61-tasks"} />
-        <.kata_card title="62. Agent" description="Simple state server, get/update/get_and_update" path={~p"/elixir-katas/62-agents"} />
+        <.kata_card title="60. Trapping Exits" description="trap_exit flag, converting exits to messages" path={~p"/elixir-katas/60-trapping-exits"} />
+        <.kata_card title="61. Task Module" description="Task.async/await, async_stream, concurrency" path={~p"/elixir-katas/61-task-module"} />
+        <.kata_card title="62. Agent" description="Simple state server, get/update/get_and_update" path={~p"/elixir-katas/62-agent"} />
       </div>
 
       <%!-- Section 9: GenServer & OTP --%>
@@ -143,11 +143,11 @@ defmodule ElixirKatasWeb.ElixirKatasIndexLive do
         <.kata_card title="64. Call vs Cast" description="Sync vs async, blocking behavior, timeouts" path={~p"/elixir-katas/64-call-vs-cast"} />
         <.kata_card title="65. GenServer State" description="Complex state, named processes, Registry" path={~p"/elixir-katas/65-genserver-state"} />
         <.kata_card title="66. Periodic Work" description="Process.send_after, timer patterns" path={~p"/elixir-katas/66-periodic-work"} />
-        <.kata_card title="67. Supervisor Basics" description="Restart strategies: one_for_one, one_for_all" path={~p"/elixir-katas/67-supervisors"} />
-        <.kata_card title="68. Dynamic Supervisors" description="DynamicSupervisor, start_child/terminate_child" path={~p"/elixir-katas/68-dynamic-supervisor"} />
+        <.kata_card title="67. Supervisor Basics" description="Restart strategies: one_for_one, one_for_all" path={~p"/elixir-katas/67-supervisor-basics"} />
+        <.kata_card title="68. Dynamic Supervisors" description="DynamicSupervisor, start_child/terminate_child" path={~p"/elixir-katas/68-dynamic-supervisors"} />
         <.kata_card title="69. Supervision Trees" description="Nested supervisors, fault tolerance" path={~p"/elixir-katas/69-supervision-trees"} />
         <.kata_card title="70. Registry" description="Process lookup, :unique vs :duplicate, pub/sub" path={~p"/elixir-katas/70-registry"} />
-        <.kata_card title="71. ETS Tables" description=":ets operations, table types, concurrent reads" path={~p"/elixir-katas/71-ets"} />
+        <.kata_card title="71. ETS Tables" description=":ets operations, table types, concurrent reads" path={~p"/elixir-katas/71-ets-tables"} />
       </div>
 
       <%!-- Section 10: Advanced Patterns --%>
@@ -157,8 +157,8 @@ defmodule ElixirKatasWeb.ElixirKatasIndexLive do
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
         <.kata_card title="72. Quote & Unquote" description="AST representation, homoiconicity" path={~p"/elixir-katas/72-quote-unquote"} />
         <.kata_card title="73. Macros" description="defmacro, compile-time code generation" path={~p"/elixir-katas/73-macros"} />
-        <.kata_card title="74. App Config" description="Application.get_env, runtime vs compile-time" path={~p"/elixir-katas/74-app-config"} />
-        <.kata_card title="75. The Elixir Toolbox" description="Decision-tree quiz: choosing the right tool" path={~p"/elixir-katas/75-toolbox"} />
+        <.kata_card title="74. App Config" description="Application.get_env, runtime vs compile-time" path={~p"/elixir-katas/74-application-config"} />
+        <.kata_card title="75. The Elixir Toolbox" description="Decision-tree quiz: choosing the right tool" path={~p"/elixir-katas/75-elixir-toolbox"} />
       </div>
     </div>
     """
