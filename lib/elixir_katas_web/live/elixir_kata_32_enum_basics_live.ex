@@ -292,10 +292,7 @@ defmodule ElixirKatasWeb.ElixirKata32EnumBasicsLive do
               </table>
             </div>
 
-            <div class="mt-4 bg-base-300 rounded-lg p-3 font-mono text-xs whitespace-pre-wrap">[1, 2, 3, 4, 5]
-|&gt; Enum.map(&amp;(&amp;1 * 2))       # [2, 4, 6, 8, 10]  &lt;- transform
-|&gt; Enum.filter(&amp;(&amp;1 &gt; 4))    # [6, 8, 10]         &lt;- select
-|&gt; Enum.reduce(0, &amp;+/2)      # 24                  &lt;- aggregate</div>
+            <div class="mt-4 bg-base-300 rounded-lg p-3 font-mono text-xs whitespace-pre-wrap">{enum_pipeline_code()}</div>
           <% end %>
         </div>
       </div>
@@ -503,6 +500,15 @@ defmodule ElixirKatasWeb.ElixirKata32EnumBasicsLive do
 
   defp functions, do: @functions
   defp try_examples, do: @try_examples
+
+  defp enum_pipeline_code do
+    """
+    [1, 2, 3, 4, 5]
+    |> Enum.map(&(&1 * 2))       # [2, 4, 6, 8, 10]  <- transform
+    |> Enum.filter(&(&1 > 4))    # [6, 8, 10]         <- select
+    |> Enum.reduce(0, &+/2)      # 24                  <- aggregate\
+    """
+  end
 
   defp evaluate_code(code) do
     code = String.trim(code)

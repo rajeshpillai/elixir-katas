@@ -260,36 +260,17 @@ defmodule ElixirKatasWeb.ElixirKata61TaskModuleLive do
             <div class="space-y-4">
               <div class="bg-base-300 rounded-lg p-4">
                 <h4 class="font-bold text-sm mb-2">Parallel API Calls</h4>
-                <div class="font-mono text-xs whitespace-pre-wrap">tasks = Enum.map(user_ids, fn id ->
-  Task.async(fn -> fetch_user(id) end)
-end)
-
-users = Task.await_many(tasks, 5000)</div>
+                <div class="font-mono text-xs whitespace-pre-wrap">{parallel_api_code()}</div>
               </div>
 
               <div class="bg-base-300 rounded-lg p-4">
                 <h4 class="font-bold text-sm mb-2">Controlled Concurrency</h4>
-                <div class="font-mono text-xs whitespace-pre-wrap">urls
-|&gt; Task.async_stream(&amp;fetch_url/1,
-     max_concurrency: 10,
-     timeout: 30_000)
-|&gt; Stream.filter(fn
-     &lbrace;:ok, _&rbrace; -&gt; true
-     &lbrace;:exit, _&rbrace; -&gt; false
-   end)
-|&gt; Enum.map(fn &lbrace;:ok, result&rbrace; -&gt; result end)</div>
+                <div class="font-mono text-xs whitespace-pre-wrap">{controlled_concurrency_code()}</div>
               </div>
 
               <div class="bg-base-300 rounded-lg p-4">
                 <h4 class="font-bold text-sm mb-2">Fire-and-Forget with Supervisor</h4>
-                <div class="font-mono text-xs whitespace-pre-wrap"># In application.ex, add to children:
-&lbrace;Task.Supervisor, name: MyApp.TaskSupervisor&rbrace;
-
-# Then use:
-Task.Supervisor.async_nolink(
-  MyApp.TaskSupervisor,
-  fn -&gt; send_email(user) end
-)</div>
+                <div class="font-mono text-xs whitespace-pre-wrap">{fire_and_forget_code()}</div>
               </div>
             </div>
           <% end %>
@@ -373,6 +354,43 @@ Task.Supervisor.async_nolink(
 
   defp examples, do: @examples
   defp timing_demos, do: @timing_demos
+
+  defp controlled_concurrency_code do
+    String.trim("""
+    urls
+    |> Task.async_stream(&fetch_url/1,
+         max_concurrency: 10,
+         timeout: 30_000)
+    |> Stream.filter(fn
+         {:ok, _} -> true
+         {:exit, _} -> false
+       end)
+    |> Enum.map(fn {:ok, result} -> result end)
+    """)
+  end
+
+  defp fire_and_forget_code do
+    String.trim("""
+    # In application.ex, add to children:
+    {Task.Supervisor, name: MyApp.TaskSupervisor}
+
+    # Then use:
+    Task.Supervisor.async_nolink(
+      MyApp.TaskSupervisor,
+      fn -> send_email(user) end
+    )
+    """)
+  end
+
+  defp parallel_api_code do
+    String.trim("""
+    tasks = Enum.map(user_ids, fn id ->
+      Task.async(fn -> fetch_user(id) end)
+    end)
+
+    users = Task.await_many(tasks, 5000)
+    """)
+  end
 
   defp task_params("fast") do
     d = Enum.random(500..1000)

@@ -547,7 +547,7 @@ defmodule ElixirKatasWeb.ElixirKata40RangesSlicingLive do
   defp sections, do: @sections
   defp range_properties, do: @range_properties
 
-  defp compute_range(first, last, step) when step == 0, do: []
+  defp compute_range(_first, _last, step) when step == 0, do: []
 
   defp compute_range(first, last, step) do
     range = first..last//step

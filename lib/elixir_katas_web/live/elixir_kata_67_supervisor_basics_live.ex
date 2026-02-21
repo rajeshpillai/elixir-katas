@@ -264,13 +264,7 @@ defmodule ElixirKatasWeb.ElixirKata67SupervisorBasicsLive do
                 Every supervised process needs one.
               </p>
 
-              <div class="bg-base-300 rounded-lg p-4 font-mono text-xs whitespace-pre-wrap mb-4">%&lbrace;
-  id: MyWorker,              # unique identifier
-  start: &lbrace;MyWorker, :start_link, [arg]&rbrace;,  # MFA tuple
-  restart: :permanent,       # :permanent | :temporary | :transient
-  shutdown: 5000,            # ms to wait before force kill
-  type: :worker              # :worker | :supervisor
-&rbrace;</div>
+              <div class="bg-base-300 rounded-lg p-4 font-mono text-xs whitespace-pre-wrap mb-4">{child_spec_code()}</div>
 
               <h4 class="text-sm font-bold mb-2">Restart Values</h4>
               <div class="overflow-x-auto mb-4">
@@ -308,33 +302,10 @@ defmodule ElixirKatasWeb.ElixirKata67SupervisorBasicsLive do
                 You can override it:
               </p>
 
-              <div class="bg-base-300 rounded-lg p-3 font-mono text-xs whitespace-pre-wrap mb-4">
-                <span class="opacity-50"># Default child_spec from use GenServer:</span>
-defmodule MyWorker do
-  use GenServer
-
-  # This is auto-generated:
-  # def child_spec(arg) do
-  #   %&lbrace;
-  #     id: __MODULE__,
-  #     start: &lbrace;__MODULE__, :start_link, [arg]&rbrace;
-  #   &rbrace;
-  # end
-end
-
-<span class="opacity-50"># Override restart strategy:</span>
-defmodule MyWorker do
-  use GenServer, restart: :transient
-end</div>
+              <div class="bg-base-300 rounded-lg p-3 font-mono text-xs whitespace-pre-wrap mb-4">{raw(use_genserver_code())}</div>
 
               <h4 class="text-sm font-bold mb-2">Starting a Supervisor</h4>
-              <div class="bg-base-300 rounded-lg p-3 font-mono text-xs whitespace-pre-wrap">children = [
-  &lbrace;Counter, 0&rbrace;,             <span class="opacity-50"># calls Counter.child_spec(0)</span>
-  &lbrace;Cache, name: :my_cache&rbrace;,  <span class="opacity-50"># calls Cache.child_spec(name: :my_cache)</span>
-  &lbrace;Poller, interval: 5000&rbrace;   <span class="opacity-50"># calls Poller.child_spec(interval: 5000)</span>
-]
-
-Supervisor.start_link(children, strategy: :one_for_one)</div>
+              <div class="bg-base-300 rounded-lg p-3 font-mono text-xs whitespace-pre-wrap">{raw(start_supervisor_code())}</div>
             </div>
           </div>
         </div>
@@ -349,11 +320,7 @@ Supervisor.start_link(children, strategy: :one_for_one)</div>
                 in a time window, the supervisor itself shuts down (and its parent supervisor handles that).
               </p>
 
-              <div class="bg-base-300 rounded-lg p-3 font-mono text-xs whitespace-pre-wrap mb-4">Supervisor.start_link(children,
-  strategy: :one_for_one,
-  max_restarts: 3,     <span class="opacity-50"># max 3 restarts...</span>
-  max_seconds: 5       <span class="opacity-50"># ...within 5 seconds</span>
-)</div>
+              <div class="bg-base-300 rounded-lg p-3 font-mono text-xs whitespace-pre-wrap mb-4">{raw(max_restarts_code())}</div>
 
               <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                 <div class="bg-base-300 rounded-lg p-4">
@@ -609,4 +576,60 @@ Supervisor.start_link(children, strategy: :one_for_one)</div>
   end
 
   defp strategies, do: @strategies
+
+  defp use_genserver_code do
+    """
+    <span class="opacity-50"># Default child_spec from use GenServer:</span>
+    defmodule MyWorker do
+      use GenServer
+
+      # This is auto-generated:
+      # def child_spec(arg) do
+      #   %{
+      #     id: __MODULE__,
+      #     start: {__MODULE__, :start_link, [arg]}
+      #   }
+      # end
+    end
+
+    <span class="opacity-50"># Override restart strategy:</span>
+    defmodule MyWorker do
+      use GenServer, restart: :transient
+    end\
+    """
+  end
+
+  defp start_supervisor_code do
+    """
+    children = [
+      {Counter, 0},             <span class="opacity-50"># calls Counter.child_spec(0)</span>
+      {Cache, name: :my_cache},  <span class="opacity-50"># calls Cache.child_spec(name: :my_cache)</span>
+      {Poller, interval: 5000}   <span class="opacity-50"># calls Poller.child_spec(interval: 5000)</span>
+    ]
+
+    Supervisor.start_link(children, strategy: :one_for_one)\
+    """
+  end
+
+  defp max_restarts_code do
+    """
+    Supervisor.start_link(children,
+      strategy: :one_for_one,
+      max_restarts: 3,     <span class="opacity-50"># max 3 restarts...</span>
+      max_seconds: 5       <span class="opacity-50"># ...within 5 seconds</span>
+    )\
+    """
+  end
+
+  defp child_spec_code do
+    String.trim("""
+    %{
+      id: MyWorker,              # unique identifier
+      start: {MyWorker, :start_link, [arg]},  # MFA tuple
+      restart: :permanent,       # :permanent | :temporary | :transient
+      shutdown: 5000,            # ms to wait before force kill
+      type: :worker              # :worker | :supervisor
+    }
+    """)
+  end
 end

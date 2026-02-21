@@ -128,15 +128,7 @@ defmodule ElixirKatasWeb.ElixirKata59ProcessStateLive do
           </div>
 
           <!-- Code representation -->
-          <div class="bg-base-300 rounded-lg p-3 mt-3 font-mono text-xs whitespace-pre-wrap">defp loop(<%= @counter_value %>) do
-  receive do
-    :increment  &rarr; loop(<%= @counter_value + 1 %>)
-    :decrement  &rarr; loop(<%= max(@counter_value - 1, 0) %>)
-    :double     &rarr; loop(<%= @counter_value * 2 %>)
-    :reset      &rarr; loop(0)
-    &lbrace;:get, caller&rbrace; &rarr; send(caller, &lbrace;:count, <%= @counter_value %>&rbrace;); loop(<%= @counter_value %>)
-  end
-end</div>
+          <div class="bg-base-300 rounded-lg p-3 mt-3 font-mono text-xs whitespace-pre-wrap">{counter_loop_code(@counter_value)}</div>
         </div>
       </div>
 
@@ -215,38 +207,12 @@ end</div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div class="bg-warning/10 border border-warning/30 rounded-lg p-4">
                 <h4 class="font-bold text-sm text-warning mb-2">DIY Process Loop</h4>
-                <div class="font-mono text-xs whitespace-pre-wrap">defmodule Counter do
-  def start do
-    spawn(fn -&gt; loop(0) end)
-  end
-
-  defp loop(state) do
-    receive do
-      &lbrace;:increment, caller&rbrace; -&gt;
-        new = state + 1
-        send(caller, &lbrace;:ok, new&rbrace;)
-        loop(new)
-    end
-  end
-end</div>
+                <div class="font-mono text-xs whitespace-pre-wrap">{diy_counter_code()}</div>
               </div>
 
               <div class="bg-success/10 border border-success/30 rounded-lg p-4">
                 <h4 class="font-bold text-sm text-success mb-2">GenServer Equivalent</h4>
-                <div class="font-mono text-xs whitespace-pre-wrap">defmodule Counter do
-  use GenServer
-
-  def start_link(init) do
-    GenServer.start_link(__MODULE__, init)
-  end
-
-  def init(state), do: &lbrace;:ok, state&rbrace;
-
-  def handle_call(:increment, _from, state) do
-    new = state + 1
-    &lbrace;:reply, new, new&rbrace;
-  end
-end</div>
+                <div class="font-mono text-xs whitespace-pre-wrap">{genserver_counter_code()}</div>
               </div>
             </div>
 
@@ -364,4 +330,54 @@ end</div>
   # Helpers
 
   defp examples, do: @examples
+
+  defp diy_counter_code do
+    String.trim("""
+    defmodule Counter do
+      def start do
+        spawn(fn -> loop(0) end)
+      end
+
+      defp loop(state) do
+        receive do
+          {:increment, caller} ->
+            new = state + 1
+            send(caller, {:ok, new})
+            loop(new)
+        end
+      end
+    end
+    """)
+  end
+
+  defp genserver_counter_code do
+    String.trim("""
+    defmodule Counter do
+      use GenServer
+
+      def start_link(init) do
+        GenServer.start_link(__MODULE__, init)
+      end
+
+      def init(state), do: {:ok, state}
+
+      def handle_call(:increment, _from, state) do
+        new = state + 1
+        {:reply, new, new}
+      end
+    end
+    """)
+  end
+
+  defp counter_loop_code(value) do
+    "defp loop(#{value}) do\n" <>
+    "  receive do\n" <>
+    "    :increment  \u2192 loop(#{value + 1})\n" <>
+    "    :decrement  \u2192 loop(#{max(value - 1, 0)})\n" <>
+    "    :double     \u2192 loop(#{value * 2})\n" <>
+    "    :reset      \u2192 loop(0)\n" <>
+    "    {:get, caller} \u2192 send(caller, {:count, #{value}}); loop(#{value})\n" <>
+    "  end\n" <>
+    "end"
+  end
 end

@@ -336,22 +336,7 @@ defmodule ElixirKatasWeb.ElixirKata45SigilsLive do
               functions in a module.
             </p>
 
-            <div class="bg-base-300 rounded-lg p-4 font-mono text-xs whitespace-pre-wrap">defmodule MySigils do
-  def sigil_i(string, []) do
-    String.to_integer(string)
-  end
-
-  def sigil_p(string, []) do
-    string
-    |> String.split("/", trim: true)
-    |> Enum.join(".")
-  end
-end
-
-import MySigils
-
-~i[42]           # 42 (integer)
-~p[users/admin]  # "users.admin"</div>
+            <div class="bg-base-300 rounded-lg p-4 font-mono text-xs whitespace-pre-wrap">{custom_sigils_code()}</div>
 
             <div class="bg-info/10 border border-info/30 rounded-lg p-3 mt-3">
               <div class="text-sm">
@@ -561,6 +546,27 @@ import MySigils
       expression: "~#{sigil}[#{input}]",
       output: "Unsupported sigil type"
     }
+  end
+
+  defp custom_sigils_code do
+    """
+    defmodule MySigils do
+      def sigil_i(string, []) do
+        String.to_integer(string)
+      end
+
+      def sigil_p(string, []) do
+        string
+        |> String.split("/", trim: true)
+        |> Enum.join(".")
+      end
+    end
+
+    import MySigils
+
+    ~i[42]           # 42 (integer)
+    ~p[users/admin]  # "users.admin"\
+    """
   end
 
   defp day_name(1), do: "Monday"

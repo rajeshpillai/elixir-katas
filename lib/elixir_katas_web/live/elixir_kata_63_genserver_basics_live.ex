@@ -257,38 +257,7 @@ defmodule ElixirKatasWeb.ElixirKata63GenserverBasicsLive do
             >
               {if @show_full_example, do: "Hide Full Example", else: "Show Full Example"}
             </button>
-            <div :if={@show_full_example} class="bg-base-300 rounded-lg p-4 font-mono text-sm whitespace-pre-wrap mt-3">defmodule Counter do
-  use GenServer
-
-  # --- Client API ---
-  def start_link(initial \\ 0) do
-    GenServer.start_link(__MODULE__, initial)
-  end
-
-  def increment(pid), do: GenServer.cast(pid, :increment)
-  def decrement(pid), do: GenServer.cast(pid, :decrement)
-  def get_count(pid), do: GenServer.call(pid, :get_count)
-
-  # --- Server Callbacks ---
-  @impl true
-  def init(initial_count) do
-    &lbrace;:ok, %&lbrace;count: initial_count&rbrace;&rbrace;
-  end
-
-  @impl true
-  def handle_cast(:increment, state) do
-    &lbrace;:noreply, %&lbrace;state | count: state.count + 1&rbrace;&rbrace;
-  end
-
-  def handle_cast(:decrement, state) do
-    &lbrace;:noreply, %&lbrace;state | count: state.count - 1&rbrace;&rbrace;
-  end
-
-  @impl true
-  def handle_call(:get_count, _from, state) do
-    &lbrace;:reply, state.count, state&rbrace;
-  end
-end</div>
+            <div :if={@show_full_example} class="bg-base-300 rounded-lg p-4 font-mono text-sm whitespace-pre-wrap mt-3">{full_counter_example()}</div>
           </div>
         </div>
 
@@ -513,4 +482,39 @@ end</div>
 
   defp callbacks, do: @callbacks
   defp flow_steps, do: @flow_steps
+
+  defp full_counter_example do
+    "defmodule Counter do\n" <>
+    "  use GenServer\n" <>
+    "\n" <>
+    "  # --- Client API ---\n" <>
+    "  def start_link(initial \\\\ 0) do\n" <>
+    "    GenServer.start_link(__MODULE__, initial)\n" <>
+    "  end\n" <>
+    "\n" <>
+    "  def increment(pid), do: GenServer.cast(pid, :increment)\n" <>
+    "  def decrement(pid), do: GenServer.cast(pid, :decrement)\n" <>
+    "  def get_count(pid), do: GenServer.call(pid, :get_count)\n" <>
+    "\n" <>
+    "  # --- Server Callbacks ---\n" <>
+    "  @impl true\n" <>
+    "  def init(initial_count) do\n" <>
+    "    {:ok, %{count: initial_count}}\n" <>
+    "  end\n" <>
+    "\n" <>
+    "  @impl true\n" <>
+    "  def handle_cast(:increment, state) do\n" <>
+    "    {:noreply, %{state | count: state.count + 1}}\n" <>
+    "  end\n" <>
+    "\n" <>
+    "  def handle_cast(:decrement, state) do\n" <>
+    "    {:noreply, %{state | count: state.count - 1}}\n" <>
+    "  end\n" <>
+    "\n" <>
+    "  @impl true\n" <>
+    "  def handle_call(:get_count, _from, state) do\n" <>
+    "    {:reply, state.count, state}\n" <>
+    "  end\n" <>
+    "end"
+  end
 end

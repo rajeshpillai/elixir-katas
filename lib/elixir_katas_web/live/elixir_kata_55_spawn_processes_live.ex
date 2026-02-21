@@ -195,17 +195,7 @@ defmodule ElixirKatasWeb.ElixirKata55SpawnProcessesLive do
               <% end %>
             </div>
 
-            <div class="bg-base-300 rounded-lg p-4 font-mono text-xs whitespace-pre-wrap">spawn/1
-  &darr;
-[Created] &rarr; Process struct allocated (~2KB)
-  &darr;
-[Running] &rarr; Function body executing
-  &darr;
-[Waiting] &rarr; In receive block (optional)
-  &darr;
-[Exited]  &rarr; Function returned or crash
-  &darr;
-Memory reclaimed by garbage collector</div>
+            <div class="bg-base-300 rounded-lg p-4 font-mono text-xs whitespace-pre-wrap">{lifecycle_diagram()}</div>
           <% end %>
         </div>
       </div>
@@ -380,6 +370,22 @@ Memory reclaimed by garbage collector</div>
       {"stack_size", "#{Keyword.get(info, :stack_size)} words", "Current stack size"},
       {"total_heap_size", "#{Keyword.get(info, :total_heap_size)} words", "Total heap including fragments"}
     ]
+  end
+
+  defp lifecycle_diagram do
+    """
+    spawn/1
+      ↓
+    [Created] → Process struct allocated (~2KB)
+      ↓
+    [Running] → Function body executing
+      ↓
+    [Waiting] → In receive block (optional)
+      ↓
+    [Exited]  → Function returned or crash
+      ↓
+    Memory reclaimed by garbage collector\
+    """
   end
 
   defp proc_style("running"), do: "border-success/40 bg-success/10"

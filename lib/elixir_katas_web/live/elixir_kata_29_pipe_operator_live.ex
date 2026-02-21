@@ -411,19 +411,12 @@ defmodule ElixirKatasWeb.ElixirKata29PipeOperatorLive do
             <div class="space-y-4">
               <div class="bg-success/10 border border-success/30 rounded-lg p-3">
                 <div class="font-bold text-sm text-success mb-2">How it works</div>
-                <div class="font-mono text-xs bg-base-100 rounded p-3 whitespace-pre-wrap">value |&gt; function(arg2, arg3)
-# is rewritten by the compiler to:
-function(value, arg2, arg3)</div>
+                <div class="font-mono text-xs bg-base-100 rounded p-3 whitespace-pre-wrap">{pipe_rewrite_code()}</div>
               </div>
 
               <div class="bg-warning/10 border border-warning/30 rounded-lg p-3">
                 <div class="font-bold text-sm text-warning mb-2">Gotcha: Always pipes into first argument</div>
-                <div class="font-mono text-xs bg-base-100 rounded p-3 whitespace-pre-wrap"># This won't work as expected:
-"hello" |&gt; String.replace("world", &amp;String.upcase/1)
-# Because it becomes: String.replace("hello", "world", &amp;String.upcase/1)
-
-# Use then/1 when you need a different position:
-42 |&gt; then(fn x -&gt; "The answer is: \#&lbrace;x&rbrace;" end)</div>
+                <div class="font-mono text-xs bg-base-100 rounded p-3 whitespace-pre-wrap">{pipe_gotcha_code()}</div>
               </div>
 
               <div class="bg-info/10 border border-info/30 rounded-lg p-3">
@@ -659,6 +652,25 @@ function(value, arg2, arg3)</div>
       {"slug", "\"Hello World!\" |> String.downcase() |> String.replace(~r/[^a-z0-9\\s]/, \"\") |> String.replace(\" \", \"-\")"},
       {"with then", "42 |> then(fn x -> x * x end) |> then(fn x -> \"square: \#{x}\" end)"}
     ]
+  end
+
+  defp pipe_rewrite_code do
+    """
+    value |> function(arg2, arg3)
+    # is rewritten by the compiler to:
+    function(value, arg2, arg3)\
+    """
+  end
+
+  defp pipe_gotcha_code do
+    String.trim("""
+    # This won't work as expected:
+    "hello" |> String.replace("world", &String.upcase/1)
+    # Because it becomes: String.replace("hello", "world", &String.upcase/1)
+
+    # Use then/1 when you need a different position:
+    42 |> then(fn x -> "The answer is: \#{x}" end)
+    """)
   end
 
   defp evaluate_code(code) do

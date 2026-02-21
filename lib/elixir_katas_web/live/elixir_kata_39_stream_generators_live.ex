@@ -340,19 +340,7 @@ defmodule ElixirKatasWeb.ElixirKata39StreamGeneratorsLive do
               and the stream halts when there are no more pages.
             </p>
 
-            <div class="bg-base-300 rounded-lg p-4 font-mono text-xs whitespace-pre-wrap mb-4">fetch_page = fn page -&gt;
-  # Simulate API: 3 items per page, 5 pages total
-  if page &gt; 5 do
-    nil
-  else
-    items = Enum.map(1..3, &amp;(&amp;1 + (page - 1) * 3))
-    &lbrace;items, page + 1&rbrace;
-  end
-end
-
-Stream.unfold(1, fetch_page)
-|&gt; Stream.flat_map(&amp;Function.identity/1)
-|&gt; Enum.to_list()</div>
+            <div class="bg-base-300 rounded-lg p-4 font-mono text-xs whitespace-pre-wrap mb-4">{paginated_api_code()}</div>
 
             <div class="flex gap-2 mb-4">
               <button
@@ -620,5 +608,21 @@ Stream.unfold(1, fetch_page)
     rescue
       e -> %{ok: false, input: code, output: "Error: #{Exception.message(e)}"}
     end
+  end
+
+  defp paginated_api_code do
+    "fetch_page = fn page ->\n" <>
+    "  # Simulate API: 3 items per page, 5 pages total\n" <>
+    "  if page > 5 do\n" <>
+    "    nil\n" <>
+    "  else\n" <>
+    "    items = Enum.map(1..3, &(&1 + (page - 1) * 3))\n" <>
+    "    {items, page + 1}\n" <>
+    "  end\n" <>
+    "end\n" <>
+    "\n" <>
+    "Stream.unfold(1, fetch_page)\n" <>
+    "|> Stream.flat_map(&Function.identity/1)\n" <>
+    "|> Enum.to_list()"
   end
 end

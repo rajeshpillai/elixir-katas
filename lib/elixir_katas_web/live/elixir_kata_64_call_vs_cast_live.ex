@@ -331,14 +331,7 @@ defmodule ElixirKatasWeb.ElixirKata64CallVsCastLive do
                 If the server doesn't reply in time, the caller crashes with an <code>exit</code>.
               </p>
 
-              <div class="bg-base-300 rounded-lg p-3 font-mono text-sm mb-4 whitespace-pre-wrap">GenServer.call(pid, :slow_operation)
-# Default: waits up to 5000ms
-
-GenServer.call(pid, :slow_operation, 10_000)
-# Custom: waits up to 10 seconds
-
-GenServer.call(pid, :operation, :infinity)
-# Waits forever (use with caution!)</div>
+              <div class="bg-base-300 rounded-lg p-3 font-mono text-sm mb-4 whitespace-pre-wrap">{timeout_examples_code()}</div>
 
               <h4 class="text-sm font-bold mb-2">Timeout Behavior Demo</h4>
               <p class="text-xs opacity-60 mb-3">
@@ -397,12 +390,7 @@ GenServer.call(pid, :operation, :infinity)
 
               <div class="mt-4 bg-base-300 rounded-lg p-3">
                 <h4 class="text-xs font-bold opacity-60 mb-2">Handling Timeouts Gracefully</h4>
-                <div class="font-mono text-sm whitespace-pre-wrap">try do
-  GenServer.call(pid, :slow_op, 2_000)
-catch
-  :exit, &lbrace;:timeout, _&rbrace; ->
-    &lbrace;:error, :timeout&rbrace;
-end</div>
+                <div class="font-mono text-sm whitespace-pre-wrap">{timeout_catch_code()}</div>
               </div>
             </div>
           </div>
@@ -564,4 +552,28 @@ end</div>
 
   defp comparisons, do: @comparisons
   defp scenarios, do: @scenarios
+
+  defp timeout_catch_code do
+    String.trim("""
+    try do
+      GenServer.call(pid, :slow_op, 2_000)
+    catch
+      :exit, {:timeout, _} ->
+        {:error, :timeout}
+    end
+    """)
+  end
+
+  defp timeout_examples_code do
+    String.trim("""
+    GenServer.call(pid, :slow_operation)
+    # Default: waits up to 5000ms
+
+    GenServer.call(pid, :slow_operation, 10_000)
+    # Custom: waits up to 10 seconds
+
+    GenServer.call(pid, :operation, :infinity)
+    # Waits forever (use with caution!)
+    """)
+  end
 end

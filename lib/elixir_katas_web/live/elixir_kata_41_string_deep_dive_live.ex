@@ -226,10 +226,7 @@ defmodule ElixirKatasWeb.ElixirKata41StringDeepDiveLive do
               <p class="text-sm opacity-70">
                 UTF-8 is a variable-width encoding. The first byte tells the decoder how many bytes follow:
               </p>
-              <div class="bg-base-300 rounded-lg p-4 font-mono text-xs whitespace-pre-wrap">1 byte:  0xxxxxxx                              (ASCII: 0-127)
-2 bytes: 110xxxxx 10xxxxxx                     (128-2047)
-3 bytes: 1110xxxx 10xxxxxx 10xxxxxx            (2048-65535)
-4 bytes: 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx   (65536+)</div>
+              <div class="bg-base-300 rounded-lg p-4 font-mono text-xs whitespace-pre-wrap">{utf8_byte_ranges()}</div>
 
               <div class="bg-info/10 border border-info/30 rounded-lg p-3">
                 <div class="text-xs font-bold opacity-60 mb-1">Why this matters in Elixir</div>
@@ -299,6 +296,15 @@ defmodule ElixirKatasWeb.ElixirKata41StringDeepDiveLive do
 
   defp string_functions, do: @string_functions
   defp byte_ranges, do: @byte_ranges
+
+  defp utf8_byte_ranges do
+    """
+    1 byte:  0xxxxxxx                              (ASCII: 0-127)
+    2 bytes: 110xxxxx 10xxxxxx                     (128-2047)
+    3 bytes: 1110xxxx 10xxxxxx 10xxxxxx            (2048-65535)
+    4 bytes: 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx   (65536+)\
+    """
+  end
 
   defp byte_color(byte) when byte < 128, do: "bg-success/20 text-success"
   defp byte_color(byte) when byte < 192, do: "bg-info/20 text-info"

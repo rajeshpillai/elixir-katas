@@ -187,13 +187,7 @@ defmodule ElixirKatasWeb.ElixirKata66PeriodicWorkLive do
             </div>
           </div>
 
-          <div class="bg-base-300 rounded-lg p-3 font-mono text-xs whitespace-pre-wrap">
-            <span class="opacity-50"># This heartbeat is powered by:</span>
-def handle_info(:heartbeat, state) do
-  IO.puts("heartbeat #&lbrace;state.count&rbrace;")
-  Process.send_after(self(), :heartbeat, state.interval)
-  &lbrace;:noreply, %&lbrace;state | count: state.count + 1&rbrace;&rbrace;
-end</div>
+          <div class="bg-base-300 rounded-lg p-3 font-mono text-xs whitespace-pre-wrap"><span class="opacity-50"># This heartbeat is powered by:</span>{heartbeat_code()}</div>
         </div>
 
         <!-- Polling Demo -->
@@ -253,20 +247,7 @@ end</div>
 
           <div class="bg-base-300 rounded-lg p-3 font-mono text-xs whitespace-pre-wrap">
             <span class="opacity-50"># Polling pattern:</span>
-def init(opts) do
-  schedule_poll(opts.interval)
-  &lbrace;:ok, %&lbrace;interval: opts.interval, data: nil&rbrace;&rbrace;
-end
-
-def handle_info(:poll, state) do
-  data = fetch_from_api()
-  schedule_poll(state.interval)
-  &lbrace;:noreply, %&lbrace;state | data: data&rbrace;&rbrace;
-end
-
-defp schedule_poll(interval) do
-  Process.send_after(self(), :poll, interval)
-end</div>
+            {polling_code()}</div>
         </div>
 
         <!-- Countdown Demo -->
@@ -332,15 +313,7 @@ end</div>
 
           <div class="bg-base-300 rounded-lg p-3 font-mono text-xs whitespace-pre-wrap">
             <span class="opacity-50"># Conditional scheduling:</span>
-def handle_info(:tick, %&lbrace;remaining: 0&rbrace; = state) do
-  # Don't schedule another tick - we're done!
-  &lbrace;:noreply, state&rbrace;
-end
-
-def handle_info(:tick, state) do
-  Process.send_after(self(), :tick, 1_000)
-  &lbrace;:noreply, %&lbrace;state | remaining: state.remaining - 1&rbrace;&rbrace;
-end</div>
+            {conditional_scheduling_code()}</div>
         </div>
 
         <!-- Key Concepts -->
@@ -518,6 +491,49 @@ end</div>
   end
 
   defp timer_patterns, do: @timer_patterns
+
+  defp heartbeat_code do
+    """
+    def handle_info(:heartbeat, state) do
+      IO.puts("heartbeat \#{state.count}")
+      Process.send_after(self(), :heartbeat, state.interval)
+      {:noreply, %{state | count: state.count + 1}}
+    end\
+    """
+  end
+
+  defp polling_code do
+    String.trim("""
+    def init(opts) do
+      schedule_poll(opts.interval)
+      {:ok, %{interval: opts.interval, data: nil}}
+    end
+
+    def handle_info(:poll, state) do
+      data = fetch_from_api()
+      schedule_poll(state.interval)
+      {:noreply, %{state | data: data}}
+    end
+
+    defp schedule_poll(interval) do
+      Process.send_after(self(), :poll, interval)
+    end
+    """)
+  end
+
+  defp conditional_scheduling_code do
+    String.trim("""
+    def handle_info(:tick, %{remaining: 0} = state) do
+      # Don't schedule another tick - we're done!
+      {:noreply, state}
+    end
+
+    def handle_info(:tick, state) do
+      Process.send_after(self(), :tick, 1_000)
+      {:noreply, %{state | remaining: state.remaining - 1}}
+    end
+    """)
+  end
 
   defp simulate_api_response(count) do
     temps = [18.5, 21.3, 19.8, 22.1, 20.5, 23.7, 17.9, 24.2]

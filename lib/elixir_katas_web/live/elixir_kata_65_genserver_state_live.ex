@@ -193,22 +193,7 @@ defmodule ElixirKatasWeb.ElixirKata65GenserverStateLive do
               <p class="text-xs opacity-60 mb-3">
                 When you need many named instances (e.g., one GenServer per user), use a Registry:
               </p>
-              <div class="bg-base-300 rounded-lg p-3 font-mono text-xs whitespace-pre-wrap"># In your application supervision tree:
-children = [
-  &lbrace;Registry, keys: :unique, name: MyApp.Registry&rbrace;
-]
-
-# Starting a per-user server:
-def start_link(user_id) do
-  GenServer.start_link(__MODULE__, user_id,
-    name: &lbrace;:via, Registry, &lbrace;MyApp.Registry, user_id&rbrace;&rbrace;)
-end
-
-# Looking up by user_id:
-GenServer.call(
-  &lbrace;:via, Registry, &lbrace;MyApp.Registry, user_id&rbrace;&rbrace;,
-  :get_data
-)</div>
+              <div class="bg-base-300 rounded-lg p-3 font-mono text-xs whitespace-pre-wrap">{registry_example_code()}</div>
             </div>
           </div>
         </div>
@@ -322,8 +307,7 @@ GenServer.call(
               <div class="space-y-4">
                 <div class="bg-base-300 rounded-lg p-4">
                   <h4 class="text-sm font-bold mb-2">:sys.get_state/1</h4>
-                  <div class="font-mono text-xs whitespace-pre-wrap mb-2">iex> :sys.get_state(pid)
-%&lbrace;count: 42, users: ["Alice", "Bob"]&rbrace;</div>
+                  <div class="font-mono text-xs whitespace-pre-wrap mb-2">{sys_get_state_code()}</div>
                   <p class="text-xs opacity-60">
                     Returns the current state directly. <strong>Development/debugging only.</strong>
                     Never use in production code because it bypasses the GenServer's message queue.
@@ -332,11 +316,7 @@ GenServer.call(
 
                 <div class="bg-base-300 rounded-lg p-4">
                   <h4 class="text-sm font-bold mb-2">:sys.get_status/1</h4>
-                  <div class="font-mono text-xs whitespace-pre-wrap mb-2">iex&gt; :sys.get_status(pid)
-&lbrace;:status, #PID&lt;0.123.0&gt;, &lbrace;:module, MyServer&rbrace;,
- [["$initial_call": ..., "$ancestors": ...],
-  :running, #PID&lt;0.120.0&gt;, [],
-  [header: ..., data: ..., data: ...]]&rbrace;</div>
+                  <div class="font-mono text-xs whitespace-pre-wrap mb-2">{sys_get_status_code()}</div>
                   <p class="text-xs opacity-60">
                     Returns detailed status including module, state, parent, and debug info.
                   </p>
@@ -344,13 +324,7 @@ GenServer.call(
 
                 <div class="bg-base-300 rounded-lg p-4">
                   <h4 class="text-sm font-bold mb-2">Dedicated API endpoint</h4>
-                  <div class="font-mono text-xs whitespace-pre-wrap mb-2"># Add to your GenServer:
-def handle_call(:get_state, _from, state) do
-  &lbrace;:reply, state, state&rbrace;
-end
-
-# Client API:
-def get_state(pid), do: GenServer.call(pid, :get_state)</div>
+                  <div class="font-mono text-xs whitespace-pre-wrap mb-2">{dedicated_api_code()}</div>
                   <p class="text-xs opacity-60">
                     The proper way for production code. Exposes state through the normal message-passing API.
                   </p>
@@ -358,11 +332,7 @@ def get_state(pid), do: GenServer.call(pid, :get_state)</div>
 
                 <div class="bg-base-300 rounded-lg p-4">
                   <h4 class="text-sm font-bold mb-2">Process.info/2</h4>
-                  <div class="font-mono text-xs whitespace-pre-wrap mb-2">iex> Process.info(pid, :message_queue_len)
-&lbrace;:message_queue_len, 0&rbrace;
-
-iex> Process.info(pid, :memory)
-&lbrace;:memory, 2688&rbrace;</div>
+                  <div class="font-mono text-xs whitespace-pre-wrap mb-2">{process_info_code()}</div>
                   <p class="text-xs opacity-60">
                     Doesn't show GenServer state, but useful for monitoring process health (mailbox size, memory usage).
                   </p>
@@ -506,4 +476,62 @@ iex> Process.info(pid, :memory)
 
   defp state_patterns, do: @state_patterns
   defp naming_examples, do: @naming_examples
+
+  defp sys_get_state_code do
+    String.trim("""
+    iex> :sys.get_state(pid)
+    %{count: 42, users: ["Alice", "Bob"]}
+    """)
+  end
+
+  defp sys_get_status_code do
+    String.trim(~s"""
+    iex> :sys.get_status(pid)
+    {:status, #PID<0.123.0>, {:module, MyServer},
+     [["$initial_call": ..., "$ancestors": ...],
+      :running, #PID<0.120.0>, [],
+      [header: ..., data: ..., data: ...]]}
+    """)
+  end
+
+  defp dedicated_api_code do
+    String.trim("""
+    # Add to your GenServer:
+    def handle_call(:get_state, _from, state) do
+      {:reply, state, state}
+    end
+
+    # Client API:
+    def get_state(pid), do: GenServer.call(pid, :get_state)
+    """)
+  end
+
+  defp process_info_code do
+    String.trim("""
+    iex> Process.info(pid, :message_queue_len)
+    {:message_queue_len, 0}
+
+    iex> Process.info(pid, :memory)
+    {:memory, 2688}
+    """)
+  end
+
+  defp registry_example_code do
+    "# In your application supervision tree:\n" <>
+    "children = [\n" <>
+    "  {Registry, keys: :unique, name: MyApp.Registry}\n" <>
+    "]\n" <>
+    "\n" <>
+    "# Starting a per-user server:\n" <>
+    "def start_link(user_id) do\n" <>
+    "  GenServer.start_link(__MODULE__, user_id,\n" <>
+    "    name: {:via, Registry, {MyApp.Registry, user_id}})\n" <>
+    "end\n" <>
+    "\n" <>
+    "# Looking up by user_id:\n" <>
+    "GenServer.call(\n" <>
+    "  {:via, Registry, {MyApp.Registry, user_id}},\n" <>
+    "  :get_data\n" <>
+    ")"
+  end
 end

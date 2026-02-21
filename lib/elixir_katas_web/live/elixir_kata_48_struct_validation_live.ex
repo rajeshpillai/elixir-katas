@@ -168,30 +168,14 @@ defmodule ElixirKatasWeb.ElixirKata48StructValidationLive do
                 <!-- Without @enforce_keys -->
                 <div class="bg-error/10 border border-error/30 rounded-lg p-4">
                   <h4 class="font-bold text-error text-sm mb-2">Without @enforce_keys</h4>
-                  <div class="bg-base-100 rounded-lg p-3 font-mono text-xs whitespace-pre-wrap">defmodule Loose do
-  defstruct [:name, :email]
-end
-
-# This is allowed -- all fields are nil!
-%Loose{}
-#=> %Loose&lbrace;name: nil, email: nil&rbrace;</div>
+                  <div class="bg-base-100 rounded-lg p-3 font-mono text-xs whitespace-pre-wrap">{loose_struct_code()}</div>
                   <div class="mt-2 text-xs text-error">Silently creates invalid structs with nil fields.</div>
                 </div>
 
                 <!-- With @enforce_keys -->
                 <div class="bg-success/10 border border-success/30 rounded-lg p-4">
                   <h4 class="font-bold text-success text-sm mb-2">With @enforce_keys</h4>
-                  <div class="bg-base-100 rounded-lg p-3 font-mono text-xs whitespace-pre-wrap">defmodule Strict do
-  @enforce_keys [:name, :email]
-  defstruct [:name, :email]
-end
-
-# This raises at compile time!
-%Strict{}
-#=> ** (ArgumentError) the following
-#     keys must also be given when
-#     building struct Strict:
-#     [:name, :email]</div>
+                  <div class="bg-base-100 rounded-lg p-3 font-mono text-xs whitespace-pre-wrap">{strict_struct_code()}</div>
                   <div class="mt-2 text-xs text-success">Catches missing required fields at compile time.</div>
                 </div>
               </div>
@@ -274,6 +258,18 @@ end
   defp validation_patterns, do: @validation_patterns
   defp try_examples, do: @try_examples
 
+  defp loose_struct_code do
+    String.trim("""
+    defmodule Loose do
+      defstruct [:name, :email]
+    end
+
+    # This is allowed -- all fields are nil!
+    %Loose{}
+    #=> %Loose{name: nil, email: nil}
+    """)
+  end
+
   defp run_validation(input) do
     try do
       {attrs, _} = Code.eval_string(input)
@@ -316,4 +312,20 @@ end
   defp validate_age(%{age: age}) when is_integer(age) and age > 0 and age < 150,
     do: {:ok, age}
   defp validate_age(_), do: {:error, "age must be an integer between 1 and 149"}
+
+  defp strict_struct_code do
+    String.trim("""
+    defmodule Strict do
+      @enforce_keys [:name, :email]
+      defstruct [:name, :email]
+    end
+
+    # This raises at compile time!
+    %Strict{}
+    #=> ** (ArgumentError) the following
+    #     keys must also be given when
+    #     building struct Strict:
+    #     [:name, :email]
+    """)
+  end
 end
