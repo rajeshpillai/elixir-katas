@@ -634,8 +634,48 @@ defmodule ElixirKatasWeb.Layouts do
             </div>
 
             <div class="mt-6">
+              <h3 class="px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                Section 3: Functions
+              </h3>
+              <div class="mt-2 space-y-1 pl-2">
+                <.link navigate="/elixir-katas/17-anonymous-functions" class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white">
+                  <span class="w-2 h-2 mr-3 rounded-full bg-emerald-500"></span>
+                  17 - Anonymous Functions
+                </.link>
+                <.link navigate="/elixir-katas/18-named-functions" class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white">
+                  <span class="w-2 h-2 mr-3 rounded-full bg-teal-500"></span>
+                  18 - Named Functions
+                </.link>
+                <.link navigate="/elixir-katas/19-guards" class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white">
+                  <span class="w-2 h-2 mr-3 rounded-full bg-emerald-600"></span>
+                  19 - Guards
+                </.link>
+                <.link navigate="/elixir-katas/20-default-arguments" class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white">
+                  <span class="w-2 h-2 mr-3 rounded-full bg-teal-600"></span>
+                  20 - Default Arguments
+                </.link>
+                <.link navigate="/elixir-katas/21-capture-operator" class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white">
+                  <span class="w-2 h-2 mr-3 rounded-full bg-emerald-400"></span>
+                  21 - Capture Operator
+                </.link>
+                <.link navigate="/elixir-katas/22-recursion" class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white">
+                  <span class="w-2 h-2 mr-3 rounded-full bg-teal-400"></span>
+                  22 - Recursion
+                </.link>
+                <.link navigate="/elixir-katas/23-tail-call" class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white">
+                  <span class="w-2 h-2 mr-3 rounded-full bg-emerald-500"></span>
+                  23 - Tail Call
+                </.link>
+                <.link navigate="/elixir-katas/24-higher-order" class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white">
+                  <span class="w-2 h-2 mr-3 rounded-full bg-teal-500"></span>
+                  24 - Higher-Order Functions
+                </.link>
+              </div>
+            </div>
+
+            <div class="mt-6">
               <h3 class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                Sections 3-10
+                Sections 4-10
               </h3>
               <div class="mt-2 pl-2">
                 <span class="px-4 py-2 text-sm text-gray-400 dark:text-gray-500">

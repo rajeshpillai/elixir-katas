@@ -140,8 +140,8 @@ defmodule ElixirKatasWeb.ElixirKata16MatchingChallengesLive do
      |> assign_new(:current_challenge_id, fn -> 1 end)
      |> assign_new(:user_answers, fn -> %{} end)
      |> assign_new(:results, fn -> %{} end)
-     |> assign_new(:show_hints, fn -> MapSet.new() end)
-     |> assign_new(:show_solutions, fn -> MapSet.new() end)
+     |> assign_new(:show_hints, fn -> %{} end)
+     |> assign_new(:show_solutions, fn -> %{} end)
      |> assign_new(:user_input, fn -> "" end)
      |> assign_new(:score, fn -> 0 end)
      |> assign_new(:attempts, fn -> %{} end)}
@@ -163,7 +163,7 @@ defmodule ElixirKatasWeb.ElixirKata16MatchingChallengesLive do
             Score: <%= @score %> / <%= length(@challenges) * 10 %>
           </div>
           <div class="badge badge-lg badge-ghost gap-2">
-            <%= map_size(@results) |> then(fn _done -> "#{Enum.count(@results, fn {_, v} -> v.correct end)}/#{length(@challenges)} solved" end) %>
+            <%= "#{Enum.count(@results, fn {_, v} -> v.correct end)}/#{length(@challenges)} solved" %>
           </div>
         </div>
       </div>
@@ -293,7 +293,7 @@ defmodule ElixirKatasWeb.ElixirKata16MatchingChallengesLive do
             </div>
 
             <div class="flex gap-2 mt-3">
-              <%= if not (current_result && current_result.correct) do %>
+              <%= if !(current_result && current_result.correct) do %>
                 <button type="submit" class="btn btn-primary btn-sm">
                   Check Answer
                 </button>
@@ -305,9 +305,9 @@ defmodule ElixirKatasWeb.ElixirKata16MatchingChallengesLive do
                 phx-value-id={current.id}
                 class="btn btn-ghost btn-sm"
               >
-                <%= if MapSet.member?(@show_hints, current.id), do: "Hide Hint", else: "Show Hint" %>
+                <%= if Map.has_key?(@show_hints, current.id), do: "Hide Hint", else: "Show Hint" %>
               </button>
-              <%= if not (current_result && current_result.correct) do %>
+              <%= if !(current_result && current_result.correct) do %>
                 <button
                   type="button"
                   phx-click="show_solution"
@@ -322,7 +322,7 @@ defmodule ElixirKatasWeb.ElixirKata16MatchingChallengesLive do
           </form>
 
           <!-- Hint -->
-          <%= if MapSet.member?(@show_hints, current.id) do %>
+          <%= if Map.has_key?(@show_hints, current.id) do %>
             <div class="alert alert-info text-sm mb-4">
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current shrink-0 w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
               <span><%= current.hint %></span>
@@ -330,7 +330,7 @@ defmodule ElixirKatasWeb.ElixirKata16MatchingChallengesLive do
           <% end %>
 
           <!-- Solution -->
-          <%= if MapSet.member?(@show_solutions, current.id) do %>
+          <%= if Map.has_key?(@show_solutions, current.id) do %>
             <div class="alert alert-warning text-sm mb-4">
               <div>
                 <div class="font-bold text-xs mb-1">Solution (no points):</div>
@@ -353,7 +353,7 @@ defmodule ElixirKatasWeb.ElixirKata16MatchingChallengesLive do
 
           <!-- Attempt counter -->
           <% attempt_count = Map.get(@attempts, current.id, 0) %>
-          <%= if attempt_count > 0 and not (current_result && current_result.correct) do %>
+          <%= if attempt_count > 0 and !(current_result && current_result.correct) do %>
             <div class="text-xs opacity-50 mt-2">
               Attempts: <%= attempt_count %>
             </div>
@@ -469,7 +469,7 @@ defmodule ElixirKatasWeb.ElixirKata16MatchingChallengesLive do
         new_attempts = Map.update(socket.assigns.attempts, challenge_id, 1, &(&1 + 1))
 
         new_score =
-          if correct and not (existing_result && existing_result.correct) do
+          if correct and !(existing_result && existing_result.correct) do
             socket.assigns.score + 10
           else
             socket.assigns.score
@@ -490,10 +490,10 @@ defmodule ElixirKatasWeb.ElixirKata16MatchingChallengesLive do
     hints = socket.assigns.show_hints
 
     new_hints =
-      if MapSet.member?(hints, id) do
-        MapSet.delete(hints, id)
+      if Map.has_key?(hints, id) do
+        Map.delete(hints, id)
       else
-        MapSet.put(hints, id)
+        Map.put(hints, id, true)
       end
 
     {:noreply, assign(socket, show_hints: new_hints)}
@@ -501,7 +501,7 @@ defmodule ElixirKatasWeb.ElixirKata16MatchingChallengesLive do
 
   def handle_event("show_solution", %{"id" => id_str}, socket) do
     id = String.to_integer(id_str)
-    {:noreply, assign(socket, show_solutions: MapSet.put(socket.assigns.show_solutions, id))}
+    {:noreply, assign(socket, show_solutions: Map.put(socket.assigns.show_solutions, id, true))}
   end
 
   # Helpers
