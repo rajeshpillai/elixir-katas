@@ -41,9 +41,9 @@ defmodule ElixirKatasWeb.Layouts do
       <!-- Sidebar -->
       <div id="sidebar" class="w-64 flex-shrink-0 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col transition-all duration-300 ease-in-out" data-layout-source="custom-app">
         <div class="h-16 flex items-center px-6 border-b border-gray-200 dark:border-gray-700">
-          <span class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-pink-600">
+          <.link navigate="/liveview-katas" class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-pink-600 hover:opacity-80 transition-opacity">
             LiveView Katas
-          </span>
+          </.link>
         </div>
         <div class="flex-1 overflow-y-auto p-4" phx-hook="ScrollPosition" data-scroll-key="sidebar-nav" id="sidebar-nav">
           <nav class="space-y-1">
@@ -140,9 +140,9 @@ defmodule ElixirKatasWeb.Layouts do
       <!-- Sidebar -->
       <div id="sidebar" class="w-64 flex-shrink-0 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col transition-all duration-300 ease-in-out" data-layout-source="elixir-app">
         <div class="h-16 flex items-center px-6 border-b border-gray-200 dark:border-gray-700">
-          <span class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-emerald-500 to-teal-600">
+          <.link navigate="/elixir-katas" class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-emerald-500 to-teal-600 hover:opacity-80 transition-opacity">
             Elixir Katas
-          </span>
+          </.link>
         </div>
         <div class="flex-1 overflow-y-auto p-4" phx-hook="ScrollPosition" data-scroll-key="elixir-sidebar-nav" id="elixir-sidebar-nav">
           <nav class="space-y-1">
