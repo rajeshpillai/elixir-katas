@@ -453,6 +453,10 @@ defmodule ElixirKatasWeb.Layouts do
                    <span class="w-2 h-2 mr-3 rounded-full bg-blue-500"></span>
                    100 - Error Boundary
                  </.link>
+                 <.link navigate="/liveview-katas/101-hooks" class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white">
+                   <span class="w-2 h-2 mr-3 rounded-full bg-purple-500"></span>
+                   101 - LiveView Hooks
+                 </.link>
                   <.link navigate="/liveview-katas/104-genserver" class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white">
                     <span class="w-2 h-2 mr-3 rounded-full bg-indigo-500"></span>
                     104 - GenServer Integration

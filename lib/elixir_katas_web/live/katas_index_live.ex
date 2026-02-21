@@ -434,6 +434,7 @@ defmodule ElixirKatasWeb.KatasIndexLive do
       <.kata_card title="98. PDF Generation" description="Document generation" path={~p"/liveview-katas/98-pdf"} />
       <.kata_card title="99. CSV Export" description="Data export" path={~p"/liveview-katas/99-csv"} />
       <.kata_card title="100. Error Boundary" description="Crash handling" path={~p"/liveview-katas/100-error"} />
+      <.kata_card title="101. LiveView Hooks" description="JavaScript hooks for client-side interop" path={~p"/liveview-katas/101-hooks"} />
       <.kata_card title="104. GenServer Integration" description="Background workers with LiveView" path={~p"/liveview-katas/104-genserver"} />
        <.kata_card title="125. State Machine" description="Complex workflows with :gen_statem" path={~p"/liveview-katas/125-statemachine"} />
       <.kata_card title="139. Virtual Scrolling" description="Efficiently rendering large datasets with window-based rendering" path={~p"/liveview-katas/139-virtual-scrolling"} />
