@@ -1,4 +1,103 @@
-# Advanced Kata Ideas for Senior Elixir Developers
+# Elixir Katas — Core Elixir Curriculum
+
+## Section 1: Types, Operators & Basics (01-08)
+- [x] **01. Type Explorer** - Basic types: integer, float, string, atom, boolean, nil
+- [x] **02. Arithmetic Lab** - Operators: +, -, *, /, div, rem; float vs integer division
+- [x] **03. String Playground** - Concatenation, interpolation, String module functions
+- [x] **04. Atoms & Booleans** - Atoms, boolean operators (and/or vs &&/||), truthy/falsy
+- [x] **05. Comparison & Ordering** - ==, ===, <, >, term ordering across types
+- [x] **06. Tuples** - {a, b}, elem/2, put_elem/3, {:ok, val}/{:error, reason}
+- [x] **07. Lists** - [head|tail], hd/tl, ++, --, prepend vs append performance
+- [x] **08. Maps & Keyword Lists** - %{}, Map module, keyword lists, when to use each
+
+## Section 2: Pattern Matching (09-16)
+- [ ] **09. Match Operator** - = is match not assignment, binding vs matching
+- [ ] **10. Tuple Matching** - {:ok, val}, {:error, reason} destructuring
+- [ ] **11. List Matching** - [h|t], fixed-length, nested matching
+- [ ] **12. Map Matching** - Partial map matching, nested extraction
+- [ ] **13. Pin Operator** - ^ to match against existing bindings
+- [ ] **14. Multi-clause Matching** - Multiple function clauses, first-match-wins
+- [ ] **15. Destructuring** - Complex nested structures, chained extraction
+- [ ] **16. Matching Challenges** - Pattern matching mini-challenges with scoring
+
+## Section 3: Functions (17-24)
+- [ ] **17. Anonymous Functions** - fn -> end, closures, .() calling
+- [ ] **18. Named Functions** - def/defp, arity, defmodule
+- [ ] **19. Guards** - when clauses, allowed guard expressions
+- [ ] **20. Default Arguments** - \\\\ syntax, generated arities
+- [ ] **21. Capture Operator** - &, &Module.fun/arity, &(&1 + 1) shorthand
+- [ ] **22. Recursion** - Base case + recursive case, visual call stack
+- [ ] **23. Tail Recursion** - Accumulators, stack depth comparison
+- [ ] **24. Higher-Order Functions** - Functions as values, composition
+
+## Section 4: Control Flow (25-31)
+- [ ] **25. Case Expressions** - Pattern matching on values, guards in case
+- [ ] **26. Cond Expressions** - Boolean conditions, first-true-wins
+- [ ] **27. If/Unless** - Simple conditionals, macros not special forms
+- [ ] **28. With Expressions** - Happy path chaining, else clauses
+- [ ] **29. Pipe Operator** - |> pipelines, nested-to-piped refactoring
+- [ ] **30. Comprehensions** - for generators, filters, :into
+- [ ] **31. Try/Rescue** - Error handling, let it crash philosophy
+
+## Section 5: Enum & Stream (32-40)
+- [ ] **32. Enum Basics** - map, filter, reduce, each
+- [ ] **33. Enum Transforms** - sort, reverse, uniq, flat_map, zip, chunk_every
+- [ ] **34. Enum Aggregates** - count, sum, min/max, frequencies, group_by
+- [ ] **35. Enum Search** - find, any?, all?, take_while, drop_while
+- [ ] **36. Reduce Mastery** - Step-through animation, implement map/filter with reduce
+- [ ] **37. MapSet** - Set operations: union, intersection, difference
+- [ ] **38. Streams** - Eager vs lazy, Stream.map/filter/take
+- [ ] **39. Stream Generators** - iterate, unfold, cycle, infinite streams
+- [ ] **40. Ranges & Slicing** - 1..10, step ranges, Enum.slice/take/drop
+
+## Section 6: Strings, Binaries & Sigils (41-46)
+- [ ] **41. String Deep Dive** - UTF-8 binaries, byte_size vs String.length, graphemes
+- [ ] **42. Charlists vs Strings** - Single vs double quotes, conversion
+- [ ] **43. String Matching** - Binary matching <<h::utf8, rest::binary>>
+- [ ] **44. Regex** - ~r//, Regex.match?/run/scan/replace
+- [ ] **45. Sigils** - ~s, ~w, ~D, ~T, ~r, uppercase vs lowercase
+- [ ] **46. Formatting** - String.pad, IO.inspect options, number formatting
+
+## Section 7: Structs, Protocols & Behaviours (47-54)
+- [ ] **47. Structs** - defstruct, @enforce_keys, update syntax
+- [ ] **48. Struct Validation** - Constructor patterns, new/1 returning tagged tuples
+- [ ] **49. Protocols** - defprotocol/defimpl, dispatch on type
+- [ ] **50. Built-in Protocols** - String.Chars, Inspect, Enumerable
+- [ ] **51. Behaviours** - @callback, @behaviour, compile-time contracts
+- [ ] **52. Polymorphism** - Protocols vs behaviours vs pattern matching
+- [ ] **53. Module Attributes** - @moduledoc, @doc, @spec, @type, constants
+- [ ] **54. Use & Import** - import, alias, require, use, __using__ macro
+
+## Section 8: Processes & Message Passing (55-62)
+- [ ] **55. Spawn & Processes** - spawn/1, self(), process isolation, PIDs
+- [ ] **56. Send & Receive** - Message passing, mailbox visualization
+- [ ] **57. Process Links** - spawn_link, bidirectional crash propagation
+- [ ] **58. Process Monitors** - Process.monitor, :DOWN messages
+- [ ] **59. Process State Loop** - Recursive receive loop (DIY GenServer)
+- [ ] **60. Trapping Exits** - trap_exit flag, converting exits to messages
+- [ ] **61. Task Module** - Task.async/await, async_stream, concurrency
+- [ ] **62. Agent** - Simple state server, get/update/get_and_update
+
+## Section 9: GenServer & OTP (63-71)
+- [ ] **63. GenServer Basics** - init, handle_call, handle_cast, handle_info
+- [ ] **64. Call vs Cast** - Sync vs async, blocking behavior, timeouts
+- [ ] **65. GenServer State** - Complex state, named processes, Registry
+- [ ] **66. Periodic Work** - Process.send_after, timer patterns
+- [ ] **67. Supervisor Basics** - Restart strategies: one_for_one, one_for_all
+- [ ] **68. Dynamic Supervisors** - DynamicSupervisor, start_child/terminate_child
+- [ ] **69. Supervision Trees** - Nested supervisors, fault tolerance
+- [ ] **70. Registry** - Process lookup, :unique vs :duplicate, pub/sub
+- [ ] **71. ETS Tables** - :ets operations, table types, concurrent reads
+
+## Section 10: Advanced Patterns (72-75)
+- [ ] **72. Quote & Unquote** - AST representation, homoiconicity
+- [ ] **73. Macros** - defmacro, compile-time code generation
+- [ ] **74. App Config** - Application.get_env, runtime vs compile-time
+- [ ] **75. The Elixir Toolbox** - Decision-tree quiz: choosing the right tool
+
+---
+
+# Advanced LiveView Kata Ideas for Senior Elixir Developers
 
 ## Performance & Optimization
 - [ ] **104. Query Optimization** - N+1 prevention, preloading strategies, Ecto.Query optimization

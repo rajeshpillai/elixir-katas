@@ -33,7 +33,7 @@ defmodule ElixirKatasWeb.Layouts do
 
   def app(assigns) do
     ~H"""
-    <div class="flex h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-sans">
+    <div class="flex h-full bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-sans">
       <!-- Sidebar -->
       <div id="sidebar" class="w-64 flex-shrink-0 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col transition-all duration-300 ease-in-out" data-layout-source="custom-app">
         <div class="h-16 flex items-center px-6 border-b border-gray-200 dark:border-gray-700">
@@ -517,6 +517,171 @@ defmodule ElixirKatasWeb.Layouts do
         const sidebar = document.getElementById('sidebar');
         const isHidden = sidebar.classList.contains('-ml-64');
         
+        if (isHidden) {
+          sidebar.classList.remove('-ml-64');
+        } else {
+          sidebar.classList.add('-ml-64');
+        }
+      }
+    </script>
+    """
+  end
+
+  @doc """
+  Renders the Elixir Katas layout with a dedicated sidebar.
+  """
+  attr :flash, :map, required: true, doc: "the map of flash messages"
+
+  attr :current_scope, :map,
+    default: nil,
+    doc: "the current [scope](https://hexdocs.pm/phoenix/scopes.html)"
+
+  def elixir_app(assigns) do
+    ~H"""
+    <div class="flex h-full bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-sans">
+      <!-- Sidebar -->
+      <div id="sidebar" class="w-64 flex-shrink-0 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col transition-all duration-300 ease-in-out" data-layout-source="elixir-app">
+        <div class="h-16 flex items-center px-6 border-b border-gray-200 dark:border-gray-700">
+          <span class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-emerald-500 to-teal-600">
+            Elixir Katas
+          </span>
+        </div>
+        <div class="flex-1 overflow-y-auto p-4" phx-hook="ScrollPosition" data-scroll-key="elixir-sidebar-nav" id="elixir-sidebar-nav">
+          <nav class="space-y-1">
+            <a href="/" class="group flex items-center px-4 py-2 text-sm font-medium rounded-md bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300">
+              <.icon name="hero-home" class="mr-3 h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+              Home
+            </a>
+
+            <div class="mt-6">
+              <h3 class="px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                Section 1: Types & Basics
+              </h3>
+              <div class="mt-2 space-y-1 pl-2">
+                <.link navigate="/elixir-katas/01-type-explorer" class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white">
+                  <span class="w-2 h-2 mr-3 rounded-full bg-emerald-400"></span>
+                  01 - Type Explorer
+                </.link>
+                <.link navigate="/elixir-katas/02-arithmetic-lab" class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white">
+                  <span class="w-2 h-2 mr-3 rounded-full bg-teal-400"></span>
+                  02 - Arithmetic Lab
+                </.link>
+                <.link navigate="/elixir-katas/03-string-playground" class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white">
+                  <span class="w-2 h-2 mr-3 rounded-full bg-emerald-500"></span>
+                  03 - String Playground
+                </.link>
+                <.link navigate="/elixir-katas/04-atoms-booleans" class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white">
+                  <span class="w-2 h-2 mr-3 rounded-full bg-teal-500"></span>
+                  04 - Atoms & Booleans
+                </.link>
+                <.link navigate="/elixir-katas/05-comparison" class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white">
+                  <span class="w-2 h-2 mr-3 rounded-full bg-emerald-600"></span>
+                  05 - Comparison
+                </.link>
+                <.link navigate="/elixir-katas/06-tuples" class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white">
+                  <span class="w-2 h-2 mr-3 rounded-full bg-teal-600"></span>
+                  06 - Tuples
+                </.link>
+                <.link navigate="/elixir-katas/07-lists" class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white">
+                  <span class="w-2 h-2 mr-3 rounded-full bg-emerald-400"></span>
+                  07 - Lists
+                </.link>
+                <.link navigate="/elixir-katas/08-maps-keywords" class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white">
+                  <span class="w-2 h-2 mr-3 rounded-full bg-teal-400"></span>
+                  08 - Maps & Keywords
+                </.link>
+              </div>
+            </div>
+
+            <div class="mt-6">
+              <h3 class="px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                Section 2: Pattern Matching
+              </h3>
+              <div class="mt-2 space-y-1 pl-2">
+                <.link navigate="/elixir-katas/09-match-operator" class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white">
+                  <span class="w-2 h-2 mr-3 rounded-full bg-emerald-500"></span>
+                  09 - Match Operator
+                </.link>
+                <.link navigate="/elixir-katas/10-tuple-matching" class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white">
+                  <span class="w-2 h-2 mr-3 rounded-full bg-teal-500"></span>
+                  10 - Tuple Matching
+                </.link>
+                <.link navigate="/elixir-katas/11-list-matching" class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white">
+                  <span class="w-2 h-2 mr-3 rounded-full bg-emerald-600"></span>
+                  11 - List Matching
+                </.link>
+                <.link navigate="/elixir-katas/12-map-matching" class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white">
+                  <span class="w-2 h-2 mr-3 rounded-full bg-teal-600"></span>
+                  12 - Map Matching
+                </.link>
+                <.link navigate="/elixir-katas/13-pin-operator" class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white">
+                  <span class="w-2 h-2 mr-3 rounded-full bg-emerald-400"></span>
+                  13 - Pin Operator
+                </.link>
+                <.link navigate="/elixir-katas/14-multi-clause" class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white">
+                  <span class="w-2 h-2 mr-3 rounded-full bg-teal-400"></span>
+                  14 - Multi-clause
+                </.link>
+                <.link navigate="/elixir-katas/15-destructuring" class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white">
+                  <span class="w-2 h-2 mr-3 rounded-full bg-emerald-500"></span>
+                  15 - Destructuring
+                </.link>
+                <.link navigate="/elixir-katas/16-matching-challenges" class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white">
+                  <span class="w-2 h-2 mr-3 rounded-full bg-teal-500"></span>
+                  16 - Challenges
+                </.link>
+              </div>
+            </div>
+
+            <div class="mt-6">
+              <h3 class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                Sections 3-10
+              </h3>
+              <div class="mt-2 pl-2">
+                <span class="px-4 py-2 text-sm text-gray-400 dark:text-gray-500">
+                  Coming soon...
+                </span>
+              </div>
+            </div>
+          </nav>
+        </div>
+        <div class="p-4 border-t border-gray-200 dark:border-gray-700">
+          <div class="flex justify-center">
+            <.theme_toggle />
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Content -->
+      <div class="flex-1 flex flex-col overflow-hidden relative">
+        <header class="flex items-center justify-between h-16 px-6 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+          <button
+            id="elixir-sidebar-toggle"
+            class="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            onclick="toggleElixirSidebar()"
+            aria-label="Toggle sidebar"
+          >
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+            </svg>
+          </button>
+          <span class="text-lg font-bold md:hidden">Elixir Katas</span>
+          <div class="w-10"></div>
+        </header>
+
+        <main class="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-900 p-4 sm:p-6 lg:p-8">
+          <.flash_group flash={@flash} />
+          <div class="mx-auto max-w-5xl">
+            {@inner_content}
+          </div>
+        </main>
+      </div>
+    </div>
+    <script>
+      function toggleElixirSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const isHidden = sidebar.classList.contains('-ml-64');
+
         if (isHidden) {
           sidebar.classList.remove('-ml-64');
         } else {

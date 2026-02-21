@@ -26,6 +26,11 @@ defmodule ElixirKatasWeb.Router do
     
     live "/usecases", UseCasesIndexLive
     
+    live_session :elixir_katas, layout: {ElixirKatasWeb.Layouts, :elixir_app} do
+      live "/elixir-katas", ElixirKatasIndexLive
+      live "/elixir-katas/:slug", ElixirKataHostLive, :index
+    end
+
     live_session :default, layout: {ElixirKatasWeb.Layouts, :app} do
       live "/katas", KatasIndexLive
       # Specific routes for katas with extra path segments
