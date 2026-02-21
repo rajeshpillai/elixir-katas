@@ -32,14 +32,14 @@ defmodule ElixirKatasWeb.Router do
     end
 
     live_session :default, layout: {ElixirKatasWeb.Layouts, :app} do
-      live "/katas", KatasIndexLive
+      live "/liveview-katas", KatasIndexLive
       # Specific routes for katas with extra path segments
-      live "/katas/42-path-params/:id", KataHostLive, :kata_42
+      live "/liveview-katas/42-path-params/:id", KataHostLive, :kata_42
 
       # Catch-all for all other katas
-      live "/katas/01-hello-world", KataHostLive, :kata_01
-      live "/katas/02-counter", KataHostLive, :kata_02
-      live "/katas/:slug", KataHostLive, :index
+      live "/liveview-katas/01-hello-world", KataHostLive, :kata_01
+      live "/liveview-katas/02-counter", KataHostLive, :kata_02
+      live "/liveview-katas/:slug", KataHostLive, :index
     end
   end
 
