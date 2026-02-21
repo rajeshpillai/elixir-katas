@@ -121,114 +121,6 @@ defmodule ElixirKatasWeb.Layouts do
     """
   end
 
-  @elixir_kata_sections [
-    %{title: "Section 1: Types & Basics", katas: [
-      %{num: "01", slug: "01-type-explorer", label: "01 - Type Explorer", color: "bg-emerald-400"},
-      %{num: "02", slug: "02-arithmetic-lab", label: "02 - Arithmetic Lab", color: "bg-teal-400"},
-      %{num: "03", slug: "03-string-playground", label: "03 - String Playground", color: "bg-emerald-500"},
-      %{num: "04", slug: "04-atoms-booleans", label: "04 - Atoms & Booleans", color: "bg-teal-500"},
-      %{num: "05", slug: "05-comparison", label: "05 - Comparison", color: "bg-emerald-600"},
-      %{num: "06", slug: "06-tuples", label: "06 - Tuples", color: "bg-teal-600"},
-      %{num: "07", slug: "07-lists", label: "07 - Lists", color: "bg-emerald-400"},
-      %{num: "08", slug: "08-maps-keywords", label: "08 - Maps & Keywords", color: "bg-teal-400"}
-    ]},
-    %{title: "Section 2: Pattern Matching", katas: [
-      %{num: "09", slug: "09-match-operator", label: "09 - Match Operator", color: "bg-emerald-500"},
-      %{num: "10", slug: "10-tuple-matching", label: "10 - Tuple Matching", color: "bg-teal-500"},
-      %{num: "11", slug: "11-list-matching", label: "11 - List Matching", color: "bg-emerald-600"},
-      %{num: "12", slug: "12-map-matching", label: "12 - Map Matching", color: "bg-teal-600"},
-      %{num: "13", slug: "13-pin-operator", label: "13 - Pin Operator", color: "bg-emerald-400"},
-      %{num: "14", slug: "14-multi-clause", label: "14 - Multi-clause", color: "bg-teal-400"},
-      %{num: "15", slug: "15-destructuring", label: "15 - Destructuring", color: "bg-emerald-500"},
-      %{num: "16", slug: "16-matching-challenges", label: "16 - Challenges", color: "bg-teal-500"}
-    ]},
-    %{title: "Section 3: Functions", katas: [
-      %{num: "17", slug: "17-anonymous-functions", label: "17 - Anonymous Functions", color: "bg-emerald-500"},
-      %{num: "18", slug: "18-named-functions", label: "18 - Named Functions", color: "bg-teal-500"},
-      %{num: "19", slug: "19-guards", label: "19 - Guards", color: "bg-emerald-600"},
-      %{num: "20", slug: "20-default-arguments", label: "20 - Default Arguments", color: "bg-teal-600"},
-      %{num: "21", slug: "21-capture-operator", label: "21 - Capture Operator", color: "bg-emerald-400"},
-      %{num: "22", slug: "22-recursion", label: "22 - Recursion", color: "bg-teal-400"},
-      %{num: "23", slug: "23-tail-call", label: "23 - Tail Call", color: "bg-emerald-500"},
-      %{num: "24", slug: "24-higher-order", label: "24 - Higher-Order Functions", color: "bg-teal-500"}
-    ]},
-    %{title: "Section 4: Control Flow", katas: [
-      %{num: "25", slug: "25-case-expressions", label: "25 - Case Expressions", color: "bg-emerald-400"},
-      %{num: "26", slug: "26-cond-expressions", label: "26 - Cond Expressions", color: "bg-teal-400"},
-      %{num: "27", slug: "27-if-unless", label: "27 - If/Unless", color: "bg-emerald-500"},
-      %{num: "28", slug: "28-with-expressions", label: "28 - With Expressions", color: "bg-teal-500"},
-      %{num: "29", slug: "29-pipe-operator", label: "29 - Pipe Operator", color: "bg-emerald-600"},
-      %{num: "30", slug: "30-comprehensions", label: "30 - Comprehensions", color: "bg-teal-600"},
-      %{num: "31", slug: "31-try-rescue", label: "31 - Try/Rescue", color: "bg-emerald-400"}
-    ]},
-    %{title: "Section 5: Enum & Stream", katas: [
-      %{num: "32", slug: "32-enum-basics", label: "32 - Enum Basics", color: "bg-emerald-500"},
-      %{num: "33", slug: "33-enum-transforms", label: "33 - Enum Transforms", color: "bg-teal-500"},
-      %{num: "34", slug: "34-enum-aggregates", label: "34 - Enum Aggregates", color: "bg-emerald-600"},
-      %{num: "35", slug: "35-enum-search", label: "35 - Enum Search", color: "bg-teal-600"},
-      %{num: "36", slug: "36-reduce-mastery", label: "36 - Reduce Mastery", color: "bg-emerald-400"},
-      %{num: "37", slug: "37-mapset", label: "37 - MapSet", color: "bg-teal-400"},
-      %{num: "38", slug: "38-streams-lazy", label: "38 - Streams: Lazy", color: "bg-emerald-500"},
-      %{num: "39", slug: "39-stream-generators", label: "39 - Stream Generators", color: "bg-teal-500"},
-      %{num: "40", slug: "40-ranges-slicing", label: "40 - Ranges & Slicing", color: "bg-emerald-600"}
-    ]},
-    %{title: "Section 6: Strings & Binaries", katas: [
-      %{num: "41", slug: "41-string-deep-dive", label: "41 - String Deep Dive", color: "bg-emerald-400"},
-      %{num: "42", slug: "42-charlists-strings", label: "42 - Charlists vs Strings", color: "bg-teal-400"},
-      %{num: "43", slug: "43-string-matching", label: "43 - String Matching", color: "bg-emerald-500"},
-      %{num: "44", slug: "44-regex", label: "44 - Regex", color: "bg-teal-500"},
-      %{num: "45", slug: "45-sigils", label: "45 - Sigils", color: "bg-emerald-600"},
-      %{num: "46", slug: "46-formatting", label: "46 - Formatting", color: "bg-teal-600"}
-    ]},
-    %{title: "Section 7: Structs & Protocols", katas: [
-      %{num: "47", slug: "47-structs", label: "47 - Structs", color: "bg-emerald-400"},
-      %{num: "48", slug: "48-struct-validation", label: "48 - Struct Validation", color: "bg-teal-400"},
-      %{num: "49", slug: "49-protocols", label: "49 - Protocols", color: "bg-emerald-500"},
-      %{num: "50", slug: "50-builtin-protocols", label: "50 - Built-in Protocols", color: "bg-teal-500"},
-      %{num: "51", slug: "51-behaviours", label: "51 - Behaviours", color: "bg-emerald-600"},
-      %{num: "52", slug: "52-polymorphism", label: "52 - Polymorphism", color: "bg-teal-600"},
-      %{num: "53", slug: "53-module-attributes", label: "53 - Module Attributes", color: "bg-emerald-400"},
-      %{num: "54", slug: "54-use-import", label: "54 - Use & Import", color: "bg-teal-400"}
-    ]},
-    %{title: "Section 8: Processes", katas: [
-      %{num: "55", slug: "55-spawn-processes", label: "55 - Spawn & Processes", color: "bg-emerald-500"},
-      %{num: "56", slug: "56-send-receive", label: "56 - Send & Receive", color: "bg-teal-500"},
-      %{num: "57", slug: "57-process-links", label: "57 - Process Links", color: "bg-emerald-600"},
-      %{num: "58", slug: "58-process-monitors", label: "58 - Process Monitors", color: "bg-teal-600"},
-      %{num: "59", slug: "59-process-state", label: "59 - Process State Loop", color: "bg-emerald-400"},
-      %{num: "60", slug: "60-trapping-exits", label: "60 - Trapping Exits", color: "bg-teal-400"},
-      %{num: "61", slug: "61-task-module", label: "61 - Task Module", color: "bg-emerald-500"},
-      %{num: "62", slug: "62-agent", label: "62 - Agent", color: "bg-teal-500"}
-    ]},
-    %{title: "Section 9: GenServer & OTP", katas: [
-      %{num: "63", slug: "63-genserver-basics", label: "63 - GenServer Basics", color: "bg-emerald-600"},
-      %{num: "64", slug: "64-call-vs-cast", label: "64 - Call vs Cast", color: "bg-teal-600"},
-      %{num: "65", slug: "65-genserver-state", label: "65 - GenServer State", color: "bg-emerald-400"},
-      %{num: "66", slug: "66-periodic-work", label: "66 - Periodic Work", color: "bg-teal-400"},
-      %{num: "67", slug: "67-supervisor-basics", label: "67 - Supervisor Basics", color: "bg-emerald-500"},
-      %{num: "68", slug: "68-dynamic-supervisors", label: "68 - Dynamic Supervisors", color: "bg-teal-500"},
-      %{num: "69", slug: "69-supervision-trees", label: "69 - Supervision Trees", color: "bg-emerald-600"},
-      %{num: "70", slug: "70-registry", label: "70 - Registry", color: "bg-teal-600"},
-      %{num: "71", slug: "71-ets-tables", label: "71 - ETS Tables", color: "bg-emerald-400"}
-    ]},
-    %{title: "Section 10: Advanced", katas: [
-      %{num: "72", slug: "72-quote-unquote", label: "72 - Quote & Unquote", color: "bg-emerald-500"},
-      %{num: "73", slug: "73-macros", label: "73 - Macros", color: "bg-teal-500"},
-      %{num: "74", slug: "74-application-config", label: "74 - Application Config", color: "bg-emerald-600"},
-      %{num: "75", slug: "75-elixir-toolbox", label: "75 - The Elixir Toolbox", color: "bg-teal-600"}
-    ]},
-    %{title: "Section 11: Essentials", katas: [
-      %{num: "76", slug: "76-io-file", label: "76 - IO & File Operations", color: "bg-emerald-500"},
-      %{num: "77", slug: "77-erlang-interop", label: "77 - Erlang Interop", color: "bg-teal-500"},
-      %{num: "78", slug: "78-exunit-basics", label: "78 - ExUnit Basics", color: "bg-emerald-600"},
-      %{num: "79", slug: "79-date-time", label: "79 - Date & Time", color: "bg-teal-600"},
-      %{num: "80", slug: "80-nested-access", label: "80 - Nested Data Access", color: "bg-emerald-400"},
-      %{num: "81", slug: "81-custom-exceptions", label: "81 - Custom Exceptions", color: "bg-teal-400"},
-      %{num: "82", slug: "82-debugging", label: "82 - Debugging Tools", color: "bg-emerald-500"},
-      %{num: "83", slug: "83-nodes-distribution", label: "83 - Nodes & Distribution", color: "bg-teal-500"}
-    ]}
-  ]
-
   @doc """
   Renders the Elixir Katas layout with a dedicated sidebar.
   """
@@ -239,7 +131,7 @@ defmodule ElixirKatasWeb.Layouts do
     doc: "the current [scope](https://hexdocs.pm/phoenix/scopes.html)"
 
   def elixir_app(assigns) do
-    assigns = assign(assigns, :sections, @elixir_kata_sections)
+    assigns = assign(assigns, :sections, ElixirKatasWeb.ElixirKataData.sections())
     current_kata_id = assigns[:kata_id]
     assigns = assign(assigns, :current_kata_id, current_kata_id)
 
