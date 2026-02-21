@@ -95,6 +95,16 @@
 - [ ] **74. App Config** - Application.get_env, runtime vs compile-time
 - [ ] **75. The Elixir Toolbox** - Decision-tree quiz: choosing the right tool
 
+## Section 11: Essentials (76-83)
+- [x] **76. IO & File Operations** - IO.puts/inspect, File.read/write/stream!, Path module, IO lists
+- [x] **77. Erlang Interop** - Calling :math, :timer, :crypto, :rand; type mapping
+- [x] **78. ExUnit Basics** - assert/refute, describe, setup, doctest, test patterns
+- [x] **79. Date & Time** - Date, Time, DateTime, NaiveDateTime; arithmetic & formatting
+- [x] **80. Nested Data Access** - get_in/put_in/update_in, Access module
+- [x] **81. Custom Exceptions** - defexception, raise/rescue, exceptions vs tagged tuples
+- [x] **82. Debugging Tools** - IO.inspect, dbg, IEx helpers, Logger, process debugging
+- [x] **83. Nodes & Distribution** - Node.connect, :rpc.call, :global, distributed Erlang
+
 ---
 
 # Advanced LiveView Kata Ideas for Senior Elixir Developers

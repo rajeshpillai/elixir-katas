@@ -622,6 +622,16 @@ defmodule ElixirKatasWeb.Layouts do
       %{num: "73", slug: "73-macros", label: "73 - Macros", color: "bg-teal-500"},
       %{num: "74", slug: "74-application-config", label: "74 - Application Config", color: "bg-emerald-600"},
       %{num: "75", slug: "75-elixir-toolbox", label: "75 - The Elixir Toolbox", color: "bg-teal-600"}
+    ]},
+    %{title: "Section 11: Essentials", katas: [
+      %{num: "76", slug: "76-io-file", label: "76 - IO & File Operations", color: "bg-emerald-500"},
+      %{num: "77", slug: "77-erlang-interop", label: "77 - Erlang Interop", color: "bg-teal-500"},
+      %{num: "78", slug: "78-exunit-basics", label: "78 - ExUnit Basics", color: "bg-emerald-600"},
+      %{num: "79", slug: "79-date-time", label: "79 - Date & Time", color: "bg-teal-600"},
+      %{num: "80", slug: "80-nested-access", label: "80 - Nested Data Access", color: "bg-emerald-400"},
+      %{num: "81", slug: "81-custom-exceptions", label: "81 - Custom Exceptions", color: "bg-teal-400"},
+      %{num: "82", slug: "82-debugging", label: "82 - Debugging Tools", color: "bg-emerald-500"},
+      %{num: "83", slug: "83-nodes-distribution", label: "83 - Nodes & Distribution", color: "bg-teal-500"}
     ]}
   ]
 

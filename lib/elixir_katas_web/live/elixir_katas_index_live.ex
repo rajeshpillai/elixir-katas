@@ -160,6 +160,21 @@ defmodule ElixirKatasWeb.ElixirKatasIndexLive do
         <.kata_card title="74. App Config" description="Application.get_env, runtime vs compile-time" path={~p"/elixir-katas/74-application-config"} />
         <.kata_card title="75. The Elixir Toolbox" description="Decision-tree quiz: choosing the right tool" path={~p"/elixir-katas/75-elixir-toolbox"} />
       </div>
+
+      <%!-- Section 11: Essentials --%>
+      <h2 class="text-xl font-bold text-emerald-700 dark:text-emerald-400 mb-4 mt-8 border-b border-emerald-200 dark:border-emerald-800 pb-2">
+        Section 11: Essentials
+      </h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <.kata_card title="76. IO & File Operations" description="IO.puts/inspect, File.read/write/stream!, Path module, IO lists" path={~p"/elixir-katas/76-io-file"} />
+        <.kata_card title="77. Erlang Interop" description="Calling :math, :timer, :crypto, :rand; type mapping" path={~p"/elixir-katas/77-erlang-interop"} />
+        <.kata_card title="78. ExUnit Basics" description="assert/refute, describe, setup, doctest, test patterns" path={~p"/elixir-katas/78-exunit-basics"} />
+        <.kata_card title="79. Date & Time" description="Date, Time, DateTime, NaiveDateTime; arithmetic & formatting" path={~p"/elixir-katas/79-date-time"} />
+        <.kata_card title="80. Nested Data Access" description="get_in/put_in/update_in, Access module" path={~p"/elixir-katas/80-nested-access"} />
+        <.kata_card title="81. Custom Exceptions" description="defexception, raise/rescue, exceptions vs tagged tuples" path={~p"/elixir-katas/81-custom-exceptions"} />
+        <.kata_card title="82. Debugging Tools" description="IO.inspect, dbg, IEx helpers, Logger, process debugging" path={~p"/elixir-katas/82-debugging"} />
+        <.kata_card title="83. Nodes & Distribution" description="Node.connect, :rpc.call, :global, distributed Erlang" path={~p"/elixir-katas/83-nodes-distribution"} />
+      </div>
     </div>
     """
   end
