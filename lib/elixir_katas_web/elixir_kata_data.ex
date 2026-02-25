@@ -131,7 +131,8 @@ defmodule ElixirKatasWeb.ElixirKataData do
         %{num: "80", slug: "80-nested-access", label: "80 - Nested Data Access", color: "bg-emerald-400", tags: ["types", "functions"], description: "get_in/put_in/update_in, Access module"},
         %{num: "81", slug: "81-custom-exceptions", label: "81 - Custom Exceptions", color: "bg-teal-400", tags: ["errors", "structs"], description: "defexception, raise/rescue, exceptions vs tagged tuples"},
         %{num: "82", slug: "82-debugging", label: "82 - Debugging Tools", color: "bg-emerald-500", tags: ["debugging", "io"], description: "IO.inspect, dbg, IEx helpers, Logger, process debugging"},
-        %{num: "83", slug: "83-nodes-distribution", label: "83 - Nodes & Distribution", color: "bg-teal-500", tags: ["processes", "otp"], description: "Node.connect, :rpc.call, :global, distributed Erlang"}
+        %{num: "83", slug: "83-nodes-distribution", label: "83 - Nodes & Distribution", color: "bg-teal-500", tags: ["processes", "otp"], description: "Node.connect, :rpc.call, :global, distributed Erlang"},
+        %{num: "84", slug: "84-scheduler-priorities", label: "84 - Scheduler & Priorities", color: "bg-emerald-600", tags: ["processes"], description: "Preemptive vs cooperative, reductions, Process.flag(:priority), dirty schedulers"}
       ]}
     ]
   end
