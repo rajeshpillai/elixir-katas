@@ -233,6 +233,19 @@ defmodule ElixirKatasWeb.Layouts do
     current_kata_id = assigns[:kata_id]
     assigns = assign(assigns, :current_kata_id, current_kata_id)
 
+    implemented =
+      Path.wildcard("lib/elixir_katas_web/live/phoenix_kata_*_live.ex")
+      |> Enum.map(fn f ->
+        case Regex.run(~r/phoenix_kata_(\d+)_/, f) do
+          [_, num] -> num
+          _ -> nil
+        end
+      end)
+      |> Enum.reject(&is_nil/1)
+      |> MapSet.new()
+
+    assigns = assign(assigns, :implemented, implemented)
+
     ~H"""
     <div class="flex h-full bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-sans">
       <!-- Sidebar -->
@@ -251,19 +264,26 @@ defmodule ElixirKatasWeb.Layouts do
                 </h3>
                 <div class="mt-2 space-y-1 pl-2">
                   <%= for kata <- section.katas do %>
-                    <.link
-                      navigate={"/phoenix-katas/#{kata.slug}"}
-                      class={[
-                        "group flex items-center px-4 py-2 text-sm font-medium rounded-md",
-                        if(kata.num == @current_kata_id,
-                          do: "bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300 font-semibold",
-                          else: "text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white"
-                        )
-                      ]}
-                    >
-                      <span class={["w-2 h-2 mr-3 rounded-full", kata.color]}></span>
-                      {kata.label}
-                    </.link>
+                    <%= if MapSet.member?(@implemented, kata.num) do %>
+                      <.link
+                        navigate={"/phoenix-katas/#{kata.slug}"}
+                        class={[
+                          "group flex items-center px-4 py-2 text-sm font-medium rounded-md",
+                          if(kata.num == @current_kata_id,
+                            do: "bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300 font-semibold",
+                            else: "text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white"
+                          )
+                        ]}
+                      >
+                        <span class={["w-2 h-2 mr-3 rounded-full", kata.color]}></span>
+                        {kata.label}
+                      </.link>
+                    <% else %>
+                      <span class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-400 dark:text-gray-600 cursor-not-allowed">
+                        <span class="w-2 h-2 mr-3 rounded-full bg-gray-300 dark:bg-gray-600"></span>
+                        {kata.label}
+                      </span>
+                    <% end %>
                   <% end %>
                 </div>
               </div>

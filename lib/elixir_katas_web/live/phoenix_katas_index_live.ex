@@ -7,13 +7,26 @@ defmodule ElixirKatasWeb.PhoenixKatasIndexLive do
   def mount(_params, _session, socket) do
     sections = PhoenixKataData.sections()
 
+    # Detect which katas have implementation files
+    implemented =
+      Path.wildcard("lib/elixir_katas_web/live/phoenix_kata_*_live.ex")
+      |> Enum.map(fn f ->
+        case Regex.run(~r/phoenix_kata_(\d+)_/, f) do
+          [_, num] -> num
+          _ -> nil
+        end
+      end)
+      |> Enum.reject(&is_nil/1)
+      |> MapSet.new()
+
     {:ok,
      assign(socket,
        sections: sections,
        filtered_sections: sections,
        search: "",
        active_tags: MapSet.new(),
-       all_tags: PhoenixKataData.all_tags()
+       all_tags: PhoenixKataData.all_tags(),
+       implemented: implemented
      )}
   end
 
@@ -145,6 +158,7 @@ defmodule ElixirKatasWeb.PhoenixKatasIndexLive do
                 path={"/phoenix-katas/#{kata.slug}"}
                 tags={kata.tags}
                 tag_color_fn={&PhoenixKataData.tag_color/1}
+                disabled={not MapSet.member?(@implemented, kata.num)}
               />
             <% end %>
           </div>
