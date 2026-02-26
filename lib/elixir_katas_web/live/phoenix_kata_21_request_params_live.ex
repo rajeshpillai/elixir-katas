@@ -1,6 +1,76 @@
 defmodule ElixirKatasWeb.PhoenixKata21RequestParamsLive do
   use ElixirKatasWeb, :live_component
 
+  def phoenix_source do
+    """
+    defmodule MyAppWeb.ProductController do
+      use MyAppWeb, :controller
+
+      # Optional params with defaults
+      def index(conn, params) do
+        opts = [
+          page: to_int(params["page"], 1),
+          per_page: to_int(params["per_page"], 20),
+          sort: params["sort"] || "inserted_at",
+          category: params["category"]
+        ]
+        products = Catalog.list_products(opts)
+        render(conn, :index, products: products, opts: opts)
+      end
+
+      # Required path param — MatchError if missing
+      def show(conn, %{"id" => id}) do
+        product = Catalog.get_product!(id)
+        render(conn, :show, product: product)
+      end
+
+      # Nested form params
+      def create(conn, %{"product" => product_params}) do
+        case Catalog.create_product(product_params) do
+          {:ok, product} ->
+            conn
+            |> put_flash(:info, "Created!")
+            |> redirect(to: ~p"/products/\#{product}")
+          {:error, changeset} ->
+            render(conn, :new, changeset: changeset)
+        end
+      end
+
+      # Match on specific values — dispatch different behaviors
+      def export(conn, %{"format" => "csv"}) do
+        csv = Catalog.products_to_csv()
+        send_download(conn, {:binary, csv}, filename: "products.csv")
+      end
+
+      def export(conn, %{"format" => "json"}) do
+        products = Catalog.list_products()
+        json(conn, %{products: products})
+      end
+
+      def export(conn, _params) do
+        render(conn, :export_options)
+      end
+
+      # Extract specific keys AND keep the full map
+      def update(conn, %{"id" => id, "product" => product_params} = params) do
+        redirect_to = params["redirect_to"] || "/products"
+        product = Catalog.get_product!(id)
+        Catalog.update_product(product, product_params)
+        redirect(conn, to: redirect_to)
+      end
+
+      defp to_int(nil, default), do: default
+      defp to_int(str, default) do
+        case Integer.parse(str) do
+          {n, ""} -> n
+          _ -> default
+        end
+      end
+    end
+    """
+    |> String.trim()
+  end
+
   @param_sources [
     %{id: "path", label: "Path Params", example: "/users/42", result: ~s(%{"id" => "42"}), color: "blue"},
     %{id: "query", label: "Query Params", example: "?page=2&sort=name", result: ~s(%{"page" => "2", "sort" => "name"}), color: "purple"},

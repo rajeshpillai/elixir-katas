@@ -1,6 +1,65 @@
 defmodule ElixirKatasWeb.PhoenixKata37EctoQueriesLive do
   use ElixirKatasWeb, :live_component
 
+  def phoenix_source do
+    """
+    import Ecto.Query
+
+    # --- Keyword syntax ---
+    from u in User,
+      where: u.role == ^role and u.verified == true,
+      order_by: [desc: u.inserted_at],
+      limit: 20,
+      offset: ^offset,
+      select: %{id: u.id, email: u.email}
+
+    # --- Pipe syntax (composable) ---
+    User
+    |> where([u], u.verified == true)
+    |> where([u], u.age >= ^min_age)
+    |> order_by([u], asc: u.username)
+    |> limit(20)
+    |> Repo.all()
+
+    # --- Filtering ---
+    from u in User, where: u.age > 18
+    from u in User, where: u.role in ["admin", "editor"]
+    from u in User, where: is_nil(u.deleted_at)
+    from u in User, where: like(u.username, "%alice%")
+    from u in User, where: ilike(u.email, "%@example.com")
+
+    # --- Joins ---
+    from p in Post,
+      join: u in assoc(p, :author),
+      where: u.verified == true,
+      preload: [author: u]
+
+    from p in Post,
+      left_join: u in User, on: u.id == p.author_id,
+      select: %{title: p.title, author: u.username}
+
+    # --- Aggregates & grouping ---
+    from p in Post,
+      group_by: p.author_id,
+      having: count(p.id) > 5,
+      select: {p.author_id, count(p.id)}
+
+    # --- Dynamic queries ---
+    conditions = dynamic([u], u.verified == true)
+    conditions = dynamic([u], ^conditions and u.age > ^age)
+    from(u in User, where: ^conditions) |> Repo.all()
+
+    # --- Fragments (raw SQL, safely parameterized) ---
+    from u in User,
+      where: fragment("lower(?)", u.email) == ^email
+
+    # --- Subqueries ---
+    sub = from(p in Post, where: p.status == "published", limit: 10)
+    from(p in subquery(sub)) |> Repo.all()
+    """
+    |> String.trim()
+  end
+
   def mount(socket) do
     {:ok, assign(socket, active_tab: "overview", selected_topic: "from")}
   end

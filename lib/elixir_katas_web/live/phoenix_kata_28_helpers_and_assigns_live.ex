@@ -1,6 +1,74 @@
 defmodule ElixirKatasWeb.PhoenixKata28HelpersAndAssignsLive do
   use ElixirKatasWeb, :live_component
 
+  def phoenix_source do
+    """
+    defmodule MyAppWeb.ProductLive.Index do
+      use MyAppWeb, :live_view
+
+      # Assigns — pass data to templates via assign/2
+      def mount(_params, _session, socket) do
+        {:ok,
+         assign(socket,
+           products: Catalog.list_products(),
+           page: 1,
+           sort: "name",
+           page_title: "Products"
+         )}
+      end
+
+      # handle_params — update assigns on URL changes
+      def handle_params(params, _uri, socket) do
+        page = to_int(params["page"], 1)
+        sort = params["sort"] || "name"
+
+        {:noreply,
+         assign(socket,
+           products: Catalog.list_products(page: page, sort: sort),
+           page: page,
+           sort: sort
+         )}
+      end
+
+      def render(assigns) do
+        ~H\"\"\"
+        <h1>{@page_title}</h1>
+
+        <%# patch — same LiveView, new URL/params %>
+        <.link :for={sort <- ["name", "price", "newest"]}
+          patch={~p"/products?\#{%{sort: sort, page: @page}}"}>
+          {String.capitalize(sort)}
+        </.link>
+
+        <%# navigate — different LiveView, mounts fresh %>
+        <div :for={product <- @products}>
+          <.link navigate={~p"/products/\#{product}"}>
+            {product.name}
+          </.link>
+        </div>
+
+        <%# href — full page reload, non-GET methods %>
+        <.link href={~p"/logout"} method="delete">Log out</.link>
+        \"\"\"
+      end
+
+      defp to_int(nil, d), do: d
+      defp to_int(s, d) do
+        case Integer.parse(s) do
+          {n, ""} -> n
+          _ -> d
+        end
+      end
+    end
+
+    # Page title — in root layout:
+    <.live_title suffix=" - MyApp">
+      {assigns[:page_title] || "Home"}
+    </.live_title>
+    """
+    |> String.trim()
+  end
+
   def mount(socket) do
     {:ok, assign(socket, active_tab: "assigns", selected_topic: "controller")}
   end

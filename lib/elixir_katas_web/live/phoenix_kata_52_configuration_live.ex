@@ -1,6 +1,79 @@
 defmodule ElixirKatasWeb.PhoenixKata52ConfigurationLive do
   use ElixirKatasWeb, :live_component
 
+  def phoenix_source do
+    """
+    # Configuration — runtime.exs, Environment Variables, Secrets
+
+    # --- config/runtime.exs (read at startup, NOT compile time) ---
+    import Config
+
+    if System.get_env("PHX_SERVER") do
+      config :my_app, MyAppWeb.Endpoint, server: true
+    end
+
+    if config_env() == :prod do
+      # Database
+      database_url =
+        System.get_env("DATABASE_URL") ||
+          raise "DATABASE_URL env var is missing!"
+
+      config :my_app, MyApp.Repo,
+        url: database_url,
+        pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10"),
+        ssl: true
+
+      # Endpoint
+      secret_key_base =
+        System.get_env("SECRET_KEY_BASE") ||
+          raise "SECRET_KEY_BASE env var is missing!"
+
+      host = System.get_env("PHX_HOST") || "example.com"
+      port = String.to_integer(System.get_env("PORT") || "4000")
+
+      config :my_app, MyAppWeb.Endpoint,
+        url: [host: host, port: 443, scheme: "https"],
+        http: [ip: {0, 0, 0, 0, 0, 0, 0, 0}, port: port],
+        secret_key_base: secret_key_base,
+        force_ssl: [rewrite_on: [:x_forwarded_proto]]
+
+      # Mailer
+      config :my_app, MyApp.Mailer,
+        adapter: Swoosh.Adapters.SMTP,
+        relay: "smtp.sendgrid.net",
+        username: "apikey",
+        password: System.fetch_env!("SENDGRID_API_KEY"),
+        tls: :always, port: 587
+
+      # External services
+      config :my_app, :stripe,
+        secret_key: System.fetch_env!("STRIPE_SECRET_KEY"),
+        webhook_secret: System.fetch_env!("STRIPE_WEBHOOK_SECRET")
+    end
+
+    # --- Config layers (merged in order) ---
+    # 1. config/config.exs       (base, all envs)
+    # 2. config/dev|prod|test.exs (env-specific, compile-time)
+    # 3. config/runtime.exs      (runtime, any env)
+    # Later values OVERRIDE earlier ones.
+
+    # --- Accessing config at runtime ---
+    Application.get_env(:my_app, MyApp.Repo)
+    Application.fetch_env!(:my_app, :stripe)
+
+    # Compile-time config (module attribute):
+    @feature_flags Application.compile_env(:my_app, :feature_flags, [])
+
+    # --- Secrets management ---
+    # Use System.fetch_env!/1 in runtime.exs (fails fast if missing)
+    # Generate keys: mix phx.gen.secret
+    # Never hardcode secrets in config files
+    # Use .env files in dev (add to .gitignore)
+    # Use cloud secret managers in production
+    """
+    |> String.trim()
+  end
+
   def mount(socket) do
     {:ok, assign(socket, active_tab: "overview", selected_topic: "runtime")}
   end

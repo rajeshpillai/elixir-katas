@@ -1,6 +1,96 @@
 defmodule ElixirKatasWeb.PhoenixKata11ComposingPlugsLive do
   use ElixirKatasWeb, :live_component
 
+  def phoenix_source do
+    """
+    # Endpoint — top-level plug chain (every request)
+    defmodule MyAppWeb.Endpoint do
+      use Phoenix.Endpoint, otp_app: :my_app
+
+      plug Plug.Static, at: "/", from: :my_app
+      plug Plug.RequestId
+      plug Plug.Telemetry, event_prefix: [:phoenix, :endpoint]
+      plug Plug.Parsers,
+        parsers: [:urlencoded, :multipart, :json],
+        json_decoder: Phoenix.json_library()
+      plug Plug.MethodOverride
+      plug Plug.Head
+      plug Plug.Session, @session_options
+      plug MyAppWeb.Router   # ← Router is the LAST plug
+    end
+
+    # Router — pipelines compose plugs by name
+    defmodule MyAppWeb.Router do
+      use MyAppWeb, :router
+
+      pipeline :browser do
+        plug :accepts, ["html"]
+        plug :fetch_session
+        plug :fetch_live_flash
+        plug :put_root_layout, html: {Layouts, :root}
+        plug :protect_from_forgery
+        plug :put_secure_browser_headers
+      end
+
+      pipeline :api do
+        plug :accepts, ["json"]
+      end
+
+      scope "/", MyAppWeb do
+        pipe_through :browser
+        get "/", PageController, :home
+      end
+
+      scope "/admin", MyAppWeb do
+        pipe_through [:browser, :require_admin]
+        get "/dashboard", AdminController, :dashboard
+      end
+    end
+
+    # Halting a plug — stops the pipeline
+    defp require_auth(conn, _opts) do
+      if conn.assigns[:current_user] do
+        conn  # Authenticated → continue to next plug
+      else
+        conn
+        |> put_status(401)
+        |> put_view(ErrorHTML)
+        |> render(:"401")
+        |> halt()  # STOP — no more plugs run
+      end
+    end
+
+    # Custom module plug with Plug.Builder
+    defmodule MyApp.Pipeline do
+      use Plug.Builder
+
+      plug Plug.Logger
+      plug Plug.RequestId
+      plug :add_server_header
+      plug MyApp.Router
+
+      def add_server_header(conn, _) do
+        put_resp_header(conn, "server", "MyApp/1.0")
+      end
+    end
+
+    # Custom CORS plug
+    defmodule MyAppWeb.Plugs.CORS do
+      import Plug.Conn
+
+      def init(opts), do: opts
+
+      def call(conn, _opts) do
+        conn
+        |> put_resp_header("access-control-allow-origin", "*")
+        |> put_resp_header("access-control-allow-methods", "GET, POST, PUT, DELETE")
+        |> put_resp_header("access-control-allow-headers", "content-type, authorization")
+      end
+    end
+    """
+    |> String.trim()
+  end
+
   @pipeline_plugs [
     %{name: "Plug.Static", category: :endpoint, desc: "Check if static file", halts: false},
     %{name: "Plug.RequestId", category: :endpoint, desc: "Add X-Request-Id header", halts: false},

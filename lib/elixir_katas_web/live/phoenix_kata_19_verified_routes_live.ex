@@ -1,6 +1,71 @@
 defmodule ElixirKatasWeb.PhoenixKata19VerifiedRoutesLive do
   use ElixirKatasWeb, :live_component
 
+  def phoenix_source do
+    """
+    # Verified Routes — compile-time checked paths with ~p sigil
+    # Typos become compiler errors, not runtime 404s!
+
+    # Setup (auto-generated in lib/my_app_web.ex):
+    defp html_helpers do
+      quote do
+        use Phoenix.VerifiedRoutes,
+          endpoint: MyAppWeb.Endpoint,
+          router: MyAppWeb.Router,
+          statics: MyAppWeb.static_paths()
+      end
+    end
+
+    # Basic usage:
+    ~p"/products"                         # => "/products"
+    ~p"/products/\#{product}"              # => "/products/42"
+    ~p"/users/\#{user}/posts"              # => "/users/5/posts"
+    ~p"/products?\#{%{page: 2, sort: "name"}}"  # => "/products?page=2&sort=name"
+
+    # In controllers:
+    def create(conn, %{"product" => params}) do
+      case Catalog.create_product(params) do
+        {:ok, product} ->
+          conn
+          |> put_flash(:info, "Created!")
+          |> redirect(to: ~p"/products/\#{product}")
+
+        {:error, changeset} ->
+          render(conn, :new, changeset: changeset)
+      end
+    end
+
+    # In templates (HEEx):
+    <.link navigate={~p"/products"}>Products</.link>
+    <.link navigate={~p"/products/\#{@product}"}>View</.link>
+    <.link navigate={~p"/products/\#{@product}/edit"}>Edit</.link>
+
+    <.form for={@changeset} action={~p"/products"}>
+      ...
+    </.form>
+
+    # In LiveView:
+    def handle_event("view", %{"id" => id}, socket) do
+      {:noreply, push_navigate(socket, to: ~p"/products/\#{id}")}
+    end
+
+    # Static assets (cache-busting in prod):
+    <link href={~p"/assets/app.css"} rel="stylesheet" />
+    <script src={~p"/assets/app.js"}></script>
+    # Dev:  "/assets/app.css"
+    # Prod: "/assets/app-d3adb33f.css"
+
+    # Typo? Compile error, not runtime 404:
+    # ~p"/prodcuts/\#{id}"
+    # => ** (CompileError) no route path matches "/prodcuts/*"
+
+    # Migrating from old path helpers:
+    # product_path(conn, :index)    → ~p"/products"
+    # product_path(conn, :show, 42) → ~p"/products/\#{product}"
+    """
+    |> String.trim()
+  end
+
   @examples [
     %{id: "basic", label: "Basic", path: "/products", route: "get \"/products\", ProductController, :index", result: "/products"},
     %{id: "with_param", label: "With Param", path: "/products/42", route: "get \"/products/:id\", ProductController, :show", result: "/products/42"},

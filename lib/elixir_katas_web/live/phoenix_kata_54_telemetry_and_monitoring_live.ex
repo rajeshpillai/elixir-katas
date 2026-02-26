@@ -1,6 +1,111 @@
 defmodule ElixirKatasWeb.PhoenixKata54TelemetryAndMonitoringLive do
   use ElixirKatasWeb, :live_component
 
+  def phoenix_source do
+    """
+    # Telemetry & Monitoring
+
+    # 1. Telemetry module (lib/my_app/telemetry.ex)
+    defmodule MyApp.Telemetry do
+      use Supervisor
+      import Telemetry.Metrics
+
+      def start_link(arg) do
+        Supervisor.start_link(__MODULE__, arg, name: __MODULE__)
+      end
+
+      def init(_arg) do
+        children = [
+          {:telemetry_poller,
+           measurements: [{MyApp.Telemetry, :measure_memory, []}],
+           period: 30_000}
+        ]
+        Supervisor.init(children, strategy: :one_for_one)
+      end
+
+      def measure_memory do
+        :telemetry.execute([:vm, :memory], :erlang.memory(), %{})
+      end
+
+      def metrics do
+        [
+          # HTTP requests
+          counter("phoenix.router_dispatch.stop.duration", tags: [:route]),
+          summary("phoenix.router_dispatch.stop.duration",
+            tags: [:route], unit: {:native, :millisecond}),
+
+          # LiveView
+          summary("phoenix.live_view.mount.stop.duration",
+            unit: {:native, :millisecond}),
+
+          # Ecto queries
+          summary("my_app.repo.query.total_time",
+            unit: {:native, :millisecond}),
+          counter("my_app.repo.query.count"),
+
+          # Business events
+          counter("my_app.orders.placed.count"),
+
+          # VM
+          last_value("vm.memory.total", unit: {:byte, :megabyte}),
+          last_value("vm.total_run_queue_lengths.total")
+        ]
+      end
+    end
+
+    # 2. Emitting custom events
+    :telemetry.execute(
+      [:my_app, :order, :placed],
+      %{amount_cents: 2999},
+      %{order_id: 42, user_id: 7}
+    )
+
+    # 3. Using :telemetry.span for start/stop events
+    :telemetry.span([:my_app, :payment, :process], %{}, fn ->
+      result = PaymentGateway.charge(payment)
+      {result, %{status: elem(result, 0)}}
+    end)
+    # Emits: [:my_app, :payment, :process, :start]
+    #        [:my_app, :payment, :process, :stop]  (with duration)
+    #        [:my_app, :payment, :process, :exception]  (on error)
+
+    # 4. Attaching handlers
+    :telemetry.attach("my-handler",
+      [:phoenix, :router_dispatch, :start],
+      &MyApp.Telemetry.handle_event/4, %{})
+
+    def handle_event(event, measurements, metadata, config) do
+      # event:        [:phoenix, :router_dispatch, :start]
+      # measurements: %{system_time: ...}
+      # metadata:     %{conn: ..., route: ...}
+    end
+
+    # 5. LiveDashboard
+    import Phoenix.LiveDashboard.Router
+    scope "/" do
+      pipe_through [:browser, :require_admin]
+      live_dashboard "/dashboard",
+        metrics: MyApp.Telemetry,
+        ecto_repos: [MyApp.Repo]
+    end
+
+    # 6. Health check controller
+    defmodule MyAppWeb.HealthController do
+      use MyAppWeb, :controller
+
+      def index(conn, _params), do: json(conn, %{status: "ok"})
+
+      def ready(conn, _params) do
+        case MyApp.Repo.query("SELECT 1") do
+          {:ok, _} -> json(conn, %{status: "ready", db: "connected"})
+          _ -> conn |> put_status(503) |> json(%{status: "not_ready"})
+        end
+      end
+    end
+    """
+    |> String.trim()
+  end
+
   def mount(socket) do
     {:ok, assign(socket, active_tab: "overview", selected_topic: "events")}
   end

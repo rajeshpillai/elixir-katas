@@ -1,6 +1,89 @@
 defmodule ElixirKatasWeb.PhoenixKata47ChannelBasicsLive do
   use ElixirKatasWeb, :live_component
 
+  def phoenix_source do
+    """
+    # Channel Basics — Socket, Topic, Join, handle_in, push
+
+    # 1. UserSocket — authenticates and routes to channels
+    defmodule MyAppWeb.UserSocket do
+      use Phoenix.Socket
+
+      channel "room:*", MyAppWeb.RoomChannel
+      channel "user:*", MyAppWeb.UserChannel
+
+      @impl true
+      def connect(%{"token" => token}, socket, _connect_info) do
+        case Phoenix.Token.verify(socket, "user_token", token,
+               max_age: 86400) do
+          {:ok, user_id} ->
+            {:ok, assign(socket, :user_id, user_id)}
+          {:error, _} ->
+            :error
+        end
+      end
+
+      @impl true
+      def id(socket), do: "users_socket:\#{socket.assigns.user_id}"
+    end
+
+    # 2. RoomChannel — handles join, events, and broadcasts
+    defmodule MyAppWeb.RoomChannel do
+      use MyAppWeb, :channel
+      alias MyApp.Chat
+
+      @impl true
+      def join("room:" <> room_id, _params, socket) do
+        if Chat.room_member?(room_id, socket.assigns.user_id) do
+          send(self(), :after_join)
+          {:ok, assign(socket, :room_id, room_id)}
+        else
+          {:error, %{reason: "unauthorized"}}
+        end
+      end
+
+      def handle_info(:after_join, socket) do
+        messages = Chat.recent_messages(socket.assigns.room_id)
+        push(socket, "history", %{messages: messages})
+        {:noreply, socket}
+      end
+
+      @impl true
+      def handle_in("new_msg", %{"body" => body}, socket) do
+        msg = Chat.save_message(socket.assigns.user_id, body)
+        broadcast!(socket, "new_msg", %{
+          body: msg.body, user: msg.user.name, at: msg.inserted_at
+        })
+        {:noreply, socket}
+      end
+
+      def handle_in("typing", _payload, socket) do
+        broadcast_from!(socket, "user_typing", %{
+          user_id: socket.assigns.user_id
+        })
+        {:reply, {:ok, %{}}, socket}
+      end
+    end
+
+    # 3. Pushing messages
+    push(socket, "event_name", payload)          # to THIS client
+    broadcast!(socket, "event_name", payload)    # to ALL on topic
+    broadcast_from!(socket, "event_name", payload) # all EXCEPT sender
+
+    # From outside a channel process:
+    MyAppWeb.Endpoint.broadcast("room:lobby", "new_msg", %{body: "Hi"})
+
+    # 4. JS Client
+    # const channel = socket.channel("room:lobby", {})
+    # channel.join()
+    #   .receive("ok", resp => console.log("Joined!"))
+    #   .receive("error", resp => console.log("Failed:", resp))
+    # channel.on("new_msg", msg => appendMessage(msg))
+    # channel.push("new_msg", {body: "Hello!"})
+    """
+    |> String.trim()
+  end
+
   def mount(socket) do
     {:ok, assign(socket, active_tab: "overview", selected_topic: "lifecycle")}
   end

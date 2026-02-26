@@ -1,6 +1,69 @@
 defmodule ElixirKatasWeb.PhoenixKata32PlugConnDeepDiveLive do
   use ElixirKatasWeb, :live_component
 
+  def phoenix_source do
+    """
+    # Plug.Conn — the connection struct and its key functions
+
+    import Plug.Conn
+
+    # --- Reading request data ---
+    conn.method           # "GET", "POST", etc.
+    conn.request_path     # "/users/1"
+    conn.query_string     # "page=2&sort=name"
+    conn.params           # %{"id" => "1", "page" => "2"}
+    conn.host             # "example.com"
+    conn.port             # 443
+    conn.scheme           # :https
+    conn.remote_ip        # {1, 2, 3, 4}
+    conn.req_headers      # [{"accept", "html"}, ...]
+    get_req_header(conn, "authorization")  # list
+
+    # --- Assigns (app data, visible in templates) ---
+    assign(conn, :current_user, user)
+    conn.assigns.current_user
+    conn.assigns[:key]    # nil if missing
+
+    # --- Private (framework data, NOT in templates) ---
+    put_private(conn, :my_lib, %{version: "2.0"})
+    conn.private.phoenix_action
+
+    # --- Response headers ---
+    put_resp_header(conn, "x-request-id", "abc123")
+    delete_resp_header(conn, "x-old")
+    put_resp_content_type(conn, "application/json")
+
+    # --- Sending responses ---
+    send_resp(conn, 200, "body")
+    put_status(conn, :created)     # 201
+
+    # --- Halting the pipeline ---
+    # halt/1 sets conn.halted = true — no further plugs run
+    def require_auth(conn, _opts) do
+      if conn.assigns[:current_user] do
+        conn
+      else
+        conn
+        |> send_resp(401, "Unauthorized")
+        |> halt()
+      end
+    end
+
+    # --- Session ---
+    get_session(conn, :user_id)
+    put_session(conn, :user_id, 42)
+    delete_session(conn, :user_id)
+    clear_session(conn)
+
+    # --- Hooks ---
+    register_before_send(conn, fn conn ->
+      # runs before bytes are written
+      conn
+    end)
+    """
+    |> String.trim()
+  end
+
   @conn_fields [
     %{name: "method", type: "string", example: "\"GET\"", desc: "HTTP method"},
     %{name: "host", type: "string", example: "\"example.com\"", desc: "Request host"},

@@ -1,6 +1,83 @@
 defmodule ElixirKatasWeb.PhoenixKata10PlugRouterLive do
   use ElixirKatasWeb, :live_component
 
+  def phoenix_source do
+    """
+    # Plug.Router: A Mini Web App Without Phoenix
+    defmodule MyApp.Router do
+      use Plug.Router
+
+      # Plugs run before routing
+      plug Plug.Logger
+      plug Plug.Parsers,
+        parsers: [:urlencoded, :json],
+        json_decoder: Jason
+
+      plug :match     # Find matching route
+      plug :dispatch  # Execute route handler
+
+      get "/" do
+        send_resp(conn, 200, "Welcome!")
+      end
+
+      get "/hello/:name" do
+        send_resp(conn, 200, "Hello, \#{name}!")
+      end
+
+      get "/users" do
+        users = [%{id: 1, name: "Alice"}, %{id: 2, name: "Bob"}]
+        json_resp(conn, 200, users)
+      end
+
+      get "/users/:id" do
+        user = find_user(String.to_integer(id))
+        if user, do: json_resp(conn, 200, user),
+                 else: json_resp(conn, 404, %{error: "Not found"})
+      end
+
+      post "/users" do
+        name = conn.body_params["name"]
+        json_resp(conn, 201, %{id: 3, name: name})
+      end
+
+      # Catch-all (must be last!)
+      match _ do
+        send_resp(conn, 404, "Not Found")
+      end
+
+      defp json_resp(conn, status, data) do
+        conn
+        |> put_resp_content_type("application/json")
+        |> send_resp(status, Jason.encode!(data))
+      end
+    end
+
+    # Starting the server:
+    children = [
+      {Plug.Cowboy,
+        scheme: :http,
+        plug: MyApp.Router,
+        options: [port: 4001]}
+    ]
+    Supervisor.start_link(children, strategy: :one_for_one)
+
+    # Forwarding to sub-routers:
+    defmodule MyApp.MainRouter do
+      use Plug.Router
+      plug :match
+      plug :dispatch
+
+      forward "/api", to: MyApp.ApiRouter
+      forward "/admin", to: MyApp.AdminRouter
+
+      get "/" do
+        send_resp(conn, 200, "Main site")
+      end
+    end
+    """
+    |> String.trim()
+  end
+
   def mount(socket) do
     {:ok,
      assign(socket,

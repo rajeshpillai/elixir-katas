@@ -1,6 +1,77 @@
 defmodule ElixirKatasWeb.PhoenixKata17NestedRoutesAndScopesLive do
   use ElixirKatasWeb, :live_component
 
+  def phoenix_source do
+    """
+    # Scopes group routes with shared prefixes, modules, and pipelines
+
+    # Public — no auth needed
+    scope "/", MyAppWeb do
+      pipe_through :browser
+      get "/", PageController, :home
+      resources "/products", ProductController, only: [:index, :show]
+    end
+
+    # Authenticated — logged-in users only
+    scope "/", MyAppWeb do
+      pipe_through [:browser, :require_auth]
+      resources "/orders", OrderController
+      resources "/settings", SettingsController, singleton: true
+    end
+
+    # Admin — separate module namespace + path prefix
+    scope "/admin", MyAppWeb.Admin, as: :admin do
+      pipe_through [:browser, :require_admin]
+      get "/", DashboardController, :index
+      resources "/users", UserController
+      resources "/products", ProductController
+    end
+
+    # Versioned API — nested scopes
+    scope "/api", MyAppWeb.API do
+      pipe_through :api
+
+      scope "/v1", V1 do
+        resources "/products", ProductController, only: [:index, :show]
+      end
+
+      scope "/v2", V2 do
+        resources "/products", ProductController
+      end
+    end
+
+    # Nested resources — full nesting
+    resources "/users", UserController do
+      resources "/posts", PostController
+    end
+    # GET /users/:user_id/posts     PostController :index
+    # GET /users/:user_id/posts/:id PostController :show
+
+    # Shallow nesting — nest only where parent context needed
+    resources "/users", UserController do
+      resources "/posts", PostController, only: [:index, :new, :create]
+    end
+    resources "/posts", PostController, only: [:show, :edit, :update, :delete]
+
+    # Controller with nested route params
+    defmodule MyAppWeb.PostController do
+      use MyAppWeb, :controller
+
+      def index(conn, %{"user_id" => user_id}) do
+        user = Accounts.get_user!(user_id)
+        posts = Blog.list_posts_for_user(user)
+        render(conn, :index, user: user, posts: posts)
+      end
+
+      def show(conn, %{"id" => id}) do
+        post = Blog.get_post!(id)
+        render(conn, :show, post: post)
+      end
+    end
+    """
+    |> String.trim()
+  end
+
   @scope_examples [
     %{id: "public", label: "Public", prefix: "/", module: "MyAppWeb", pipeline: ":browser"},
     %{id: "auth", label: "Authenticated", prefix: "/", module: "MyAppWeb", pipeline: "[:browser, :require_auth]"},

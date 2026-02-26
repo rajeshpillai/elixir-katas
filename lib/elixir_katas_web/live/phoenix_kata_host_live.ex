@@ -64,6 +64,14 @@ defmodule ElixirKatasWeb.PhoenixKataHostLive do
           {:error, err} -> {nil, {:error, "Initial compilation failed: #{inspect(err)}. Please fix the source code."}}
         end
 
+      # 4. Use phoenix_source/0 if the module exports it (shows Phoenix code, not LiveView code)
+      {display_source, source_read_only} =
+        if dynamic_module && function_exported?(dynamic_module, :phoenix_source, 0) do
+          {dynamic_module.phoenix_source(), true}
+        else
+          {source_code, false}
+        end
+
       # 4. Load Notes
       notes_pattern = "notes/phoenix_kata_#{kata_id}_*_notes.md"
       notes_path =
@@ -81,14 +89,14 @@ defmodule ElixirKatasWeb.PhoenixKataHostLive do
       {:ok,
        socket
        |> assign(:dynamic_module, dynamic_module)
-       |> assign(:source_code, source_code)
+       |> assign(:source_code, display_source)
        |> assign(:user_id, user_id)
        |> assign(:kata_id, kata_id)
        |> assign(:title, title)
        |> assign(:active_tab, initial_tab)
        |> assign(:notes_content, notes_content)
        |> assign(:kata_mode, kata_mode)
-       |> assign(:read_only, false)
+       |> assign(:read_only, source_read_only)
        |> assign(:is_user_author, is_user_author)
        |> assign(:compiling, false)
        |> assign(:compile_error, nil)

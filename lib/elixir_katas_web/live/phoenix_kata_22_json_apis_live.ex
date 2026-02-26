@@ -1,6 +1,76 @@
 defmodule ElixirKatasWeb.PhoenixKata22JsonApisLive do
   use ElixirKatasWeb, :live_component
 
+  def phoenix_source do
+    """
+    # Router — API pipeline and scopes:
+    pipeline :api do
+      plug :accepts, ["json"]
+    end
+
+    scope "/api", MyAppWeb.API do
+      pipe_through :api
+      resources "/products", ProductController, only: [:index, :show]
+    end
+
+    # Controller — JSON responses:
+    defmodule MyAppWeb.API.ProductController do
+      use MyAppWeb, :controller
+
+      def index(conn, _params) do
+        products = Catalog.list_products()
+        render(conn, :index, products: products)
+      end
+
+      def show(conn, %{"id" => id}) do
+        product = Catalog.get_product!(id)
+        render(conn, :show, product: product)
+      end
+
+      def create(conn, %{"product" => params}) do
+        case Catalog.create_product(params) do
+          {:ok, product} ->
+            conn |> put_status(:created) |> render(:show, product: product)
+          {:error, changeset} ->
+            conn |> put_status(:unprocessable_entity)
+                 |> json(%{errors: format_errors(changeset)})
+        end
+      end
+
+      def delete(conn, %{"id" => id}) do
+        product = Catalog.get_product!(id)
+        {:ok, _} = Catalog.delete_product(product)
+        send_resp(conn, :no_content, "")
+      end
+
+      defp format_errors(changeset) do
+        Ecto.Changeset.traverse_errors(changeset, fn {msg, _} -> msg end)
+      end
+    end
+
+    # JSON View — structured serialization:
+    defmodule MyAppWeb.API.ProductJSON do
+      def index(%{products: products}) do
+        %{data: for(product <- products, do: data(product))}
+      end
+
+      def show(%{product: product}) do
+        %{data: data(product)}
+      end
+
+      defp data(product) do
+        %{
+          id: product.id,
+          name: product.name,
+          price: product.price,
+          inserted_at: product.inserted_at
+        }
+      end
+    end
+    """
+    |> String.trim()
+  end
+
   @endpoints [
     %{method: "GET", path: "/api/products", action: "index", status: 200, desc: "List products"},
     %{method: "GET", path: "/api/products/:id", action: "show", status: 200, desc: "Get one product"},

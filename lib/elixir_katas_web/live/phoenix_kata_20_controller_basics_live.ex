@@ -1,6 +1,90 @@
 defmodule ElixirKatasWeb.PhoenixKata20ControllerBasicsLive do
   use ElixirKatasWeb, :live_component
 
+  def phoenix_source do
+    """
+    # Controllers handle HTTP requests
+    # Each action receives conn and params, returns a response
+
+    defmodule MyAppWeb.ProductController do
+      use MyAppWeb, :controller
+
+      def index(conn, params) do
+        page = to_int(params["page"], 1)
+        products = Catalog.list_products(page: page)
+        render(conn, :index, products: products, page: page)
+      end
+
+      def show(conn, %{"id" => id}) do
+        product = Catalog.get_product!(id)
+        render(conn, :show, product: product)
+      end
+
+      def new(conn, _params) do
+        changeset = Catalog.change_product(%Product{})
+        render(conn, :new, changeset: changeset)
+      end
+
+      def create(conn, %{"product" => params}) do
+        case Catalog.create_product(params) do
+          {:ok, product} ->
+            conn
+            |> put_flash(:info, "Product created!")
+            |> redirect(to: ~p"/products/\#{product}")
+
+          {:error, changeset} ->
+            render(conn, :new, changeset: changeset)
+        end
+      end
+
+      def delete(conn, %{"id" => id}) do
+        product = Catalog.get_product!(id)
+        {:ok, _} = Catalog.delete_product(product)
+
+        conn
+        |> put_flash(:info, "Deleted!")
+        |> redirect(to: ~p"/products")
+      end
+
+      defp to_int(nil, default), do: default
+      defp to_int(str, default) do
+        case Integer.parse(str) do
+          {n, ""} -> n
+          _ -> default
+        end
+      end
+    end
+
+    # Response types:
+    render(conn, :index, products: products)  # HTML template
+    json(conn, %{data: products})             # JSON response
+    text(conn, "OK")                          # Plain text
+    html(conn, "<h1>Hello!</h1>")             # Raw HTML
+    redirect(conn, to: ~p"/products")         # 302 redirect
+    send_resp(conn, 204, "")                  # Custom status
+
+    # The conn struct — request fields:
+    conn.method        # "GET"
+    conn.request_path  # "/products/42"
+    conn.params        # %{"id" => "42", "tab" => "reviews"}
+
+    # Modifying conn:
+    conn
+    |> put_status(:created)
+    |> put_resp_header("x-req", "abc")
+    |> assign(:key, value)
+    |> put_flash(:info, "Done!")
+    |> put_session(:user_id, 42)
+
+    # Common status codes:
+    # 200 :ok             201 :created          204 :no_content
+    # 301 :moved_permanently  302 :found
+    # 400 :bad_request    401 :unauthorized      403 :forbidden
+    # 404 :not_found      422 :unprocessable_entity
+    """
+    |> String.trim()
+  end
+
   @response_types [
     %{id: "render", label: "render", desc: "HTML template", status: 200, content_type: "text/html"},
     %{id: "json", label: "json", desc: "JSON response", status: 200, content_type: "application/json"},

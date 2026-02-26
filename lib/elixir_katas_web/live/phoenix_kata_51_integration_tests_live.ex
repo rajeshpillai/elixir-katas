@@ -1,6 +1,111 @@
 defmodule ElixirKatasWeb.PhoenixKata51IntegrationTestsLive do
   use ElixirKatasWeb, :live_component
 
+  def phoenix_source do
+    """
+    # Integration Tests — LiveView Testing & E2E Flows
+
+    # 1. LiveView test basics (no browser needed!)
+    defmodule MyAppWeb.CounterLiveTest do
+      use MyAppWeb.ConnCase, async: true
+      import Phoenix.LiveViewTest
+
+      test "increments counter on click", %{conn: conn} do
+        {:ok, view, html} = live(conn, ~p"/counter")
+        assert html =~ "Count: 0"
+
+        view |> element("button", "Increment") |> render_click()
+        assert render(view) =~ "Count: 1"
+      end
+    end
+
+    # 2. LiveView form interactions
+    defmodule MyAppWeb.PostLive.IndexTest do
+      use MyAppWeb.ConnCase, async: true
+      import Phoenix.LiveViewTest
+      import MyApp.BlogFixtures
+
+      test "creates post via form", %{conn: conn} do
+        {:ok, view, _html} = live(conn, ~p"/posts/new")
+
+        view
+        |> form("#post-form", post: %{title: "New Post", body: "Content"})
+        |> render_submit()
+
+        flash = assert_redirect(view, "/posts/" <> _)
+        assert flash["info"] =~ "Post created"
+      end
+
+      test "shows validation errors", %{conn: conn} do
+        {:ok, view, _html} = live(conn, ~p"/posts/new")
+        html = view
+          |> form("#post-form", post: %{title: ""})
+          |> render_submit()
+        assert html =~ "can't be blank"
+      end
+
+      test "search filters posts", %{conn: conn} do
+        post_fixture(title: "Elixir Post")
+        post_fixture(title: "Ruby Post")
+        {:ok, view, _html} = live(conn, ~p"/posts")
+
+        html = view
+          |> form("#search-form", search: %{q: "Elixir"})
+          |> render_change()
+
+        assert html =~ "Elixir Post"
+        refute html =~ "Ruby Post"
+      end
+    end
+
+    # 3. Full auth + edit flow
+    defmodule MyAppWeb.PostLive.EditFlowTest do
+      use MyAppWeb.ConnCase, async: true
+      import Phoenix.LiveViewTest
+      import MyApp.AccountsFixtures
+      import MyApp.BlogFixtures
+
+      setup :register_and_log_in_user
+
+      test "updates post with valid data", %{conn: conn, user: user} do
+        post = post_fixture(user_id: user.id)
+        {:ok, view, _html} = live(conn, ~p"/posts/\#{post.id}/edit")
+
+        view
+        |> form("#post-form", post: %{title: "Updated Title"})
+        |> render_submit()
+
+        {path, flash} = assert_redirect(view)
+        assert path == ~p"/posts/\#{post.id}"
+        assert flash["info"] =~ "updated"
+      end
+
+      test "403 for another user's post", %{conn: conn} do
+        other_user = user_fixture()
+        post = post_fixture(user_id: other_user.id)
+        {:error, {:redirect, %{to: to}}} =
+          live(conn, ~p"/posts/\#{post.id}/edit")
+        assert to == ~p"/posts"
+      end
+    end
+
+    # 4. Wallaby — real browser E2E tests
+    # defmodule MyAppWeb.CheckoutFlowTest do
+    #   use Wallaby.Feature
+    #   feature "user can checkout", %{session: session} do
+    #     session
+    #     |> visit("/")
+    #     |> click(button("Add to Cart"))
+    #     |> click(link("Checkout"))
+    #     |> fill_in(text_field("Card"), with: "4242...")
+    #     |> click(button("Place Order"))
+    #     |> assert_text("Order confirmed!")
+    #   end
+    # end
+    """
+    |> String.trim()
+  end
+
   def mount(socket) do
     {:ok, assign(socket, active_tab: "overview", selected_topic: "liveview")}
   end

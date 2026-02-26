@@ -1,6 +1,73 @@
 defmodule ElixirKatasWeb.PhoenixKata46WebsocketsPrimerLive do
   use ElixirKatasWeb, :live_component
 
+  def phoenix_source do
+    """
+    # WebSockets Primer — Protocol & Phoenix Integration
+
+    # --- The Upgrade Handshake (RFC 6455) ---
+    # CLIENT REQUEST:
+    # GET /socket/websocket HTTP/1.1
+    # Host: example.com
+    # Upgrade: websocket
+    # Connection: Upgrade
+    # Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==
+    # Sec-WebSocket-Version: 13
+    #
+    # SERVER RESPONSE:
+    # HTTP/1.1 101 Switching Protocols
+    # Upgrade: websocket
+    # Connection: Upgrade
+    # Sec-WebSocket-Accept: s3pPLMBiTxaQ9kYGzzhZRbK+xOo=
+    #
+    # After this: pure WebSocket frames, no more HTTP.
+
+    # --- Phoenix Endpoint socket configuration ---
+    # For LiveView:
+    socket "/live", Phoenix.LiveView.Socket,
+      websocket: [connect_info: [session: @session_options]]
+
+    # For Channels:
+    socket "/socket", MyAppWeb.UserSocket,
+      websocket: true,
+      longpoll: false
+
+    # --- WebSocket frame structure ---
+    # Byte 0: FIN bit + opcode (text=1, binary=2, ping=9, close=8)
+    # Byte 1: MASK bit + payload length
+    # Client->Server: MUST be masked
+    # Server->Client: MUST NOT be masked
+
+    # --- Phoenix channel message format ---
+    # [join_ref, ref, topic, event, payload]
+    # ["1", "1", "room:lobby", "phx_join", {}]
+    # [null, "2", "room:lobby", "new_msg", {"body": "Hi!"}]
+
+    # --- JavaScript client (phoenix.js) ---
+    # import {Socket} from "phoenix"
+    #
+    # const socket = new Socket("/socket", {
+    #   params: {token: window.userToken}
+    # })
+    # socket.connect()
+    #
+    # const channel = socket.channel("room:lobby", {})
+    # channel.join()
+    #   .receive("ok", resp => console.log("Joined!", resp))
+    #   .receive("error", resp => console.log("Error", resp))
+    #
+    # channel.push("new_msg", {body: "Hello!"})
+    # channel.on("new_msg", msg => console.log("Got:", msg))
+
+    # --- Why WebSockets over HTTP? ---
+    # HTTP: stateless, half-duplex, ~500 bytes overhead per request
+    # WS:   stateful, full-duplex, ~2-14 bytes per frame
+    # Each WS connection = one Elixir process (~2KB)
+    # A single Phoenix server can handle 2M+ connections
+    """
+    |> String.trim()
+  end
+
   def mount(socket) do
     {:ok, assign(socket, active_tab: "overview", selected_topic: "why")}
   end

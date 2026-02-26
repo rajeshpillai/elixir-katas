@@ -1,6 +1,80 @@
 defmodule ElixirKatasWeb.PhoenixKata30FunctionPlugsLive do
   use ElixirKatasWeb, :live_component
 
+  def phoenix_source do
+    """
+    # Function plug signature: def my_plug(conn, opts) -> conn
+
+    defmodule MyAppWeb.Router do
+      use MyAppWeb, :router
+      import Plug.Conn
+
+      pipeline :browser do
+        plug :accepts, ["html"]
+        plug :fetch_session
+        plug :put_root_layout, html: {MyAppWeb.Layouts, :root}
+        plug :put_locale          # custom function plug
+        plug :add_request_id      # custom function plug
+      end
+
+      # Function plug — reads locale from session
+      defp put_locale(conn, _opts) do
+        locale = get_session(conn, :locale) || "en"
+        assign(conn, :locale, locale)
+      end
+
+      # Function plug — generates a request ID
+      defp add_request_id(conn, _opts) do
+        id = :crypto.strong_rand_bytes(8) |> Base.encode16()
+        conn
+        |> assign(:request_id, id)
+        |> put_resp_header("x-request-id", id)
+      end
+    end
+
+    # Controller-level function plugs with guards:
+    defmodule MyAppWeb.ProductController do
+      use MyAppWeb, :controller
+
+      # Only runs for specific actions:
+      plug :load_product when action in [:show, :edit, :update, :delete]
+      plug :verify_owner when action in [:edit, :update, :delete]
+
+      def show(conn, _params) do
+        render(conn, :show, product: conn.assigns.product)
+      end
+
+      defp load_product(conn, _opts) do
+        product = Catalog.get_product!(conn.params["id"])
+        Plug.Conn.assign(conn, :product, product)
+      end
+
+      defp verify_owner(conn, _opts) do
+        if conn.assigns.product.user_id == conn.assigns.current_user.id do
+          conn
+        else
+          conn
+          |> put_flash(:error, "Not authorized")
+          |> redirect(to: ~p"/products")
+          |> halt()
+        end
+      end
+    end
+
+    # Request timing with register_before_send:
+    def log_request(conn, _opts) do
+      start = System.monotonic_time(:millisecond)
+
+      Plug.Conn.register_before_send(conn, fn conn ->
+        duration = System.monotonic_time(:millisecond) - start
+        Logger.info("\#{conn.method} \#{conn.request_path} => \#{conn.status} in \#{duration}ms")
+        conn
+      end)
+    end
+    """
+    |> String.trim()
+  end
+
   def mount(socket) do
     {:ok, assign(socket, active_tab: "overview", selected_topic: "inline")}
   end

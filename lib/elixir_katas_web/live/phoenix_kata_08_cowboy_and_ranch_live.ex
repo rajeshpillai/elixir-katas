@@ -1,6 +1,64 @@
 defmodule ElixirKatasWeb.PhoenixKata08CowboyAndRanchLive do
   use ElixirKatasWeb, :live_component
 
+  def phoenix_source do
+    """
+    # Cowboy Handler: called for each HTTP request
+    defmodule MyHandler do
+      def init(req, state) do
+        method = :cowboy_req.method(req)
+        path = :cowboy_req.path(req)
+
+        {status, body} =
+          case {method, path} do
+            {"GET", "/"} ->
+              {200, "<h1>Welcome!</h1>"}
+            {"GET", "/about"} ->
+              {200, "<h1>About Us</h1>"}
+            _ ->
+              {404, "<h1>Not Found</h1>"}
+          end
+
+        req = :cowboy_req.reply(status, %{
+          "content-type" => "text/html"
+        }, body, req)
+
+        {:ok, req, state}
+      end
+    end
+
+    # Cowboy Dispatch Rules: map URL patterns to handlers
+    dispatch = :cowboy_router.compile([
+      {:_, [                                # Match any hostname
+        {"/", PageHandler, []},             # Exact match: /
+        {"/about", PageHandler, []},        # Exact match: /about
+        {"/api/[...]", ApiHandler, []},     # Prefix match: /api/*
+        {:_, NotFoundHandler, []}           # Catch-all: everything else
+      ]}
+    ])
+
+    # Start the server with dispatch rules
+    :cowboy.start_clear(:my_http_listener,
+      [port: 4000],                         # Ranch options (TCP)
+      %{env: %{dispatch: dispatch}}         # Cowboy options (HTTP)
+    )
+
+    # Phoenix startup chain:
+    # 1. mix phx.server → starts application supervisor
+    # 2. Phoenix.Endpoint.start_link() → initializes endpoint
+    # 3. Plug.Cowboy.http(Endpoint, [], port: 4000) → tells Cowboy to start
+    # 4. :cowboy.start_clear(:http, ...) → Cowboy starts Ranch listener
+    # 5. Ranch listens on port 4000 → 100 acceptors ready
+
+    # config/dev.exs → flows through Phoenix → Plug.Cowboy → :cowboy → :ranch
+    config :my_app, MyAppWeb.Endpoint,
+      http: [port: 4000],       # → Ranch: listen on port 4000
+      debug_errors: true,       # → Cowboy: show error details
+      check_origin: false       # → Cowboy: WebSocket origin check
+    """
+    |> String.trim()
+  end
+
   def mount(socket) do
     {:ok,
      assign(socket,

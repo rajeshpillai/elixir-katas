@@ -1,6 +1,68 @@
 defmodule ElixirKatasWeb.PhoenixKata23FlashAndRedirectsLive do
   use ElixirKatasWeb, :live_component
 
+  def phoenix_source do
+    """
+    defmodule MyAppWeb.ProductController do
+      use MyAppWeb, :controller
+
+      def create(conn, %{"product" => params}) do
+        case Catalog.create_product(params) do
+          {:ok, product} ->
+            conn
+            |> put_flash(:info, "Product created!")
+            |> redirect(to: ~p"/products/\#{product}")
+
+          {:error, changeset} ->
+            # Don't redirect on failure — re-render with errors
+            render(conn, :new, changeset: changeset)
+        end
+      end
+
+      def update(conn, %{"id" => id, "product" => params}) do
+        product = Catalog.get_product!(id)
+
+        case Catalog.update_product(product, params) do
+          {:ok, product} ->
+            conn
+            |> put_flash(:info, "Product updated!")
+            |> redirect(to: ~p"/products/\#{product}")
+
+          {:error, changeset} ->
+            render(conn, :edit, product: product, changeset: changeset)
+        end
+      end
+
+      def delete(conn, %{"id" => id}) do
+        product = Catalog.get_product!(id)
+        {:ok, _} = Catalog.delete_product(product)
+
+        conn
+        |> put_flash(:info, "Product deleted.")
+        |> redirect(to: ~p"/products")
+      end
+    end
+
+    # In LiveView — use socket, not conn:
+    def handle_event("save", %{"product" => params}, socket) do
+      case Catalog.create_product(params) do
+        {:ok, product} ->
+          {:noreply,
+           socket
+           |> put_flash(:info, "Saved!")
+           |> push_navigate(to: ~p"/products/\#{product}")}
+
+        {:error, changeset} ->
+          {:noreply,
+           socket
+           |> put_flash(:error, "Could not save.")
+           |> assign(:changeset, changeset)}
+      end
+    end
+    """
+    |> String.trim()
+  end
+
   def mount(socket) do
     {:ok,
      assign(socket,

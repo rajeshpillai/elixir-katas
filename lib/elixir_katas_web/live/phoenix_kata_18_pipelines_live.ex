@@ -1,6 +1,83 @@
 defmodule ElixirKatasWeb.PhoenixKata18PipelinesLive do
   use ElixirKatasWeb, :live_component
 
+  def phoenix_source do
+    """
+    # Pipelines — named plug chains for different request types
+
+    # :browser — for HTML pages (6 plugs)
+    pipeline :browser do
+      plug :accepts, ["html"]
+      plug :fetch_session
+      plug :fetch_live_flash
+      plug :put_root_layout, html: {MyAppWeb.Layouts, :root}
+      plug :protect_from_forgery
+      plug :put_secure_browser_headers
+    end
+
+    # :api — minimal, stateless (1 plug)
+    pipeline :api do
+      plug :accepts, ["json"]
+    end
+
+    # Custom auth pipeline
+    pipeline :require_auth do
+      plug MyAppWeb.Plugs.FetchCurrentUser
+      plug MyAppWeb.Plugs.RequireAuth
+    end
+
+    # Custom module plug
+    defmodule MyAppWeb.Plugs.RequireAuth do
+      import Plug.Conn
+      import Phoenix.Controller
+
+      def init(opts), do: opts
+
+      def call(conn, _opts) do
+        if conn.assigns[:current_user] do
+          conn
+        else
+          conn
+          |> put_flash(:error, "Please log in")
+          |> redirect(to: "/login")
+          |> halt()  # Stop pipeline!
+        end
+      end
+    end
+
+    # API auth pipeline
+    pipeline :api_auth do
+      plug MyAppWeb.Plugs.VerifyAPIKey
+      plug MyAppWeb.Plugs.FetchAPIUser
+    end
+
+    # Chaining multiple pipelines (run in order):
+    scope "/admin", MyAppWeb.Admin do
+      pipe_through [:browser, :require_auth, :require_admin]
+      #              ↑ 6 plugs  ↑ 2 plugs     ↑ 1 plug
+      #              = 9 plugs total, in order
+      get "/", DashboardController, :index
+    end
+
+    # Using pipelines in a complete router
+    scope "/", MyAppWeb do
+      pipe_through :browser
+      get "/", PageController, :home
+    end
+
+    scope "/", MyAppWeb do
+      pipe_through [:browser, :require_auth]
+      resources "/orders", OrderController
+    end
+
+    scope "/api", MyAppWeb.API do
+      pipe_through [:api, :api_auth]
+      resources "/orders", OrderController
+    end
+    """
+    |> String.trim()
+  end
+
   @browser_plugs [
     %{name: ":accepts", arg: "[\"html\"]", desc: "Only accept HTML format", halts: false},
     %{name: ":fetch_session", arg: nil, desc: "Load session from signed cookie", halts: false},

@@ -1,6 +1,85 @@
 defmodule ElixirKatasWeb.PhoenixKata41MultiContextInteractionsLive do
   use ElixirKatasWeb, :live_component
 
+  def phoenix_source do
+    """
+    # Cross-context interactions: call public APIs, keep deps one-directional
+
+    # Orders context calls Accounts and Catalog public APIs:
+    defmodule MyApp.Orders do
+      import Ecto.Query, warn: false
+      alias MyApp.Repo
+      alias MyApp.Orders.{Order, LineItem}
+      alias MyApp.Catalog   # controlled dependency
+
+      def place_order(user_id, items) when is_list(items) do
+        enriched_items =
+          Enum.map(items, fn %{product_id: pid, quantity: qty} ->
+            product = Catalog.get_product!(pid)
+            %{product_id: pid, quantity: qty,
+              unit_price: product.price, name: product.name}
+          end)
+
+        total =
+          Enum.reduce(enriched_items, Decimal.new(0), fn item, acc ->
+            Decimal.add(acc, Decimal.mult(item.unit_price, item.quantity))
+          end)
+
+        Ecto.Multi.new()
+        |> Ecto.Multi.insert(:order,
+            Order.changeset(%Order{}, %{
+              user_id: user_id, total: total, status: :pending
+            }))
+        |> Ecto.Multi.run(:line_items, fn _repo, %{order: order} ->
+            results =
+              Enum.map(enriched_items, fn attrs ->
+                %LineItem{}
+                |> LineItem.changeset(Map.put(attrs, :order_id, order.id))
+                |> Repo.insert()
+              end)
+            if Enum.all?(results, fn {s, _} -> s == :ok end) do
+              {:ok, Enum.map(results, fn {:ok, li} -> li end)}
+            else
+              {:error, :line_item_failed}
+            end
+          end)
+        |> Repo.transaction()
+        |> case do
+            {:ok, %{order: order}} ->
+              # Broadcast event — loose coupling via PubSub:
+              Phoenix.PubSub.broadcast(MyApp.PubSub, "orders", {:order_placed, order})
+              {:ok, order}
+            {:error, :order, changeset, _} ->
+              {:error, changeset}
+          end
+      end
+    end
+
+    # PubSub for loose coupling (side effects without hard deps):
+    # Orders broadcasts; Notifications subscribes independently.
+    defmodule MyApp.Notifications.Worker do
+      use GenServer
+
+      def init(state) do
+        Phoenix.PubSub.subscribe(MyApp.PubSub, "orders")
+        {:ok, state}
+      end
+
+      def handle_info({:order_placed, order}, state) do
+        Notifications.send_order_confirmation(order)
+        {:noreply, state}
+      end
+    end
+
+    # Rules:
+    # 1. Only call public context functions, never another context's Repo/schemas
+    # 2. Dependencies flow ONE way — no circular deps
+    # 3. Pass IDs or plain values across boundaries
+    # 4. Use PubSub for optional side effects (email, analytics, audit)
+    """
+    |> String.trim()
+  end
+
   def mount(socket) do
     {:ok, assign(socket, active_tab: "overview", selected_topic: "problem")}
   end

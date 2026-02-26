@@ -1,6 +1,45 @@
 defmodule ElixirKatasWeb.PhoenixKata06TcpSocketsInElixirLive do
   use ElixirKatasWeb, :live_component
 
+  def phoenix_source do
+    """
+    defmodule SimpleServer do
+      def start(port \\\\ 4001) do
+        # Step 1: Listen on a port
+        {:ok, listen_socket} = :gen_tcp.listen(port, [
+          :binary,             # receive data as binaries
+          packet: :raw,        # raw TCP data
+          active: false,       # we'll read manually
+          reuseaddr: true      # reuse port after restart
+        ])
+        IO.puts("Listening on port \#{port}...")
+        accept_loop(listen_socket)
+      end
+
+      # Step 2: Accept connections in a loop
+      defp accept_loop(listen_socket) do
+        {:ok, client} = :gen_tcp.accept(listen_socket)  # Blocks until client connects
+        spawn(fn -> handle_client(client) end)           # Handle in new process!
+        accept_loop(listen_socket)                       # Accept next connection
+      end
+
+      defp handle_client(client) do
+        # Step 3: Read the request
+        {:ok, request} = :gen_tcp.recv(client, 0)        # 0 = read all available data
+        IO.puts("Request: \#{String.split(request, "\\r\\n") |> hd()}")
+
+        # Step 4: Send a response
+        response = "HTTP/1.1 200 OK\\r\\nContent-Type: text/html\\r\\n\\r\\n<h1>Hello from raw TCP!</h1>"
+        :gen_tcp.send(client, response)
+
+        # Step 5: Close the connection
+        :gen_tcp.close(client)
+      end
+    end
+    """
+    |> String.trim()
+  end
+
   def mount(socket) do
     {:ok,
      assign(socket,

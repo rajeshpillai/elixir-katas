@@ -1,6 +1,78 @@
 defmodule ElixirKatasWeb.PhoenixKata36RepoBasicsLive do
   use ElixirKatasWeb, :live_component
 
+  def phoenix_source do
+    """
+    defmodule MyApp.Accounts do
+      alias MyApp.{Repo, Accounts.User}
+      import Ecto.Query
+
+      # CREATE
+      def create_user(attrs) do
+        %User{}
+        |> User.registration_changeset(attrs)
+        |> Repo.insert()
+      end
+
+      # READ - single
+      def get_user(id), do: Repo.get(User, id)
+      def get_user!(id), do: Repo.get!(User, id)
+
+      def get_user_by_email(email) do
+        Repo.get_by(User, email: email)
+      end
+
+      # READ - collection
+      def list_users do
+        Repo.all(User)
+      end
+
+      def list_admins do
+        from(u in User, where: u.role == "admin")
+        |> Repo.all()
+      end
+
+      # UPDATE
+      def update_user(%User{} = user, attrs) do
+        user
+        |> User.profile_changeset(attrs)
+        |> Repo.update()
+      end
+
+      # DELETE
+      def delete_user(%User{} = user) do
+        Repo.delete(user)
+      end
+
+      # UPSERT
+      def upsert_user(attrs) do
+        case get_user_by_email(attrs.email) do
+          nil  -> %User{} |> User.registration_changeset(attrs)
+          user -> User.profile_changeset(user, attrs)
+        end
+        |> Repo.insert_or_update()
+      end
+    end
+
+    # Transactions with Ecto.Multi:
+    Ecto.Multi.new()
+    |> Ecto.Multi.insert(:user, user_changeset)
+    |> Ecto.Multi.run(:profile, fn repo, %{user: user} ->
+         profile_cs = Profile.changeset(%Profile{}, %{user_id: user.id})
+         repo.insert(profile_cs)
+       end)
+    |> Repo.transaction()
+    # => {:ok, %{user: user, profile: profile}}
+    # => {:error, :user, changeset, %{}}
+
+    # Bulk operations (no changesets):
+    Repo.insert_all(User, [%{email: "a@x.com", ...}, ...])
+    Repo.update_all(from(u in User, where: u.role == "member"), set: [verified: true])
+    Repo.delete_all(from(u in User, where: u.verified == false))
+    """
+    |> String.trim()
+  end
+
   def mount(socket) do
     {:ok, assign(socket, active_tab: "overview", selected_topic: "what")}
   end

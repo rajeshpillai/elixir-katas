@@ -1,6 +1,50 @@
 defmodule ElixirKatasWeb.PhoenixKata02UrlsPathsQueryStringsLive do
   use ElixirKatasWeb, :live_component
 
+  def phoenix_source do
+    """
+    # URL Anatomy
+    # https://shop.example.com:8080/products/shoes?color=red&size=10#reviews
+    #
+    # scheme: "https"
+    # host:   "shop.example.com"
+    # port:   8080
+    # path:   "/products/shoes"
+    # query:  "color=red&size=10"
+    # fragment: "reviews"  (never sent to server)
+
+    # Parsing URLs in Elixir
+    uri = URI.parse("https://shop.example.com:8080/products/shoes?color=red&size=10#reviews")
+
+    uri.scheme    #=> "https"
+    uri.host      #=> "shop.example.com"
+    uri.port      #=> 8080
+    uri.path      #=> "/products/shoes"
+    uri.query     #=> "color=red&size=10"
+    uri.fragment  #=> "reviews"
+
+    # Breaking down the path into segments
+    path_segments = String.split("/products/shoes", "/", trim: true)
+    #=> ["products", "shoes"]
+
+    # Decoding query parameters
+    params = URI.decode_query("color=red&size=10")
+    #=> %{"color" => "red", "size" => "10"}
+
+    # How it maps to Plug.Conn in Phoenix:
+    %Plug.Conn{
+      scheme: :https,
+      host: "shop.example.com",
+      port: 8080,
+      request_path: "/products/shoes",
+      path_info: ["products", "shoes"],
+      query_string: "color=red&size=10",
+      params: %{"color" => "red", "size" => "10"}
+    }
+    """
+    |> String.trim()
+  end
+
   def mount(socket) do
     {:ok,
      assign(socket,

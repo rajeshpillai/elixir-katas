@@ -1,6 +1,69 @@
 defmodule ElixirKatasWeb.PhoenixKata07ParsingHttpByHandLive do
   use ElixirKatasWeb, :live_component
 
+  def phoenix_source do
+    """
+    defmodule HTTPParser do
+      def parse(raw) do
+        # Split headers from body at the blank line
+        [head, body] = String.split(raw, "\\r\\n\\r\\n", parts: 2)
+        [request_line | header_lines] = String.split(head, "\\r\\n")
+
+        # Parse request line: "GET /products?page=2 HTTP/1.1"
+        [method, full_path, version] = String.split(request_line, " ")
+
+        # Separate path from query string
+        {path, query_string} =
+          case String.split(full_path, "?", parts: 2) do
+            [p, q] -> {p, q}
+            [p]    -> {p, ""}
+          end
+
+        # Parse headers into a map
+        headers =
+          header_lines
+          |> Enum.map(fn line ->
+            [k, v] = String.split(line, ": ", parts: 2)
+            {String.downcase(k), v}
+          end)
+          |> Map.new()
+
+        %{
+          method: method,
+          path: path,
+          query_string: query_string,
+          params: URI.decode_query(query_string),
+          version: version,
+          headers: headers,
+          body: body
+        }
+      end
+    end
+
+    # Building an HTTP response
+    defmodule HTTPBuilder do
+      def response(status, body) do
+        reason = %{200 => "OK", 201 => "Created", 404 => "Not Found", 500 => "Internal Server Error"}
+
+        "HTTP/1.1 \#{status} \#{reason[status]}\\r\\n" <>
+        "Content-Type: text/html\\r\\n" <>
+        "Content-Length: \#{byte_size(body)}\\r\\n" <>
+        "Connection: close\\r\\n" <>
+        "\\r\\n" <>
+        body
+      end
+    end
+
+    # How parsed data maps to Plug.Conn:
+    # conn.method        = "GET"
+    # conn.request_path  = "/products"
+    # conn.query_string  = "page=2"
+    # conn.params        = %{"page" => "2"}
+    # conn.req_headers   = [{"host", "shop.example.com"}, ...]
+    """
+    |> String.trim()
+  end
+
   def mount(socket) do
     default_request = "GET /products?page=2 HTTP/1.1\r\nHost: shop.example.com\r\nAccept: text/html\r\nUser-Agent: Mozilla/5.0\r\nCookie: session=abc123\r\n\r\n"
 

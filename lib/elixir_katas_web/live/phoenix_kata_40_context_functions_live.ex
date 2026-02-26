@@ -1,6 +1,89 @@
 defmodule ElixirKatasWeb.PhoenixKata40ContextFunctionsLive do
   use ElixirKatasWeb, :live_component
 
+  def phoenix_source do
+    """
+    # Standard CRUD patterns in a Phoenix context module
+
+    defmodule MyApp.Blog do
+      import Ecto.Query, warn: false
+      alias MyApp.Repo
+      alias MyApp.Blog.{Post, Comment}
+
+      # --- Reads ---
+      def list_posts do
+        from(p in Post, order_by: [desc: p.inserted_at])
+        |> Repo.all()
+      end
+
+      def list_published_posts do
+        from(p in Post,
+          where: p.published == true,
+          order_by: [desc: p.published_at],
+          preload: [:author])
+        |> Repo.all()
+      end
+
+      def get_post!(id), do: Repo.get!(Post, id)
+      def get_post(id), do: Repo.get(Post, id)
+
+      def get_post_by_slug(slug) do
+        Repo.get_by(Post, slug: slug)
+      end
+
+      # --- Writes ---
+      def create_post(attrs \\\\ %{}) do
+        %Post{}
+        |> Post.changeset(attrs)
+        |> Repo.insert()
+      end
+
+      def update_post(%Post{} = post, attrs) do
+        post
+        |> Post.changeset(attrs)
+        |> Repo.update()
+      end
+
+      def delete_post(%Post{} = post) do
+        Repo.delete(post)
+      end
+
+      # --- Change (returns changeset for forms, no DB call) ---
+      def change_post(%Post{} = post, attrs \\\\ %{}) do
+        Post.changeset(post, attrs)
+      end
+
+      # --- Domain-specific ---
+      def publish_post(%Post{} = post) do
+        update_post(post, %{
+          published: true,
+          published_at: DateTime.utc_now() |> DateTime.truncate(:second)
+        })
+      end
+    end
+
+    # Controller usage:
+    def create(conn, %{"post" => post_params}) do
+      case Blog.create_post(post_params) do
+        {:ok, post} ->
+          conn |> put_flash(:info, "Post created.") |> redirect(to: ~p"/posts/\#{post.id}")
+        {:error, %Ecto.Changeset{} = changeset} ->
+          render(conn, :new, changeset: changeset)
+      end
+    end
+
+    # LiveView form handler:
+    def handle_event("validate", %{"post" => params}, socket) do
+      changeset =
+        socket.assigns.post
+        |> Blog.change_post(params)
+        |> Map.put(:action, :validate)
+      {:noreply, assign(socket, form: to_form(changeset))}
+    end
+    """
+    |> String.trim()
+  end
+
   def mount(socket) do
     {:ok, assign(socket, active_tab: "overview", selected_topic: "list")}
   end

@@ -1,6 +1,73 @@
 defmodule ElixirKatasWeb.PhoenixKata38AssociationsLive do
   use ElixirKatasWeb, :live_component
 
+  def phoenix_source do
+    """
+    # User has_many Posts, Post belongs_to User
+    # Post many_to_many Tags via join table
+
+    defmodule MyApp.Accounts.User do
+      use Ecto.Schema
+      schema "users" do
+        field :email,    :string
+        field :username, :string
+        has_many :posts,    MyApp.Blog.Post,    foreign_key: :author_id
+        has_one  :profile,  MyApp.Accounts.Profile
+        timestamps()
+      end
+    end
+
+    defmodule MyApp.Blog.Post do
+      use Ecto.Schema
+      import Ecto.Changeset
+      schema "posts" do
+        field :title,  :string
+        field :body,   :text
+        field :status, :string, default: "draft"
+        belongs_to :author,   MyApp.Accounts.User
+        has_many   :comments, MyApp.Blog.Comment
+        many_to_many :tags,   MyApp.Blog.Tag,
+          join_through: "post_tags",
+          on_replace: :delete
+        timestamps()
+      end
+    end
+
+    # --- Preloading (associations are NOT loaded automatically) ---
+    user = Repo.get!(User, 1)
+    user.posts  # => %Ecto.Association.NotLoaded{} !!
+
+    # Preload after fetch:
+    user = Repo.preload(user, [:posts, :profile])
+
+    # Preload in query (avoids N+1):
+    from(p in Post,
+      join: u in assoc(p, :author),
+      preload: [author: u])
+    |> Repo.all()
+
+    # Nested preloads:
+    Repo.preload(user, posts: [:comments, :tags])
+
+    # --- many_to_many with put_assoc ---
+    tags = Repo.all(from t in Tag, where: t.id in ^tag_ids)
+    post = Repo.get!(Post, id) |> Repo.preload(:tags)
+
+    post
+    |> Ecto.Changeset.cast(attrs, [:title, :body])
+    |> Ecto.Changeset.put_assoc(:tags, tags)
+    |> Repo.update()
+
+    # --- Migration for join table ---
+    create table(:post_tags, primary_key: false) do
+      add :post_id, references(:posts, on_delete: :delete_all)
+      add :tag_id,  references(:tags,  on_delete: :delete_all)
+    end
+    create unique_index(:post_tags, [:post_id, :tag_id])
+    """
+    |> String.trim()
+  end
+
   def mount(socket) do
     {:ok, assign(socket, active_tab: "overview", selected_topic: "belongs_to")}
   end

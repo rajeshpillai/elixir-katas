@@ -1,6 +1,55 @@
 defmodule ElixirKatasWeb.PhoenixKata29StaticAssetsLive do
   use ElixirKatasWeb, :live_component
 
+  def phoenix_source do
+    """
+    # Project asset structure:
+    # assets/js/app.js       → Main JS entry point
+    # assets/css/app.css     → Main CSS (Tailwind directives)
+    # priv/static/assets/    → Built output (don't edit!)
+    # priv/static/images/    → Static images
+
+    # 1. Endpoint — serves static files:
+    defmodule MyAppWeb.Endpoint do
+      use Phoenix.Endpoint, otp_app: :my_app
+
+      plug Plug.Static,
+        at: "/",
+        from: :my_app,
+        gzip: false,
+        only: MyAppWeb.static_paths()
+    end
+
+    # 2. Static paths — which directories to serve:
+    def static_paths do
+      ~w(assets fonts images favicon.ico robots.txt)
+    end
+
+    # 3. In root layout — reference assets with ~p:
+    <link phx-track-static rel="stylesheet" href={~p"/assets/app.css"} />
+    <script defer phx-track-static src={~p"/assets/app.js"}></script>
+    <img src={~p"/images/logo.png"} alt="Logo" />
+
+    # 4. Cache busting:
+    # Dev:  ~p"/assets/app.css" → "/assets/app.css"
+    # Prod: ~p"/assets/app.css" → "/assets/app-ABC123.css"
+
+    # 5. Dev config — watchers auto-rebuild on changes:
+    config :my_app, MyAppWeb.Endpoint,
+      watchers: [
+        esbuild: {Esbuild, :install_and_run, [:my_app, ~w(--sourcemap=inline --watch)]},
+        tailwind: {Tailwind, :install_and_run, [:my_app, ~w(--watch)]}
+      ]
+
+    # 6. Production build:
+    # $ mix assets.deploy
+    # → esbuild (bundle + minify JS)
+    # → tailwind (compile + purge CSS)
+    # → phx.digest (fingerprint files + cache manifest)
+    """
+    |> String.trim()
+  end
+
   def mount(socket) do
     {:ok, assign(socket, active_tab: "overview", selected_topic: "structure")}
   end

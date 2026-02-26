@@ -1,6 +1,80 @@
 defmodule ElixirKatasWeb.PhoenixKata16RestfulResourcesLive do
   use ElixirKatasWeb, :live_component
 
+  def phoenix_source do
+    """
+    # One line generates 7 RESTful routes:
+    resources "/products", ProductController
+
+    # GET     /products          :index   — List all
+    # GET     /products/new      :new     — New form
+    # POST    /products          :create  — Create
+    # GET     /products/:id      :show    — Show one
+    # GET     /products/:id/edit :edit    — Edit form
+    # PUT     /products/:id      :update  — Update
+    # DELETE  /products/:id      :delete  — Delete
+
+    # Controller with all CRUD actions:
+    defmodule MyAppWeb.ProductController do
+      use MyAppWeb, :controller
+
+      def index(conn, _params) do
+        products = Catalog.list_products()
+        render(conn, :index, products: products)
+      end
+
+      def show(conn, %{"id" => id}) do
+        product = Catalog.get_product!(id)
+        render(conn, :show, product: product)
+      end
+
+      def new(conn, _params) do
+        changeset = Catalog.change_product(%Product{})
+        render(conn, :new, changeset: changeset)
+      end
+
+      def create(conn, %{"product" => product_params}) do
+        case Catalog.create_product(product_params) do
+          {:ok, product} ->
+            conn
+            |> put_flash(:info, "Product created!")
+            |> redirect(to: ~p"/products/\#{product}")
+
+          {:error, changeset} ->
+            render(conn, :new, changeset: changeset)
+        end
+      end
+
+      def delete(conn, %{"id" => id}) do
+        product = Catalog.get_product!(id)
+        {:ok, _} = Catalog.delete_product(product)
+
+        conn
+        |> put_flash(:info, "Product deleted!")
+        |> redirect(to: ~p"/products")
+      end
+    end
+
+    # Customize with :only and :except
+    resources "/products", ProductController, only: [:index, :show]
+    resources "/users", UserController, except: [:delete]
+
+    # Router with resources
+    scope "/", MyAppWeb do
+      pipe_through :browser
+      resources "/products", ProductController
+    end
+
+    # API — no form actions needed
+    scope "/api", MyAppWeb.API do
+      pipe_through :api
+      resources "/products", ProductController,
+        only: [:index, :show, :create, :update, :delete]
+    end
+    """
+    |> String.trim()
+  end
+
   @all_actions [
     %{action: :index, method: "GET", path_suffix: "", desc: "List all"},
     %{action: :new, method: "GET", path_suffix: "/new", desc: "New form"},

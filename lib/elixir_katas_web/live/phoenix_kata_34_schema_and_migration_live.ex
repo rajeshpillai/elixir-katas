@@ -1,6 +1,72 @@
 defmodule ElixirKatasWeb.PhoenixKata34SchemaAndMigrationLive do
   use ElixirKatasWeb, :live_component
 
+  def phoenix_source do
+    """
+    # 1. Schema: lib/my_app/accounts/user.ex
+    defmodule MyApp.Accounts.User do
+      use Ecto.Schema
+      import Ecto.Changeset
+
+      schema "users" do
+        field :email,    :string
+        field :username, :string
+        field :role,     :string, default: "member"
+        field :verified, :boolean, default: false
+        timestamps()
+      end
+
+      def changeset(user, attrs) do
+        user
+        |> cast(attrs, [:email, :username, :role])
+        |> validate_required([:email, :username])
+        |> validate_format(:email, ~r/@/)
+        |> unique_constraint(:email)
+      end
+    end
+
+    # 2. Migration: priv/repo/migrations/..._create_users.exs
+    defmodule MyApp.Repo.Migrations.CreateUsers do
+      use Ecto.Migration
+
+      def change do
+        create table(:users) do
+          add :email,    :string,  null: false
+          add :username, :string,  null: false
+          add :role,     :string,  default: "member"
+          add :verified, :boolean, default: false
+          timestamps()
+        end
+
+        create unique_index(:users, [:email])
+        create index(:users, [:username])
+      end
+    end
+
+    # 3. Alter existing table:
+    defmodule MyApp.Repo.Migrations.AddBioToUsers do
+      use Ecto.Migration
+
+      def change do
+        alter table(:users) do
+          add    :bio,       :text
+          add    :avatar,    :string
+          modify :username,  :string, size: 100
+          remove :old_field
+        end
+      end
+    end
+
+    # 4. Mix commands:
+    # mix ecto.gen.migration create_users
+    # mix ecto.migrate
+    # mix ecto.rollback
+    # mix ecto.reset      (drop + create + migrate + seeds)
+    # mix ecto.migrations  (show migration status)
+    """
+    |> String.trim()
+  end
+
   def mount(socket) do
     {:ok, assign(socket, active_tab: "overview", selected_topic: "schema")}
   end

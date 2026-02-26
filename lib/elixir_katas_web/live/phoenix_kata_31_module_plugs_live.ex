@@ -1,6 +1,77 @@
 defmodule ElixirKatasWeb.PhoenixKata31ModulePlugsLive do
   use ElixirKatasWeb, :live_component
 
+  def phoenix_source do
+    """
+    # Module plug structure: init/1 (compile time) + call/2 (runtime)
+    defmodule MyApp.Plugs.RequestLogger do
+      @behaviour Plug
+      import Plug.Conn
+      require Logger
+
+      @valid_levels [:debug, :info, :warning, :error]
+
+      @impl Plug
+      def init(opts) do
+        level = Keyword.get(opts, :level, :info)
+
+        unless level in @valid_levels do
+          raise ArgumentError,
+            "level must be one of: \#{inspect(@valid_levels)}"
+        end
+
+        %{
+          level: level,
+          log_headers: Keyword.get(opts, :log_headers, false),
+          filter_paths: Keyword.get(opts, :filter_paths, [])
+        }
+      end
+
+      @impl Plug
+      def call(conn, opts) do
+        if should_log?(conn, opts) do
+          start = System.monotonic_time(:millisecond)
+          log_request(conn, opts)
+
+          register_before_send(conn, fn conn ->
+            elapsed = System.monotonic_time(:millisecond) - start
+            log_response(conn, elapsed, opts)
+            conn
+          end)
+        else
+          conn
+        end
+      end
+
+      defp should_log?(conn, %{filter_paths: paths}) do
+        not Enum.any?(paths, &String.starts_with?(
+          conn.request_path, &1))
+      end
+
+      defp log_request(conn, %{level: level}) do
+        Logger.log(level, "[REQ] \#{conn.method} \#{conn.request_path}")
+      end
+
+      defp log_response(conn, elapsed, %{level: level}) do
+        Logger.log(level,
+          "[RES] \#{conn.method} \#{conn.request_path} " <>
+          "=> \#{conn.status} in \#{elapsed}ms")
+      end
+    end
+
+    # Usage in router:
+    pipeline :browser do
+      plug :accepts, ["html"]
+      plug :fetch_session
+      plug MyApp.Plugs.RequestLogger,
+        level: :info,
+        log_headers: false,
+        filter_paths: ["/health", "/metrics"]
+    end
+    """
+    |> String.trim()
+  end
+
   def mount(socket) do
     {:ok, assign(socket, active_tab: "overview", selected_topic: "structure")}
   end

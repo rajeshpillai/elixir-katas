@@ -1,6 +1,103 @@
 defmodule ElixirKatasWeb.PhoenixKata50ContextTestsLive do
   use ElixirKatasWeb, :live_component
 
+  def phoenix_source do
+    """
+    # Context Tests — DataCase, Fixtures, Changesets
+
+    # 1. Fixtures (test/support/fixtures/blog_fixtures.ex)
+    defmodule MyApp.BlogFixtures do
+      alias MyApp.Blog
+
+      def post_fixture(attrs \\\\ %{}) do
+        user = MyApp.AccountsFixtures.user_fixture()
+        {:ok, post} =
+          attrs
+          |> Enum.into(%{
+               title: "Test Post",
+               body: "Some content here",
+               user_id: user.id
+             })
+          |> Blog.create_post()
+        post
+      end
+    end
+
+    # 2. Context function tests
+    defmodule MyApp.CatalogTest do
+      use MyApp.DataCase, async: true
+
+      import MyApp.CatalogFixtures
+      alias MyApp.Catalog
+      alias MyApp.Catalog.Product
+
+      @valid_attrs %{name: "Widget", price: 999, stock: 100}
+
+      describe "create_product/1" do
+        test "with valid data creates product" do
+          assert {:ok, %Product{} = product} =
+            Catalog.create_product(@valid_attrs)
+          assert product.name == "Widget"
+          assert product.price == 999
+        end
+
+        test "with duplicate name returns error" do
+          Catalog.create_product!(@valid_attrs)
+          assert {:error, changeset} = Catalog.create_product(@valid_attrs)
+          assert "has already been taken" in errors_on(changeset).name
+        end
+      end
+
+      describe "decrease_stock/2" do
+        test "decreases stock by amount" do
+          product = product_fixture(stock: 10)
+          assert {:ok, updated} = Catalog.decrease_stock(product, 3)
+          assert updated.stock == 7
+        end
+
+        test "returns error when insufficient stock" do
+          product = product_fixture(stock: 2)
+          assert {:error, :insufficient_stock} =
+            Catalog.decrease_stock(product, 5)
+        end
+      end
+    end
+
+    # 3. Changeset tests
+    defmodule MyApp.Blog.PostTest do
+      use MyApp.DataCase, async: true
+      alias MyApp.Blog.Post
+
+      test "changeset with valid attributes" do
+        changeset = Post.changeset(%Post{}, %{title: "Hello", body: "World!"})
+        assert changeset.valid?
+      end
+
+      test "changeset requires title" do
+        changeset = Post.changeset(%Post{}, %{body: "content"})
+        refute changeset.valid?
+        assert "can't be blank" in errors_on(changeset).title
+      end
+    end
+
+    # 4. DataCase setup (test/support/data_case.ex)
+    defmodule MyApp.DataCase do
+      use ExUnit.CaseTemplate
+
+      setup tags do
+        pid = Ecto.Adapters.SQL.Sandbox.start_owner!(
+          MyApp.Repo, shared: not tags[:async])
+        on_exit(fn -> Ecto.Adapters.SQL.Sandbox.stop_owner(pid) end)
+        :ok
+      end
+    end
+
+    # async: true -> each test gets its own DB transaction
+    # Tests run in parallel without interfering
+    """
+    |> String.trim()
+  end
+
   def mount(socket) do
     {:ok, assign(socket, active_tab: "overview", selected_topic: "datacase")}
   end

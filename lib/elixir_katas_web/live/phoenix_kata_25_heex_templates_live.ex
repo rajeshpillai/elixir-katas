@@ -1,6 +1,63 @@
 defmodule ElixirKatasWeb.PhoenixKata25HeexTemplatesLive do
   use ElixirKatasWeb, :live_component
 
+  def phoenix_source do
+    """
+    <%# HEEx — HTML + Embedded Elixir %>
+
+    <%# Output expressions (auto-escaped for XSS safety): %>
+    <h1>{@product.name}</h1>
+    <p>Price: ${@product.price}</p>
+    <span>{String.upcase(@user.name)}</span>
+
+    <%# :if attribute (preferred over if blocks): %>
+    <div :if={@show_sidebar} class="sidebar">
+      Sidebar content
+    </div>
+
+    <%# :for attribute (preferred over for blocks): %>
+    <ul>
+      <li :for={product <- @products}>
+        {product.name} - ${product.price}
+      </li>
+    </ul>
+
+    <%# if/else block (when you need else branch): %>
+    <%= if @logged_in do %>
+      <p>Welcome, {@user.name}!</p>
+    <% else %>
+      <p>Please log in.</p>
+    <% end %>
+
+    <%# Dynamic CSS classes (false/nil filtered out): %>
+    <div class={[
+      "px-4 py-2 rounded",
+      @active && "bg-blue-500 text-white",
+      !@active && "bg-gray-100 text-gray-700"
+    ]}>
+      Content
+    </div>
+
+    <%# Dynamic attributes: %>
+    <input type="text" name={@field} value={@value} />
+    <a href={~p"/products/\#{@product}"}>View</a>
+
+    <%# Boolean attributes: %>
+    <button disabled={@loading}>Submit</button>
+    <%# disabled={false} → attribute omitted %>
+    <%# disabled={true}  → <button disabled>Submit</button> %>
+
+    <%# Case — pattern match in templates: %>
+    <%= case @role do %>
+      <% :admin -> %>
+        <span class="bg-red-100 text-red-700">Admin</span>
+      <% _ -> %>
+        <span class="bg-gray-100 text-gray-700">User</span>
+    <% end %>
+    """
+    |> String.trim()
+  end
+
   def mount(socket) do
     {:ok,
      assign(socket,

@@ -1,6 +1,94 @@
 defmodule ElixirKatasWeb.PhoenixKata27FunctionComponentsLive do
   use ElixirKatasWeb, :live_component
 
+  def phoenix_source do
+    """
+    defmodule MyAppWeb.CoreComponents do
+      use Phoenix.Component
+
+      # --- Badge with typed attributes ---
+      attr :label, :string, required: true
+      attr :variant, :string, default: "info", values: ~w(info success warning danger)
+
+      def badge(assigns) do
+        ~H\"\"\"
+        <span class={["px-2 py-1 rounded-full text-xs font-bold", variant_class(@variant)]}>
+          {@label}
+        </span>
+        \"\"\"
+      end
+
+      # --- Button with slots and global attrs ---
+      attr :type, :string, default: "button"
+      attr :rest, :global
+      slot :inner_block, required: true
+
+      def button(assigns) do
+        ~H\"\"\"
+        <button type={@type} class="px-4 py-2 rounded font-medium" {@rest}>
+          {render_slot(@inner_block)}
+        </button>
+        \"\"\"
+      end
+
+      # --- Card with named slots ---
+      slot :title
+      slot :actions
+      slot :inner_block, required: true
+
+      def card(assigns) do
+        ~H\"\"\"
+        <div class="rounded-lg border bg-white shadow">
+          <div :if={@title != []} class="px-4 py-3 border-b flex justify-between">
+            <h3 class="font-semibold">{render_slot(@title)}</h3>
+            <div :if={@actions != []}>{render_slot(@actions)}</div>
+          </div>
+          <div class="p-4">{render_slot(@inner_block)}</div>
+        </div>
+        \"\"\"
+      end
+
+      # --- Table with slot arguments ---
+      attr :rows, :list, required: true
+      slot :col, required: true do
+        attr :label, :string, required: true
+      end
+
+      def table(assigns) do
+        ~H\"\"\"
+        <table>
+          <thead>
+            <tr>
+              <th :for={col <- @col}>{col.label}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr :for={row <- @rows}>
+              <td :for={col <- @col}>{render_slot(col, row)}</td>
+            </tr>
+          </tbody>
+        </table>
+        \"\"\"
+      end
+
+      # Usage:
+      # <.badge label="New" />
+      # <.button>Click me</.button>
+      # <.card><:title>Hello</:title>Content</.card>
+      # <.table rows={@products}>
+      #   <:col :let={product} label="Name">{product.name}</:col>
+      #   <:col :let={product} label="Price">${product.price}</:col>
+      # </.table>
+
+      defp variant_class("info"), do: "bg-blue-100 text-blue-700"
+      defp variant_class("success"), do: "bg-green-100 text-green-700"
+      defp variant_class("warning"), do: "bg-amber-100 text-amber-700"
+      defp variant_class("danger"), do: "bg-red-100 text-red-700"
+    end
+    """
+    |> String.trim()
+  end
+
   def mount(socket) do
     {:ok,
      assign(socket,

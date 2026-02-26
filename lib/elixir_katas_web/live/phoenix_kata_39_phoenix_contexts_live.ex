@@ -1,6 +1,82 @@
 defmodule ElixirKatasWeb.PhoenixKata39PhoenixContextsLive do
   use ElixirKatasWeb, :live_component
 
+  def phoenix_source do
+    """
+    # A context is a boundary module grouping related business logic.
+    # Controllers/LiveViews call context functions — never Repo directly.
+
+    # lib/my_app/accounts/user.ex (schema — private implementation)
+    defmodule MyApp.Accounts.User do
+      use Ecto.Schema
+      import Ecto.Changeset
+
+      schema "users" do
+        field :name, :string
+        field :email, :string
+        field :hashed_password, :string
+        field :password, :string, virtual: true
+        field :confirmed_at, :naive_datetime
+        timestamps()
+      end
+
+      def registration_changeset(user, attrs) do
+        user
+        |> cast(attrs, [:name, :email, :password])
+        |> validate_required([:name, :email, :password])
+        |> validate_format(:email, ~r/^[\\w+\\-.]+@[a-z\\d\\-.]+\\.[a-z]+$/i)
+        |> validate_length(:password, min: 8)
+        |> unique_constraint(:email)
+        |> put_password_hash()
+      end
+
+      defp put_password_hash(changeset) do
+        if changeset.valid? do
+          put_change(changeset, :hashed_password,
+            Bcrypt.hash_pwd_salt(get_change(changeset, :password)))
+        else
+          changeset
+        end
+      end
+    end
+
+    # lib/my_app/accounts.ex (context — public API)
+    defmodule MyApp.Accounts do
+      import Ecto.Query, warn: false
+      alias MyApp.Repo
+      alias MyApp.Accounts.User
+
+      def list_users, do: Repo.all(User)
+      def get_user(id), do: Repo.get(User, id)
+      def get_user!(id), do: Repo.get!(User, id)
+      def get_user_by_email(email), do: Repo.get_by(User, email: email)
+
+      def register_user(attrs) do
+        %User{}
+        |> User.registration_changeset(attrs)
+        |> Repo.insert()
+      end
+
+      def update_user(%User{} = user, attrs) do
+        user
+        |> User.update_changeset(attrs)
+        |> Repo.update()
+      end
+
+      def delete_user(%User{} = user), do: Repo.delete(user)
+
+      def change_user(%User{} = user, attrs \\\\ %{}) do
+        User.registration_changeset(user, attrs)
+      end
+    end
+
+    # Generate context + schema + migration:
+    # mix phx.gen.context Blog Post posts title:string body:text
+    # mix phx.gen.html Blog Post posts title:string body:text  (with controller)
+    """
+    |> String.trim()
+  end
+
   def mount(socket) do
     {:ok, assign(socket, active_tab: "overview", selected_topic: "what")}
   end

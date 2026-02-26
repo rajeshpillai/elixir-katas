@@ -1,6 +1,75 @@
 defmodule ElixirKatasWeb.PhoenixKata12MixPhxNewLive do
   use ElixirKatasWeb, :live_component
 
+  def phoenix_source do
+    """
+    # Generate a new Phoenix project
+    $ mix phx.new my_app
+    $ cd my_app
+    $ mix setup       # deps.get + ecto.setup + assets.setup
+    $ mix phx.server  # → http://localhost:4000
+
+    # Project structure (key files):
+    #
+    # mix.exs                        — Project definition & deps
+    # lib/my_app/application.ex      — OTP app, supervision tree
+    # lib/my_app/repo.ex             — Database repository
+    # lib/my_app_web/endpoint.ex     — HTTP entry point (plug chain)
+    # lib/my_app_web/router.ex       — URL → controller mapping
+    # config/config.exs              — Shared config (all envs)
+    # config/dev.exs                 — Development settings
+    # config/runtime.exs             — Production runtime (env vars)
+
+    # mix.exs — Project definition
+    defmodule MyApp.MixProject do
+      use Mix.Project
+
+      def project do
+        [app: :my_app, version: "0.1.0",
+         elixir: "~> 1.14", deps: deps()]
+      end
+
+      def application do
+        [mod: {MyApp.Application, []},
+         extra_applications: [:logger]]
+      end
+
+      defp deps do
+        [{:phoenix, "~> 1.7"},
+         {:phoenix_ecto, "~> 4.4"},
+         {:phoenix_live_view, "~> 0.20"},
+         {:plug_cowboy, "~> 2.7"}]
+      end
+    end
+
+    # application.ex — OTP supervision tree
+    defmodule MyApp.Application do
+      use Application
+
+      def start(_type, _args) do
+        children = [
+          MyApp.Repo,           # Database pool
+          MyAppWeb.Telemetry,   # Metrics
+          {Phoenix.PubSub,
+            name: MyApp.PubSub}, # PubSub
+          MyAppWeb.Endpoint     # Web server
+        ]
+        Supervisor.start_link(children,
+          strategy: :one_for_one)
+      end
+    end
+
+    # Generator options:
+    #   --no-ecto      Skip database
+    #   --no-html      Skip HTML views (API only)
+    #   --no-live      Skip LiveView
+    #   --no-assets    Skip esbuild/tailwind
+    #   --database sqlite3   Use SQLite
+    #   --umbrella     Umbrella project
+    """
+    |> String.trim()
+  end
+
   def mount(socket) do
     {:ok,
      assign(socket,

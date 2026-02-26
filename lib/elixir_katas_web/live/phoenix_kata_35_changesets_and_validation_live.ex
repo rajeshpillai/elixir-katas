@@ -1,6 +1,79 @@
 defmodule ElixirKatasWeb.PhoenixKata35ChangesetsAndValidationLive do
   use ElixirKatasWeb, :live_component
 
+  def phoenix_source do
+    """
+    defmodule MyApp.Accounts.User do
+      use Ecto.Schema
+      import Ecto.Changeset
+
+      schema "users" do
+        field :email,                 :string
+        field :username,              :string
+        field :role,                  :string, default: "member"
+        field :age,                   :integer
+        field :password_hash,         :string
+        field :password,              :string, virtual: true
+        field :password_confirmation, :string, virtual: true
+        timestamps()
+      end
+
+      # For new registrations:
+      def registration_changeset(user, attrs) do
+        user
+        |> cast(attrs, [:email, :username, :age,
+                        :password, :password_confirmation])
+        |> validate_required([:email, :username, :password])
+        |> validate_format(:email, ~r/^[^\\s]+@[^\\s]+$/)
+        |> validate_length(:username, min: 2, max: 30)
+        |> validate_length(:password, min: 8)
+        |> validate_confirmation(:password, required: true)
+        |> hash_password()
+        |> unique_constraint(:email)
+      end
+
+      # For profile updates (no password required):
+      def profile_changeset(user, attrs) do
+        user
+        |> cast(attrs, [:username, :age])
+        |> validate_required([:username])
+        |> validate_length(:username, min: 2, max: 30)
+        |> validate_number(:age, greater_than_or_equal_to: 13)
+      end
+
+      # For admin updates (allows role change):
+      def admin_changeset(user, attrs) do
+        user
+        |> cast(attrs, [:email, :username, :role, :age])
+        |> validate_required([:email, :username])
+        |> validate_inclusion(:role, ["admin", "editor", "member"])
+        |> unique_constraint(:email)
+      end
+
+      # Custom validator:
+      defp hash_password(%{valid?: true,
+                           changes: %{password: pw}} = cs) do
+        put_change(cs, :password_hash, Bcrypt.hash_pwd_salt(pw))
+      end
+      defp hash_password(cs), do: cs
+    end
+
+    # Usage:
+    changeset = User.registration_changeset(%User{}, %{
+      email: "alice@example.com",
+      username: "alice",
+      password: "secret123",
+      password_confirmation: "secret123"
+    })
+
+    changeset.valid?   # => true
+    changeset.errors   # => []
+    changeset.changes  # => %{email: "alice@...", ...}
+    Repo.insert(changeset)
+    """
+    |> String.trim()
+  end
+
   def mount(socket) do
     {:ok, assign(socket, active_tab: "overview", selected_topic: "what")}
   end

@@ -1,6 +1,55 @@
 defmodule ElixirKatasWeb.PhoenixKata03HtmlAndFormsLive do
   use ElixirKatasWeb, :live_component
 
+  def phoenix_source do
+    """
+    # HTML Forms & HTTP Encoding
+
+    # A simple HTML form:
+    <form action="/login" method="POST">
+      <label>Username</label>
+      <input type="text" name="username" />
+
+      <label>Password</label>
+      <input type="password" name="password" />
+
+      <label>
+        <input type="checkbox" name="remember" value="true" />
+        Remember me
+      </label>
+
+      <button type="submit">Submit</button>
+    </form>
+
+    # GET: Data goes in the URL as query parameters
+    # GET /login?username=alice&password=secret123&remember=true HTTP/1.1
+    # Host: example.com
+    # Accept: text/html
+
+    # POST: Data goes in the request body (hidden from URL)
+    # POST /login HTTP/1.1
+    # Host: example.com
+    # Content-Type: application/x-www-form-urlencoded
+    # Content-Length: 45
+    #
+    # username=alice&password=secret123&remember=true
+
+    # In your Phoenix controller, both arrive the same way:
+    def login(conn, params) do
+      # params = %{
+      #   "username" => "alice",
+      #   "password" => "secret123",
+      #   "remember" => "true"
+      # }
+    end
+
+    # GET vs POST:
+    # GET  → data in URL, visible, bookmarkable, ~2KB limit (search, filters)
+    # POST → data in body, hidden, not bookmarkable, no limit (login, create)
+    """
+    |> String.trim()
+  end
+
   def mount(socket) do
     {:ok,
      assign(socket,

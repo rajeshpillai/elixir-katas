@@ -1,6 +1,80 @@
 defmodule ElixirKatasWeb.PhoenixKata14YourFirstRouteLive do
   use ElixirKatasWeb, :live_component
 
+  def phoenix_source do
+    """
+    # Router — maps URLs to controllers
+    defmodule MyAppWeb.Router do
+      use MyAppWeb, :router
+
+      pipeline :browser do
+        plug :accepts, ["html"]
+        plug :fetch_session
+        plug :fetch_live_flash
+        plug :put_root_layout, html: {Layouts, :root}
+        plug :protect_from_forgery
+        plug :put_secure_browser_headers
+      end
+
+      pipeline :api do
+        plug :accepts, ["json"]
+      end
+
+      scope "/", MyAppWeb do
+        pipe_through :browser
+
+        get "/", PageController, :home
+        get "/about", PageController, :about
+        get "/products", ProductController, :index
+        post "/products", ProductController, :create
+        get "/products/:id", ProductController, :show
+      end
+
+      scope "/api", MyAppWeb do
+        pipe_through :api
+
+        get "/users", UserController, :index
+        post "/users", UserController, :create
+      end
+    end
+
+    # 4 files to create a new route:
+
+    # 1. Add the route (router.ex)
+    scope "/", MyAppWeb do
+      pipe_through :browser
+      get "/hello", HelloController, :index
+    end
+
+    # 2. Create the controller
+    defmodule MyAppWeb.HelloController do
+      use MyAppWeb, :controller
+
+      def index(conn, _params) do
+        render(conn, :index)
+      end
+    end
+
+    # 3. Create the view module
+    defmodule MyAppWeb.HelloHTML do
+      use MyAppWeb, :html
+      embed_templates "hello_html/*"
+    end
+
+    # 4. Create the template (hello_html/index.html.heex)
+    <h1>Hello, Phoenix!</h1>
+    <p>This is my first route.</p>
+
+    # LiveView routes — no controller needed!
+    scope "/", MyAppWeb do
+      pipe_through :browser
+      live "/dashboard", DashboardLive
+      live "/products/:id", ProductLive.Show
+    end
+    """
+    |> String.trim()
+  end
+
   @routes [
     %{method: "GET", path: "/", controller: "PageController", action: ":home", pipeline: ":browser"},
     %{method: "GET", path: "/about", controller: "PageController", action: ":about", pipeline: ":browser"},

@@ -1,6 +1,74 @@
 defmodule ElixirKatasWeb.PhoenixKata24ErrorHandlingLive do
   use ElixirKatasWeb, :live_component
 
+  def phoenix_source do
+    """
+    # 1. Fallback Controller — centralized error handling
+    defmodule MyAppWeb.FallbackController do
+      use MyAppWeb, :controller
+
+      def call(conn, {:error, %Ecto.Changeset{} = changeset}) do
+        conn
+        |> put_status(:unprocessable_entity)
+        |> put_view(json: MyAppWeb.ErrorJSON)
+        |> render("422.json", changeset: changeset)
+      end
+
+      def call(conn, {:error, :not_found}) do
+        conn
+        |> put_status(:not_found)
+        |> put_view(json: MyAppWeb.ErrorJSON)
+        |> render("404.json")
+      end
+
+      def call(conn, {:error, :unauthorized}) do
+        conn
+        |> put_status(:unauthorized)
+        |> put_view(json: MyAppWeb.ErrorJSON)
+        |> render("401.json")
+      end
+    end
+
+    # 2. Controller using action_fallback + with
+    defmodule MyAppWeb.API.ProductController do
+      use MyAppWeb, :controller
+      action_fallback MyAppWeb.FallbackController
+
+      def show(conn, %{"id" => id}) do
+        with {:ok, product} <- Catalog.fetch_product(id) do
+          render(conn, :show, product: product)
+        end
+      end
+
+      def create(conn, %{"product" => params}) do
+        with {:ok, product} <- Catalog.create_product(params) do
+          conn |> put_status(:created) |> render(:show, product: product)
+        end
+      end
+    end
+
+    # 3. Error JSON view
+    defmodule MyAppWeb.ErrorJSON do
+      def render("422.json", %{changeset: changeset}) do
+        errors = Ecto.Changeset.traverse_errors(changeset,
+          fn {msg, _} -> msg end)
+        %{errors: errors}
+      end
+
+      def render(template, _assigns) do
+        %{errors: %{detail:
+          Phoenix.Controller.status_message_from_template(template)}}
+      end
+    end
+
+    # 4. Custom exceptions with HTTP status
+    defmodule MyApp.NotFoundError do
+      defexception message: "not found", plug_status: 404
+    end
+    """
+    |> String.trim()
+  end
+
   @exception_map [
     %{exception: "Ecto.NoResultsError", status: 404, desc: "Record not found in DB"},
     %{exception: "Phoenix.Router.NoRouteError", status: 404, desc: "No matching route"},

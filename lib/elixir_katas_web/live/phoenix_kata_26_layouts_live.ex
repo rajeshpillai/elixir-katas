@@ -1,6 +1,64 @@
 defmodule ElixirKatasWeb.PhoenixKata26LayoutsLive do
   use ElixirKatasWeb, :live_component
 
+  def phoenix_source do
+    """
+    # Two-layer layout system: root (HTML shell) + app (page chrome)
+
+    # layouts/root.html.heex — the HTML document shell
+    <!DOCTYPE html>
+    <html lang="en">
+      <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="csrf-token" content={get_csrf_token()} />
+        <.live_title>{assigns[:page_title] || "MyApp"}</.live_title>
+        <link phx-track-static rel="stylesheet" href={~p"/assets/app.css"} />
+        <script defer phx-track-static src={~p"/assets/app.js"}></script>
+      </head>
+      <body>
+        {@inner_content}
+      </body>
+    </html>
+
+    # layouts/app.html.heex — navigation + footer wrapper
+    <header>
+      <nav>
+        <.link navigate={~p"/"}>Home</.link>
+        <.link navigate={~p"/products"}>Products</.link>
+      </nav>
+    </header>
+    <main>
+      <.flash_group flash={@flash} />
+      {@inner_content}
+    </main>
+    <footer>&copy; 2024 MyApp</footer>
+
+    # Layouts module — auto-loads .heex files:
+    defmodule MyAppWeb.Layouts do
+      use MyAppWeb, :html
+      embed_templates "layouts/*"
+    end
+
+    # Setting layouts:
+
+    # In router pipeline:
+    plug :put_root_layout, html: {MyAppWeb.Layouts, :root}
+
+    # In controller — per action:
+    conn |> put_layout(html: {MyAppWeb.Layouts, :admin}) |> render(:index)
+
+    # In LiveView — via live_session:
+    live_session :admin, layout: {MyAppWeb.Layouts, :admin} do
+      live "/admin", AdminLive
+    end
+
+    # No layout (root only):
+    conn |> put_layout(false) |> render(:embed)
+    """
+    |> String.trim()
+  end
+
   def mount(socket) do
     {:ok,
      assign(socket,

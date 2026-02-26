@@ -1,6 +1,103 @@
 defmodule ElixirKatasWeb.PhoenixKata49ControllerTestsLive do
   use ElixirKatasWeb, :live_component
 
+  def phoenix_source do
+    """
+    # Controller Tests — ConnTest, Assertions, Auth
+
+    defmodule MyAppWeb.PostControllerTest do
+      use MyAppWeb.ConnCase
+
+      import MyApp.AccountsFixtures
+      alias MyApp.Blog
+
+      @create_attrs %{title: "Test Post", body: "Content here"}
+      @invalid_attrs %{title: "", body: ""}
+
+      # --- Auth setup ---
+      setup :register_and_log_in_user
+
+      # --- Index ---
+      describe "index" do
+        test "lists all posts", %{conn: conn} do
+          conn = get(conn, ~p"/posts")
+          assert html_response(conn, 200) =~ "Posts"
+        end
+      end
+
+      # --- Create ---
+      describe "create" do
+        test "redirects when valid", %{conn: conn} do
+          conn = post(conn, ~p"/posts", post: @create_attrs)
+          assert %{id: id} = redirected_params(conn)
+          assert redirected_to(conn) == ~p"/posts/\#{id}"
+
+          # Follow the redirect:
+          conn = get(recycle(conn), ~p"/posts/\#{id}")
+          assert html_response(conn, 200) =~ "Test Post"
+        end
+
+        test "shows errors when invalid", %{conn: conn} do
+          conn = post(conn, ~p"/posts", post: @invalid_attrs)
+          assert html_response(conn, 422) =~ "can't be blank"
+        end
+      end
+
+      # --- Delete ---
+      describe "delete" do
+        test "deletes post", %{conn: conn, user: user} do
+          post = Blog.create_post!(Map.put(@create_attrs, :user_id, user.id))
+          conn = delete(conn, ~p"/posts/\#{post}")
+          assert redirected_to(conn) == ~p"/posts"
+        end
+      end
+    end
+
+    # --- JSON API Tests ---
+    defmodule MyAppWeb.Api.ProductControllerTest do
+      use MyAppWeb.ConnCase
+
+      setup do
+        {:ok, conn: build_conn() |> put_req_header("accept", "application/json")}
+      end
+
+      test "GET /api/products returns list", %{conn: conn} do
+        conn = get(conn, ~p"/api/products")
+        assert is_list(json_response(conn, 200)["data"])
+      end
+
+      test "POST /api/products creates product", %{conn: conn} do
+        conn = post(conn, ~p"/api/products", %{
+          "product" => %{"name" => "Widget", "price" => 999}
+        })
+        assert %{"id" => id, "name" => "Widget"} =
+                 json_response(conn, 201)["data"]
+      end
+    end
+
+    # --- Auth Helpers (test/support/conn_case.ex) ---
+    def register_and_log_in_user(%{conn: conn}) do
+      user = AccountsFixtures.user_fixture()
+      %{conn: log_in_user(conn, user), user: user}
+    end
+
+    defp log_in_user(conn, user) do
+      token = MyApp.Accounts.generate_user_session_token(user)
+      conn
+      |> Phoenix.ConnTest.init_test_session(%{})
+      |> Plug.Conn.put_session(:user_token, token)
+    end
+
+    # --- Key Assertions ---
+    # html_response(conn, 200) =~ "text"
+    # json_response(conn, 201)["key"]
+    # redirected_to(conn) == ~p"/path"
+    # get_flash(conn, :info) =~ "Created"
+    # assert_raise Ecto.NoResultsError, fn -> ... end
+    """
+    |> String.trim()
+  end
+
   def mount(socket) do
     {:ok, assign(socket, active_tab: "overview", selected_topic: "conntest")}
   end

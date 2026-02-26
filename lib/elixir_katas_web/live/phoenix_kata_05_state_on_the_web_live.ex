@@ -1,6 +1,52 @@
 defmodule ElixirKatasWeb.PhoenixKata05StateOnTheWebLive do
   use ElixirKatasWeb, :live_component
 
+  def phoenix_source do
+    """
+    # State on the Web: HTTP is Stateless
+    # The server forgets you after every request.
+    # Cookies, sessions, and tokens solve this.
+
+    # === COOKIES ===
+    # Small data the server asks the browser to store.
+    # Browser sends them back with every subsequent request.
+
+    # Server sets a cookie:
+    # Set-Cookie: theme=dark; Path=/; HttpOnly
+    #
+    # Browser sends it back:
+    # GET /dashboard HTTP/1.1
+    # Cookie: theme=dark; lang=en; session_id=abc123
+
+    # === SESSIONS ===
+    # Server-side storage linked to a cookie.
+    # Cookie only contains the session ID — all data stays on server.
+
+    # In your Phoenix controller:
+    conn
+    |> put_session(:user_id, 42)       # Store in session
+    |> get_session(:user_id)           # Read from session
+
+    # Phoenix encrypts the cookie automatically
+    # Set-Cookie: _my_app_key=SFMyNTY...encrypted
+
+    # === TOKENS (JWT / Bearer) ===
+    # Self-contained credentials in the Authorization header.
+    # Server stores nothing — token carries all info.
+    #
+    # POST /api/login HTTP/1.1
+    # → Response: token = "eyJhbGci...signed"
+    #
+    # GET /api/dashboard HTTP/1.1
+    # Authorization: Bearer eyJhbGci...signed
+    # → Server verifies signature → knows it's Alice
+
+    # Phoenix uses signed, encrypted cookies for sessions by default.
+    # No external session store needed!
+    """
+    |> String.trim()
+  end
+
   def mount(socket) do
     {:ok,
      assign(socket,

@@ -1,6 +1,79 @@
 defmodule ElixirKatasWeb.PhoenixKata09PlugBasicsLive do
   use ElixirKatasWeb, :live_component
 
+  def phoenix_source do
+    """
+    # Plug: The Specification for Composable HTTP Middleware
+
+    # Every plug takes a conn and returns a conn:
+    conn
+    |> put_status(200)
+    |> put_resp_header("content-type", "text/html")
+    |> assign(:user, user)
+    |> send_resp(200, "<h1>Hello</h1>")
+
+    # === FUNCTION PLUG ===
+    # Any function that takes (conn, opts) and returns conn
+    defmodule MyAppWeb.ProductController do
+      use MyAppWeb, :controller
+
+      plug :require_auth
+      plug :load_product when action in [:show, :edit]
+
+      def show(conn, _params) do
+        render(conn, :show)
+      end
+
+      defp require_auth(conn, _opts) do
+        if conn.assigns[:current_user] do
+          conn
+        else
+          conn
+          |> put_status(401)
+          |> put_view(ErrorHTML)
+          |> render(:"401")
+          |> halt()  # STOP the pipeline
+        end
+      end
+
+      defp load_product(conn, _opts) do
+        product = Products.get!(conn.params["id"])
+        assign(conn, :product, product)
+      end
+    end
+
+    # === MODULE PLUG ===
+    # Implements init/1 (compile-time) and call/2 (per-request)
+    defmodule MyAppWeb.Plugs.RequestLogger do
+      @behaviour Plug
+      import Plug.Conn
+      require Logger
+
+      def init(opts) do                            # Called ONCE at compile time
+        Keyword.get(opts, :log_level, :info)
+      end
+
+      def call(conn, log_level) do                 # Called for EVERY request
+        start = System.monotonic_time()
+
+        register_before_send(conn, fn conn ->
+          duration = System.monotonic_time() - start
+          ms = System.convert_time_unit(duration, :native, :millisecond)
+          Logger.log(log_level, "\#{conn.method} \#{conn.request_path} -> \#{conn.status} (\#{ms}ms)")
+          conn
+        end)
+      end
+    end
+
+    # Usage: plug MyAppWeb.Plugs.RequestLogger, log_level: :debug
+
+    # Phoenix is just plugs all the way down:
+    # Phoenix.Endpoint → Plug.Static → Plug.RequestId → Plug.Parsers
+    # → Plug.Session → Phoenix.Router → Pipeline plugs → YOUR CODE!
+    """
+    |> String.trim()
+  end
+
   def mount(socket) do
     {:ok,
      assign(socket,

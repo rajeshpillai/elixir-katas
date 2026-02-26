@@ -1,6 +1,55 @@
 defmodule ElixirKatasWeb.PhoenixKata04ClientServerArchitectureLive do
   use ElixirKatasWeb, :live_component
 
+  def phoenix_source do
+    """
+    # Client-Server: Journey of a Web Request
+
+    # Step 1: Browser prepares the request
+    GET /products HTTP/1.1
+    Host: shop.example.com
+    Accept: text/html
+    Cookie: session_id=abc123
+
+    # Step 2: DNS resolves the domain
+    # shop.example.com → DNS → 93.184.216.34
+
+    # Step 3: Server receives the request
+    # Cowboy accepts TCP connection on port 443
+    # Creates %Plug.Conn{} struct
+    # Passes to Phoenix.Endpoint
+
+    # Step 4: Phoenix processes the request
+    # Endpoint → Router → :browser pipeline
+    conn
+    |> fetch_session()
+    |> protect_from_forgery()
+    |> ProductController.index()
+
+    # Step 5: Database query (if needed)
+    # In ProductController:
+    products = Shop.list_products()
+    # Ecto: SELECT * FROM products
+
+    # Step 6: Server sends the response
+    HTTP/1.1 200 OK
+    Content-Type: text/html
+
+    <html>...product list...</html>
+
+    # Step 7: Browser renders the page
+    # Parses HTML, fetches CSS/JS/images (more HTTP requests!),
+    # paints the page on screen.
+
+    # Static content (priv/static/): files served directly, no code runs
+    #   → HTML pages, CSS, JavaScript, images, fonts
+    #
+    # Dynamic content (Controllers, LiveView): generated per request
+    #   → User dashboards, API responses, search results, real-time updates
+    """
+    |> String.trim()
+  end
+
   def mount(socket) do
     {:ok,
      assign(socket,

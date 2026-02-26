@@ -1,6 +1,91 @@
 defmodule ElixirKatasWeb.PhoenixKata44AuthorizationLive do
   use ElixirKatasWeb, :live_component
 
+  def phoenix_source do
+    """
+    # Authorization — RBAC, Policies, and Scoped Queries
+
+    # 1. User schema with role
+    schema "users" do
+      field :email, :string
+      field :role, Ecto.Enum,
+            values: [:user, :moderator, :admin],
+            default: :user
+    end
+
+    # 2. Authorization module with permissions
+    defmodule MyApp.Authorization do
+      @role_permissions %{
+        user:      [:read, :create, :update_own, :delete_own],
+        moderator: [:read, :create, :update_own, :delete_own,
+                    :delete_any, :hide],
+        admin:     :all
+      }
+
+      def can?(%{role: :admin}, _action, _resource), do: true
+
+      def can?(user, :update, resource) do
+        perms = @role_permissions[user.role] || []
+        :update_own in perms && resource.user_id == user.id
+      end
+
+      def can?(user, action, _resource) do
+        perms = @role_permissions[user.role] || []
+        action in perms
+      end
+    end
+
+    # 3. Policy module (Bodyguard-style)
+    defmodule MyApp.Blog.Policy do
+      def authorize(:update, %{id: uid}, %{user_id: uid}), do: :ok
+      def authorize(_action, %{role: :admin}, _resource), do: :ok
+      def authorize(:read, _user, %{published: true}), do: :ok
+      def authorize(:create, %{id: _}, _), do: :ok
+      def authorize(_, _, _), do: {:error, :unauthorized}
+    end
+
+    # 4. Scope-based queries (filter at DB level)
+    defmodule MyApp.Blog do
+      import Ecto.Query
+
+      def list_posts(%{role: :admin}), do: Repo.all(Post)
+      def list_posts(user) do
+        Post |> where(user_id: ^user.id) |> Repo.all()
+      end
+
+      def get_post_for_user!(user, id) do
+        Post |> where(id: ^id, user_id: ^user.id) |> Repo.one!()
+      end
+    end
+
+    # 5. LiveView authorization (mount + event handlers)
+    defmodule MyAppWeb.PostLive.Edit do
+      use MyAppWeb, :live_view
+      on_mount {UserAuth, :ensure_authenticated}
+
+      def mount(%{"id" => id}, _session, socket) do
+        user = socket.assigns.current_user
+        post = Blog.get_post!(id)
+        if post.user_id != user.id && !Accounts.admin?(user) do
+          {:ok, socket |> put_flash(:error, "Not authorized.") |> redirect(to: ~p"/posts")}
+        else
+          {:ok, assign(socket, post: post)}
+        end
+      end
+
+      # Re-check authorization in EVERY handle_event:
+      def handle_event("save", params, socket) do
+        if socket.assigns.post.user_id != socket.assigns.current_user.id do
+          {:noreply, put_flash(socket, :error, "Not authorized.")}
+        else
+          # proceed with update...
+        end
+      end
+    end
+    """
+    |> String.trim()
+  end
+
   def mount(socket) do
     {:ok, assign(socket, active_tab: "overview", selected_topic: "roles")}
   end

@@ -1,6 +1,75 @@
 defmodule ElixirKatasWeb.PhoenixKata13EndpointAndConfigLive do
   use ElixirKatasWeb, :live_component
 
+  def phoenix_source do
+    """
+    # Endpoint — HTTP entry point, plug chain for every request
+    defmodule MyAppWeb.Endpoint do
+      use Phoenix.Endpoint, otp_app: :my_app
+
+      socket "/live", Phoenix.LiveView.Socket,
+        websocket: [connect_info: [session: @session_options]]
+
+      plug Plug.Static,
+        at: "/", from: :my_app,
+        only: MyAppWeb.static_paths()
+
+      plug Plug.RequestId
+      plug Plug.Telemetry, event_prefix: [:phoenix, :endpoint]
+
+      plug Plug.Parsers,
+        parsers: [:urlencoded, :multipart, :json],
+        json_decoder: Phoenix.json_library()
+
+      plug Plug.MethodOverride
+      plug Plug.Head
+      plug Plug.Session, @session_options
+      plug MyAppWeb.Router
+    end
+
+    # config/config.exs — Shared across all environments
+    import Config
+
+    config :my_app, MyAppWeb.Endpoint,
+      url: [host: "localhost"],
+      render_errors: [
+        formats: [html: MyAppWeb.ErrorHTML, json: MyAppWeb.ErrorJSON],
+        layout: false
+      ],
+      pubsub_server: MyApp.PubSub,
+      live_view: [signing_salt: "abc123"]
+
+    import_config "\#{config_env()}.exs"
+
+    # config/dev.exs — Development settings
+    config :my_app, MyAppWeb.Endpoint,
+      http: [ip: {127, 0, 0, 1}, port: 4000],
+      debug_errors: true,
+      code_reloader: true
+
+    # config/runtime.exs — Runs at STARTUP (not compile time)
+    if config_env() == :prod do
+      config :my_app, MyApp.Repo,
+        url: System.get_env("DATABASE_URL"),
+        pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10")
+
+      config :my_app, MyAppWeb.Endpoint,
+        url: [host: System.get_env("PHX_HOST"), port: 443, scheme: "https"],
+        secret_key_base: System.get_env("SECRET_KEY_BASE")
+    end
+
+    # Loading order: config.exs → dev/test/prod.exs → runtime.exs
+    # config.exs and env files run at COMPILE TIME
+    # runtime.exs runs at STARTUP (can read env vars)
+
+    # Accessing config at runtime:
+    Application.get_env(:my_app, MyAppWeb.Endpoint)
+    MyAppWeb.Endpoint.config(:url)
+    MyAppWeb.Endpoint.url()  # => "http://localhost:4000"
+    """
+    |> String.trim()
+  end
+
   @endpoint_plugs [
     %{name: "Plug.Static", desc: "Serve static files from priv/static/", color: "bg-blue-500", detail: "Checks if request matches a static file. If yes, serves it and STOPS — request never reaches the router. First because it's the most common request type."},
     %{name: "Plug.RequestId", desc: "Add X-Request-Id header", color: "bg-gray-500", detail: "Assigns a unique ID to every request for tracing through logs and distributed systems."},

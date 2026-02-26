@@ -1,6 +1,107 @@
 defmodule ElixirKatasWeb.PhoenixKata43SessionManagementLive do
   use ElixirKatasWeb, :live_component
 
+  def phoenix_source do
+    """
+    # Session Management — Complete Lifecycle
+
+    defmodule MyAppWeb.UserAuth do
+      import Plug.Conn
+      import Phoenix.Controller
+      alias MyApp.Accounts
+
+      @remember_me_cookie "_app_remember_me"
+      @remember_me_options [sign: true, max_age: 60 * 60 * 24 * 60,
+                             same_site: "Lax"]
+
+      # --- Login ---
+      def log_in_user(conn, user, params \\\\ %{}) do
+        token = Accounts.generate_user_session_token(user)
+        return_to = get_session(conn, :user_return_to)
+        conn
+        |> renew_session()
+        |> put_session(:user_token, token)
+        |> maybe_write_remember_me_cookie(token, params)
+        |> redirect(to: return_to || ~p"/")
+      end
+
+      # --- Logout ---
+      def log_out_user(conn) do
+        token = get_session(conn, :user_token)
+        token && Accounts.delete_user_session_token(token)
+        conn
+        |> renew_session()
+        |> delete_resp_cookie(@remember_me_cookie)
+        |> redirect(to: ~p"/")
+      end
+
+      # --- Plugs ---
+      def fetch_current_user(conn, _opts) do
+        {token, conn} = ensure_user_token(conn)
+        user = token && Accounts.get_user_by_session_token(token)
+        assign(conn, :current_user, user)
+      end
+
+      def require_authenticated_user(conn, _opts) do
+        if conn.assigns[:current_user] do
+          conn
+        else
+          conn
+          |> put_flash(:error, "You must log in.")
+          |> maybe_store_return_to()
+          |> redirect(to: ~p"/users/log_in")
+          |> halt()
+        end
+      end
+
+      # --- Remember Me ---
+      defp maybe_write_remember_me_cookie(conn, token, %{"remember_me" => "true"}) do
+        put_resp_cookie(conn, @remember_me_cookie, token, @remember_me_options)
+      end
+      defp maybe_write_remember_me_cookie(conn, _token, _params), do: conn
+
+      defp ensure_user_token(conn) do
+        if token = get_session(conn, :user_token) do
+          {token, conn}
+        else
+          conn = fetch_cookies(conn, signed: [@remember_me_cookie])
+          if token = conn.cookies[@remember_me_cookie] do
+            {token, put_session(conn, :user_token, token)}
+          else
+            {nil, conn}
+          end
+        end
+      end
+
+      # --- Session Fixation Prevention ---
+      defp renew_session(conn) do
+        delete_csrf_token()
+        conn |> configure_session(renew: true) |> clear_session()
+      end
+    end
+
+    # --- Cookie Configuration (config/config.exs) ---
+    config :my_app, MyAppWeb.Endpoint,
+      session_options: [
+        store: :cookie,
+        key: "_my_app_key",
+        signing_salt: "some_signing_salt",
+        same_site: "Lax",
+        secure: true,
+        http_only: true,
+        max_age: 24 * 60 * 60
+      ]
+
+    # --- Session Token Flow ---
+    # 1. Generate random 32-byte token on login
+    # 2. Hash it and store hash in users_tokens table
+    # 3. Store ORIGINAL (unhashed) token in session cookie
+    # 4. On next request: hash cookie token, look up DB by hash
+    # => Even if DB is compromised, tokens can't be forged
+    """
+    |> String.trim()
+  end
+
   def mount(socket) do
     {:ok, assign(socket, active_tab: "overview", selected_topic: "login")}
   end

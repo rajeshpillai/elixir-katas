@@ -1,6 +1,100 @@
 defmodule ElixirKatasWeb.PhoenixKata48BroadcastingAndPresenceLive do
   use ElixirKatasWeb, :live_component
 
+  def phoenix_source do
+    """
+    # Broadcasting & Presence
+
+    # 1. Phoenix.PubSub — publish/subscribe system
+    # Subscribe current process to a topic:
+    Phoenix.PubSub.subscribe(MyApp.PubSub, "orders:updates")
+
+    # Broadcast to all subscribers:
+    Phoenix.PubSub.broadcast(MyApp.PubSub, "orders:updates", %{
+      event: "order_placed", order_id: 42
+    })
+
+    # 2. PubSub in LiveView
+    defmodule MyAppWeb.OrdersLive do
+      use MyAppWeb, :live_view
+
+      def mount(_params, _session, socket) do
+        if connected?(socket) do
+          Phoenix.PubSub.subscribe(MyApp.PubSub, "orders")
+        end
+        {:ok, assign(socket, orders: Orders.list())}
+      end
+
+      def handle_info(%{event: "order_placed", order: order}, socket) do
+        {:noreply, update(socket, :orders, &[order | &1])}
+      end
+    end
+
+    # 3. Broadcasting from context functions
+    defmodule MyApp.Orders do
+      def create_order(attrs) do
+        with {:ok, order} <- Repo.insert(Order.changeset(attrs)) do
+          Phoenix.PubSub.broadcast(MyApp.PubSub, "orders",
+            %{event: "created", order: order})
+          {:ok, order}
+        end
+      end
+    end
+
+    # 4. Presence module
+    defmodule MyAppWeb.Presence do
+      use Phoenix.Presence,
+        otp_app: :my_app,
+        pubsub_server: MyApp.PubSub
+    end
+
+    # 5. Tracking presence in a channel
+    defmodule MyAppWeb.RoomChannel do
+      use MyAppWeb, :channel
+      alias MyAppWeb.Presence
+
+      def join("room:" <> room_id, _params, socket) do
+        send(self(), :after_join)
+        {:ok, assign(socket, room_id: room_id)}
+      end
+
+      def handle_info(:after_join, socket) do
+        user = socket.assigns.current_user
+        {:ok, _} = Presence.track(socket, user.id, %{
+          name: user.name, online_at: System.os_time(:second)
+        })
+        push(socket, "presence_state", Presence.list(socket))
+        {:noreply, socket}
+      end
+    end
+
+    # 6. Presence in LiveView
+    defmodule MyAppWeb.RoomLive do
+      use MyAppWeb, :live_view
+      alias MyAppWeb.Presence
+
+      def mount(%{"room_id" => room_id}, _session, socket) do
+        topic = "room:\#{room_id}"
+        if connected?(socket) do
+          Phoenix.PubSub.subscribe(MyApp.PubSub, topic)
+          {:ok, _} = Presence.track(self(), topic,
+            socket.assigns.current_user.id, %{
+              name: socket.assigns.current_user.name
+            })
+        end
+        {:ok, assign(socket, online_users: Presence.list(topic))}
+      end
+
+      def handle_info(%Phoenix.Socket.Broadcast{
+            event: "presence_diff", payload: diff}, socket) do
+        online_users = Presence.handle_diff(socket.assigns.online_users, diff)
+        {:noreply, assign(socket, online_users: online_users)}
+      end
+    end
+    """
+    |> String.trim()
+  end
+
   def mount(socket) do
     {:ok, assign(socket, active_tab: "overview", selected_topic: "broadcast")}
   end

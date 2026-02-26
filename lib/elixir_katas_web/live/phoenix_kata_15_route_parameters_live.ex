@@ -1,6 +1,69 @@
 defmodule ElixirKatasWeb.PhoenixKata15RouteParametersLive do
   use ElixirKatasWeb, :live_component
 
+  def phoenix_source do
+    """
+    # Path parameters — dynamic URL segments
+    # Route: get "/users/:id", UserController, :show
+    # URL:   /users/42
+    def show(conn, %{"id" => id}) do
+      # id = "42" (always a string!)
+      user = Accounts.get_user!(String.to_integer(id))
+      render(conn, :show, user: user)
+    end
+
+    # Query parameters — after ? in URL
+    # URL: /products?page=2&sort=name&category=books
+    def index(conn, params) do
+      page = Map.get(params, "page", "1") |> String.to_integer()
+      per_page = Map.get(params, "per_page", "20") |> String.to_integer()
+      sort = params["sort"] || "inserted_at"
+    end
+
+    # Pattern matching on params
+    def show(conn, %{"format" => "json"}) do
+      json(conn, %{data: "..."})
+    end
+
+    def show(conn, %{"format" => "html"}) do
+      render(conn, :show)
+    end
+
+    # Catch-all (glob) routes
+    get "/files/*path", FileController, :show
+
+    # /files/images/photos/sunset.jpg
+    def show(conn, %{"path" => path}) do
+      # path = ["images", "photos", "sunset.jpg"]
+      full = Enum.join(path, "/")
+    end
+
+    # Slug routes
+    get "/blog/:slug", BlogController, :show
+
+    def show(conn, %{"slug" => slug}) do
+      post = Blog.get_by_slug!(slug)
+      render(conn, :show, post: post)
+    end
+
+    # Nested resources
+    resources "/users", UserController do
+      resources "/posts", PostController
+    end
+
+    # Generates: GET /users/:user_id/posts
+    #            GET /users/:user_id/posts/:id
+    def index(conn, %{"user_id" => uid}) do
+      posts = Blog.list_posts(uid)
+    end
+
+    # Verified routes (~p) — compile-time checked
+    ~p"/users/\#{user.id}"
+    <.link navigate={~p"/users/\#{@user}"}>View Profile</.link>
+    """
+    |> String.trim()
+  end
+
   def mount(socket) do
     {:ok,
      assign(socket,

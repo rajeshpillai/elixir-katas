@@ -1,6 +1,97 @@
 defmodule ElixirKatasWeb.PhoenixKata33AuthenticationPlugLive do
   use ElixirKatasWeb, :live_component
 
+  def phoenix_source do
+    """
+    # 1. FetchCurrentUser plug (runs on every request):
+    defmodule MyAppWeb.Plugs.FetchCurrentUser do
+      import Plug.Conn
+      def init(opts), do: opts
+      def call(conn, _opts) do
+        if user_id = get_session(conn, :user_id) do
+          case MyApp.Accounts.get_user(user_id) do
+            nil   -> conn |> clear_session() |> assign(:current_user, nil)
+            user  -> assign(conn, :current_user, user)
+          end
+        else
+          assign(conn, :current_user, nil)
+        end
+      end
+    end
+
+    # 2. RequireAuth plug (runs on protected routes):
+    defmodule MyAppWeb.Plugs.RequireAuth do
+      import Plug.Conn
+      import Phoenix.Controller
+      def init(opts), do: opts
+      def call(conn, _opts) do
+        if conn.assigns.current_user do
+          conn
+        else
+          conn
+          |> put_flash(:error, "Please log in.")
+          |> redirect(to: ~p"/login")
+          |> halt()
+        end
+      end
+    end
+
+    # 3. UserAuth for LiveView (on_mount hooks):
+    defmodule MyAppWeb.UserAuth do
+      import Phoenix.LiveView
+
+      def on_mount(:require_authenticated_user, _params, session, socket) do
+        socket = assign_current_user(socket, session)
+        if socket.assigns.current_user do
+          {:cont, socket}
+        else
+          {:halt, socket |> put_flash(:error, "Log in.") |> redirect(to: ~p"/login")}
+        end
+      end
+
+      def on_mount(:mount_current_user, _params, session, socket) do
+        {:cont, assign_current_user(socket, session)}
+      end
+
+      defp assign_current_user(socket, session) do
+        Phoenix.Component.assign_new(socket, :current_user, fn ->
+          if id = session["user_id"], do: MyApp.Accounts.get_user!(id)
+        end)
+      end
+    end
+
+    # 4. Router wiring:
+    defmodule MyAppWeb.Router do
+      pipeline :browser do
+        plug :accepts, ["html"]
+        plug :fetch_session
+        plug :fetch_live_flash
+        plug :put_root_layout, html: {Layouts, :root}
+        plug :protect_from_forgery
+        plug :put_secure_browser_headers
+        plug MyAppWeb.Plugs.FetchCurrentUser  # always
+      end
+
+      scope "/" do
+        pipe_through :browser
+        live_session :public,
+          on_mount: [{UserAuth, :mount_current_user}] do
+          live "/", HomeLive
+        end
+      end
+
+      scope "/" do
+        pipe_through [:browser, MyAppWeb.Plugs.RequireAuth]
+        live_session :authenticated,
+          on_mount: [{UserAuth, :require_authenticated_user}] do
+          live "/dashboard", DashboardLive
+        end
+      end
+    end
+    """
+    |> String.trim()
+  end
+
   def mount(socket) do
     {:ok, assign(socket, active_tab: "overview", selected_topic: "flow")}
   end

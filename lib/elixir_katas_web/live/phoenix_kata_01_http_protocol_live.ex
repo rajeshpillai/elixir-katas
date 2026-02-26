@@ -1,6 +1,54 @@
 defmodule ElixirKatasWeb.PhoenixKata01HttpProtocolLive do
   use ElixirKatasWeb, :live_component
 
+  def phoenix_source do
+    """
+    # HTTP Request Structure
+    # Every HTTP request is plain text with this format:
+    #
+    #   METHOD PATH HTTP/1.1
+    #   Header-Name: Header-Value
+    #   \\r\\n
+    #   (optional body)
+
+    # Request line examples:
+    GET /users HTTP/1.1
+    POST /users HTTP/1.1
+    DELETE /users/3 HTTP/1.1
+
+    # Common headers:
+    Host: example.com
+    Accept: text/html
+    Content-Type: application/json
+    User-Agent: Browser/1.0
+
+    # HTTP Response Structure:
+    #   HTTP/1.1 STATUS_CODE REASON
+    #   Header-Name: Header-Value
+    #   \\r\\n
+    #   (body)
+
+    # Common Status Codes:
+    # 200 OK            - Success
+    # 201 Created       - Resource created (POST)
+    # 204 No Content    - Success, no body (DELETE)
+    # 301 Moved         - Permanent redirect
+    # 304 Not Modified  - Use cached version
+    # 400 Bad Request   - Client error
+    # 401 Unauthorized  - Not authenticated
+    # 404 Not Found     - Resource doesn't exist
+    # 500 Server Error  - Something broke on server
+
+    # Example response:
+    HTTP/1.1 200 OK
+    Content-Type: application/json
+    Server: Phoenix/1.8
+
+    [{"id": 1, "name": "Alice"}, {"id": 2, "name": "Bob"}]
+    """
+    |> String.trim()
+  end
+
   def mount(socket) do
     {:ok,
      assign(socket,

@@ -1,6 +1,99 @@
 defmodule ElixirKatasWeb.PhoenixKata42PhoenixAuthGeneratorLive do
   use ElixirKatasWeb, :live_component
 
+  def phoenix_source do
+    """
+    # mix phx.gen.auth Accounts User users
+    # Generates a complete token-based authentication system.
+
+    # UserAuth plug + on_mount hooks (generated):
+    defmodule MyAppWeb.UserAuth do
+      use MyAppWeb, :verified_routes
+      import Plug.Conn
+      import Phoenix.Controller
+      import Phoenix.LiveView
+      alias MyApp.Accounts
+
+      # --- Plugs ---
+      def fetch_current_user(conn, _opts) do
+        {user_token, conn} = ensure_user_token(conn)
+        user = user_token && Accounts.get_user_by_session_token(user_token)
+        assign(conn, :current_user, user)
+      end
+
+      def require_authenticated_user(conn, _opts) do
+        if conn.assigns[:current_user] do
+          conn
+        else
+          conn
+          |> put_flash(:error, "Log in to continue.")
+          |> maybe_store_return_to()
+          |> redirect(to: ~p"/users/log_in")
+          |> halt()
+        end
+      end
+
+      # --- LiveView on_mount ---
+      def on_mount(:ensure_authenticated, _params, session, socket) do
+        socket = mount_current_user(session, socket)
+        if socket.assigns.current_user do
+          {:cont, socket}
+        else
+          socket =
+            socket
+            |> put_flash(:error, "Log in to continue.")
+            |> redirect(to: ~p"/users/log_in")
+          {:halt, socket}
+        end
+      end
+
+      def on_mount(:mount_current_user, _params, session, socket) do
+        {:cont, mount_current_user(session, socket)}
+      end
+
+      defp mount_current_user(session, socket) do
+        Phoenix.Component.assign_new(socket, :current_user, fn ->
+          if user_token = session["user_token"] do
+            Accounts.get_user_by_session_token(user_token)
+          end
+        end)
+      end
+    end
+
+    # Token system — tokens are hashed in DB, can be revoked:
+    defmodule MyApp.Accounts.UserToken do
+      @hash_algorithm :sha256
+      @rand_size 32
+
+      def build_session_token(user) do
+        token = :crypto.strong_rand_bytes(@rand_size)
+        hashed = :crypto.hash(@hash_algorithm, token)
+        {Base.url_encode64(token),
+         %UserToken{token: hashed, context: "session", user_id: user.id}}
+      end
+    end
+
+    # Generated routes:
+    scope "/", MyAppWeb do
+      pipe_through [:browser, :redirect_if_user_is_authenticated]
+      live_session :redirect_if_user_is_authenticated,
+        on_mount: [{UserAuth, :redirect_if_user_is_authenticated}] do
+        live "/users/register", UserRegistrationLive, :new
+        live "/users/log_in", UserLoginLive, :new
+      end
+    end
+
+    scope "/", MyAppWeb do
+      pipe_through [:browser, :require_authenticated_user]
+      live_session :require_authenticated_user,
+        on_mount: [{UserAuth, :ensure_authenticated}] do
+        live "/users/settings", UserSettingsLive, :edit
+      end
+    end
+    """
+    |> String.trim()
+  end
+
   def mount(socket) do
     {:ok, assign(socket, active_tab: "overview", selected_topic: "command")}
   end

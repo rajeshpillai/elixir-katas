@@ -1,6 +1,91 @@
 defmodule ElixirKatasWeb.PhoenixKata53MixReleasesLive do
   use ElixirKatasWeb, :live_component
 
+  def phoenix_source do
+    """
+    # Mix Releases — Building & Deploying Phoenix
+
+    # --- Build steps ---
+    export MIX_ENV=prod
+    mix deps.get --only prod
+    mix compile
+    mix assets.deploy    # bundle JS, minify CSS, digest fingerprints
+    mix release          # => _build/prod/rel/my_app/
+
+    # --- Release config (mix.exs) ---
+    def project do
+      [
+        app: :my_app,
+        version: "0.1.0",
+        releases: [
+          my_app: [
+            include_executables_for: [:unix],
+            steps: [:assemble, :tar]
+          ]
+        ]
+      ]
+    end
+
+    # --- Release commands ---
+    # bin/my_app start       # start in foreground
+    # bin/my_app start_iex   # start with IEx shell
+    # bin/my_app daemon      # start as background daemon
+    # bin/my_app stop        # stop the app
+    # bin/my_app remote      # connect IEx to running app
+    # bin/my_app eval "MyApp.Release.migrate()"
+
+    # --- Custom release module (migrations) ---
+    defmodule MyApp.Release do
+      @app :my_app
+
+      def migrate do
+        load_app()
+        for repo <- repos() do
+          {:ok, _, _} = Ecto.Migrator.with_repo(repo,
+            &Ecto.Migrator.run(&1, :up, all: true))
+        end
+      end
+
+      def rollback(repo, version) do
+        load_app()
+        {:ok, _, _} = Ecto.Migrator.with_repo(repo,
+          &Ecto.Migrator.run(&1, :down, to: version))
+      end
+
+      defp repos, do: Application.fetch_env!(@app, :ecto_repos)
+      defp load_app, do: Application.load(@app)
+    end
+
+    # --- Dockerfile (multi-stage build) ---
+    # Stage 1: Build
+    FROM elixir:1.16-alpine AS build
+    RUN apk add --no-cache build-base git nodejs npm
+    WORKDIR /app
+    ENV MIX_ENV=prod
+    RUN mix local.hex --force && mix local.rebar --force
+    COPY mix.exs mix.lock ./
+    RUN mix deps.get --only prod && mix deps.compile
+    COPY . .
+    RUN mix assets.deploy && mix release
+
+    # Stage 2: Runtime (much smaller!)
+    FROM alpine:3.19 AS app
+    RUN apk add --no-cache libstdc++ openssl ncurses-libs
+    WORKDIR /app
+    COPY --from=build /app/_build/prod/rel/my_app ./
+    CMD ["bin/my_app", "start"]
+
+    # --- Running with Docker ---
+    # docker build -t my_app:latest .
+    # docker run -d -p 4000:4000 \\
+    #   -e DATABASE_URL="postgres://..." \\
+    #   -e SECRET_KEY_BASE="$(mix phx.gen.secret)" \\
+    #   my_app:latest
+    # docker exec my_app bin/my_app eval "MyApp.Release.migrate()"
+    """
+    |> String.trim()
+  end
+
   def mount(socket) do
     {:ok, assign(socket, active_tab: "overview", selected_topic: "release")}
   end

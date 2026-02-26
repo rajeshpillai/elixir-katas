@@ -1,6 +1,83 @@
 defmodule ElixirKatasWeb.PhoenixKata45CsrfAndSecurityHeadersLive do
   use ElixirKatasWeb, :live_component
 
+  def phoenix_source do
+    """
+    # CSRF & Security Headers
+
+    # --- Router pipeline with all security plugs ---
+    pipeline :browser do
+      plug :accepts, ["html"]
+      plug :fetch_session
+      plug :fetch_live_flash
+      plug :put_root_layout, html: {Layouts, :root}
+      plug :protect_from_forgery        # CSRF protection
+      plug :put_secure_browser_headers, %{
+        "content-security-policy" =>
+          "default-src 'self'; " <>
+          "script-src 'self'; " <>
+          "style-src 'self' 'unsafe-inline'; " <>
+          "img-src 'self' data: https:; " <>
+          "connect-src 'self' wss:",
+        "permissions-policy" =>
+          "camera=(), microphone=(), geolocation=()"
+      }
+    end
+
+    # --- CSRF Token in forms ---
+    # Phoenix forms auto-include _csrf_token hidden field.
+    # For AJAX requests, use the meta tag pattern:
+    # <meta name="csrf-token" content={get_csrf_token()} />
+    # fetch("/api/action", {
+    #   method: "POST",
+    #   headers: {"x-csrf-token": token}
+    # })
+
+    # --- CSP with nonce for inline scripts ---
+    defp put_content_security_policy(conn, _opts) do
+      nonce = :crypto.strong_rand_bytes(16) |> Base.encode64()
+      conn
+      |> assign(:csp_nonce, nonce)
+      |> put_resp_header("content-security-policy",
+           "default-src 'self'; script-src 'self' 'nonce-\#{nonce}'")
+    end
+
+    # --- Default Phoenix security headers ---
+    # X-Frame-Options: SAMEORIGIN        (clickjacking)
+    # X-Content-Type-Options: nosniff    (MIME sniffing)
+    # X-XSS-Protection: 1; mode=block
+    # X-Download-Options: noopen
+    # X-Permitted-Cross-Domain-Policies: none
+    # Referrer-Policy: strict-origin-when-cross-origin
+
+    # --- Force HTTPS in production ---
+    config :my_app, MyAppWeb.Endpoint,
+      force_ssl: [rewrite_on: [:x_forwarded_proto]]
+
+    # --- HSTS header ---
+    plug :put_secure_browser_headers, %{
+      "strict-transport-security" =>
+        "max-age=63072000; includeSubDomains; preload"
+    }
+
+    # --- Rate limiting plug ---
+    defmodule MyAppWeb.Plugs.RateLimit do
+      import Plug.Conn
+      def init(opts), do: opts
+      def call(conn, opts) do
+        max = Keyword.get(opts, :max, 100)
+        per = Keyword.get(opts, :per, 60_000)
+        ip = conn.remote_ip |> :inet.ntoa() |> to_string()
+        case Hammer.check_rate("rate_limit:\#{ip}", per, max) do
+          {:allow, _count} -> conn
+          {:deny, _limit} -> conn |> put_status(429) |> halt()
+        end
+      end
+    end
+    """
+    |> String.trim()
+  end
+
   def mount(socket) do
     {:ok, assign(socket, active_tab: "overview", selected_topic: "csrf")}
   end
