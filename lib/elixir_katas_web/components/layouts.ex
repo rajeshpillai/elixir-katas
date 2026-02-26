@@ -40,11 +40,6 @@ defmodule ElixirKatasWeb.Layouts do
     <div class="flex h-full bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-sans">
       <!-- Sidebar -->
       <div id="sidebar" class="w-64 flex-shrink-0 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col transition-all duration-300 ease-in-out" data-layout-source="custom-app">
-        <div class="h-16 flex items-center px-6 border-b border-gray-200 dark:border-gray-700">
-          <.link navigate="/liveview-katas" class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-pink-600 hover:opacity-80 transition-opacity">
-            LiveView Katas
-          </.link>
-        </div>
         <div class="flex-1 overflow-y-auto p-4" phx-hook="ScrollPosition" data-scroll-key="sidebar-nav" id="sidebar-nav">
           <nav class="space-y-1">
             <%= for section <- @lv_sections do %>
@@ -82,18 +77,17 @@ defmodule ElixirKatasWeb.Layouts do
 
       <!-- Main Content -->
       <div class="flex-1 flex flex-col overflow-hidden relative">
-        <div class="flex items-center h-10 px-4 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+        <div class="flex items-center h-8 px-2 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
           <button
             id="sidebar-toggle"
-            class="p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            class="p-1 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
             onclick="toggleSidebar()"
             aria-label="Toggle sidebar"
           >
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
             </svg>
           </button>
-          <span class="text-sm font-bold ml-2 md:hidden">Phoenix LiveView Katas</span>
         </div>
 
         <main class="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-900 p-4 sm:p-6 lg:p-8">
@@ -137,11 +131,6 @@ defmodule ElixirKatasWeb.Layouts do
     <div class="flex h-full bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-sans">
       <!-- Sidebar -->
       <div id="sidebar" class="w-64 flex-shrink-0 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col transition-all duration-300 ease-in-out" data-layout-source="elixir-app">
-        <div class="h-16 flex items-center px-6 border-b border-gray-200 dark:border-gray-700">
-          <.link navigate="/elixir-katas" class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-emerald-500 to-teal-600 hover:opacity-80 transition-opacity">
-            Elixir Katas
-          </.link>
-        </div>
         <div class="flex-1 overflow-y-auto p-4" phx-hook="ScrollPosition" data-scroll-key="elixir-sidebar-nav" id="elixir-sidebar-nav">
           <nav class="space-y-1">
             <%= for section <- @sections do %>
@@ -179,18 +168,17 @@ defmodule ElixirKatasWeb.Layouts do
 
       <!-- Main Content -->
       <div class="flex-1 flex flex-col overflow-hidden relative">
-        <div class="flex items-center h-10 px-4 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+        <div class="flex items-center h-8 px-2 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
           <button
             id="elixir-sidebar-toggle"
-            class="p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            class="p-1 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
             onclick="toggleElixirSidebar()"
             aria-label="Toggle sidebar"
           >
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
             </svg>
           </button>
-          <span class="text-sm font-bold ml-2 md:hidden">Elixir Katas</span>
         </div>
 
         <main class="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-900 p-4 sm:p-6 lg:p-8">
@@ -247,11 +235,6 @@ defmodule ElixirKatasWeb.Layouts do
     <div class="flex h-full bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-sans">
       <!-- Sidebar -->
       <div id="sidebar" class="w-64 flex-shrink-0 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col transition-all duration-300 ease-in-out" data-layout-source="phoenix-app">
-        <div class="h-16 flex items-center px-6 border-b border-gray-200 dark:border-gray-700">
-          <.link navigate="/phoenix-katas" class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-amber-500 to-orange-600 hover:opacity-80 transition-opacity">
-            Phoenix Katas
-          </.link>
-        </div>
         <div class="flex-1 overflow-y-auto p-4" phx-hook="ScrollPosition" data-scroll-key="phoenix-sidebar-nav" id="phoenix-sidebar-nav">
           <nav class="space-y-1">
             <%= for section <- @sections do %>
@@ -296,18 +279,17 @@ defmodule ElixirKatasWeb.Layouts do
 
       <!-- Main Content -->
       <div class="flex-1 flex flex-col overflow-hidden relative">
-        <div class="flex items-center h-10 px-4 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+        <div class="flex items-center h-8 px-2 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
           <button
             id="phoenix-sidebar-toggle"
-            class="p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            class="p-1 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
             onclick="togglePhoenixSidebar()"
             aria-label="Toggle sidebar"
           >
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
             </svg>
           </button>
-          <span class="text-sm font-bold ml-2 md:hidden">Phoenix Katas</span>
         </div>
 
         <main class="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-900 p-4 sm:p-6 lg:p-8">
