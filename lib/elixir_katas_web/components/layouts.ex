@@ -82,21 +82,19 @@ defmodule ElixirKatasWeb.Layouts do
 
       <!-- Main Content -->
       <div class="flex-1 flex flex-col overflow-hidden relative">
-        <header class="flex items-center justify-between h-16 px-6 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-          <!-- Burger Menu Button -->
+        <div class="flex items-center h-10 px-4 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
           <button
             id="sidebar-toggle"
-            class="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            class="p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
             onclick="toggleSidebar()"
             aria-label="Toggle sidebar"
           >
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
             </svg>
           </button>
-          <span class="text-lg font-bold md:hidden">Phoenix LiveView Katas</span>
-          <div class="w-10"></div> <!-- Spacer for mobile centering -->
-        </header>
+          <span class="text-sm font-bold ml-2 md:hidden">Phoenix LiveView Katas</span>
+        </div>
 
         <main class="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-900 p-4 sm:p-6 lg:p-8">
            <.flash_group flash={@flash} />
@@ -181,20 +179,19 @@ defmodule ElixirKatasWeb.Layouts do
 
       <!-- Main Content -->
       <div class="flex-1 flex flex-col overflow-hidden relative">
-        <header class="flex items-center justify-between h-16 px-6 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+        <div class="flex items-center h-10 px-4 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
           <button
             id="elixir-sidebar-toggle"
-            class="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            class="p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
             onclick="toggleElixirSidebar()"
             aria-label="Toggle sidebar"
           >
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
             </svg>
           </button>
-          <span class="text-lg font-bold md:hidden">Elixir Katas</span>
-          <div class="w-10"></div>
-        </header>
+          <span class="text-sm font-bold ml-2 md:hidden">Elixir Katas</span>
+        </div>
 
         <main class="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-900 p-4 sm:p-6 lg:p-8">
           <.flash_group flash={@flash} />
@@ -299,20 +296,19 @@ defmodule ElixirKatasWeb.Layouts do
 
       <!-- Main Content -->
       <div class="flex-1 flex flex-col overflow-hidden relative">
-        <header class="flex items-center justify-between h-16 px-6 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+        <div class="flex items-center h-10 px-4 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
           <button
             id="phoenix-sidebar-toggle"
-            class="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            class="p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
             onclick="togglePhoenixSidebar()"
             aria-label="Toggle sidebar"
           >
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
             </svg>
           </button>
-          <span class="text-lg font-bold md:hidden">Phoenix Katas</span>
-          <div class="w-10"></div>
-        </header>
+          <span class="text-sm font-bold ml-2 md:hidden">Phoenix Katas</span>
+        </div>
 
         <main class="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-900 p-4 sm:p-6 lg:p-8">
           <.flash_group flash={@flash} />
