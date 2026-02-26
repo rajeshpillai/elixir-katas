@@ -220,6 +220,104 @@ defmodule ElixirKatasWeb.Layouts do
   end
 
   @doc """
+  Renders the Phoenix Katas layout with a dedicated sidebar.
+  """
+  attr :flash, :map, required: true, doc: "the map of flash messages"
+
+  attr :current_scope, :map,
+    default: nil,
+    doc: "the current [scope](https://hexdocs.pm/phoenix/scopes.html)"
+
+  def phoenix_app(assigns) do
+    assigns = assign(assigns, :sections, ElixirKatasWeb.PhoenixKataData.sections())
+    current_kata_id = assigns[:kata_id]
+    assigns = assign(assigns, :current_kata_id, current_kata_id)
+
+    ~H"""
+    <div class="flex h-full bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-sans">
+      <!-- Sidebar -->
+      <div id="sidebar" class="w-64 flex-shrink-0 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col transition-all duration-300 ease-in-out" data-layout-source="phoenix-app">
+        <div class="h-16 flex items-center px-6 border-b border-gray-200 dark:border-gray-700">
+          <.link navigate="/phoenix-katas" class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-amber-500 to-orange-600 hover:opacity-80 transition-opacity">
+            Phoenix Katas
+          </.link>
+        </div>
+        <div class="flex-1 overflow-y-auto p-4" phx-hook="ScrollPosition" data-scroll-key="phoenix-sidebar-nav" id="phoenix-sidebar-nav">
+          <nav class="space-y-1">
+            <%= for section <- @sections do %>
+              <div class="mt-6">
+                <h3 class="px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  {section.title}
+                </h3>
+                <div class="mt-2 space-y-1 pl-2">
+                  <%= for kata <- section.katas do %>
+                    <.link
+                      navigate={"/phoenix-katas/#{kata.slug}"}
+                      class={[
+                        "group flex items-center px-4 py-2 text-sm font-medium rounded-md",
+                        if(kata.num == @current_kata_id,
+                          do: "bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300 font-semibold",
+                          else: "text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white"
+                        )
+                      ]}
+                    >
+                      <span class={["w-2 h-2 mr-3 rounded-full", kata.color]}></span>
+                      {kata.label}
+                    </.link>
+                  <% end %>
+                </div>
+              </div>
+            <% end %>
+          </nav>
+        </div>
+        <div class="p-4 border-t border-gray-200 dark:border-gray-700">
+          <div class="flex justify-center">
+            <.theme_toggle />
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Content -->
+      <div class="flex-1 flex flex-col overflow-hidden relative">
+        <header class="flex items-center justify-between h-16 px-6 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+          <button
+            id="phoenix-sidebar-toggle"
+            class="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            onclick="togglePhoenixSidebar()"
+            aria-label="Toggle sidebar"
+          >
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+            </svg>
+          </button>
+          <span class="text-lg font-bold md:hidden">Phoenix Katas</span>
+          <div class="w-10"></div>
+        </header>
+
+        <main class="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-900 p-4 sm:p-6 lg:p-8">
+          <.flash_group flash={@flash} />
+          <div class="mx-auto max-w-5xl">
+            {@inner_content}
+          </div>
+        </main>
+      </div>
+    </div>
+    <script>
+      function togglePhoenixSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const isHidden = sidebar.classList.contains('-ml-64');
+
+        if (isHidden) {
+          sidebar.classList.remove('-ml-64');
+        } else {
+          sidebar.classList.add('-ml-64');
+        }
+      }
+    </script>
+    """
+  end
+
+  @doc """
   Renders a simple layout for use cases without the katas sidebar.
   """
   attr :flash, :map, required: true, doc: "the map of flash messages"

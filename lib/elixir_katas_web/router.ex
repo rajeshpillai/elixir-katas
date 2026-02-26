@@ -31,6 +31,11 @@ defmodule ElixirKatasWeb.Router do
       live "/elixir-katas/:slug", ElixirKataHostLive, :index
     end
 
+    live_session :phoenix_katas, layout: {ElixirKatasWeb.Layouts, :phoenix_app} do
+      live "/phoenix-katas", PhoenixKatasIndexLive
+      live "/phoenix-katas/:slug", PhoenixKataHostLive, :index
+    end
+
     live_session :default, layout: {ElixirKatasWeb.Layouts, :app} do
       live "/liveview-katas", KatasIndexLive
       # Specific routes for katas with extra path segments
