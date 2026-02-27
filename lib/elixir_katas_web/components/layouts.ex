@@ -205,7 +205,7 @@ defmodule ElixirKatasWeb.Layouts do
   end
 
   @doc """
-  Renders the Phoenix Katas layout with a dedicated sidebar.
+  Renders the Phoenix Web Katas layout with a dedicated sidebar.
   """
   attr :flash, :map, required: true, doc: "the map of flash messages"
 
@@ -302,6 +302,117 @@ defmodule ElixirKatasWeb.Layouts do
     </div>
     <script>
       function togglePhoenixSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const isHidden = sidebar.classList.contains('-ml-64');
+
+        if (isHidden) {
+          sidebar.classList.remove('-ml-64');
+        } else {
+          sidebar.classList.add('-ml-64');
+        }
+      }
+    </script>
+    """
+  end
+
+  @doc """
+  Renders the Phoenix API Katas layout with a dedicated sidebar.
+  """
+  attr :flash, :map, required: true, doc: "the map of flash messages"
+
+  attr :current_scope, :map,
+    default: nil,
+    doc: "the current [scope](https://hexdocs.pm/phoenix/scopes.html)"
+
+  def phoenix_api_app(assigns) do
+    assigns = assign(assigns, :sections, ElixirKatasWeb.PhoenixApiKataData.sections())
+    current_kata_id = assigns[:kata_id]
+    assigns = assign(assigns, :current_kata_id, current_kata_id)
+
+    implemented =
+      Path.wildcard("lib/elixir_katas_web/live/phoenix_api_kata_*_live.ex")
+      |> Enum.map(fn f ->
+        case Regex.run(~r/phoenix_api_kata_(\d+)_/, f) do
+          [_, num] -> num
+          _ -> nil
+        end
+      end)
+      |> Enum.reject(&is_nil/1)
+      |> MapSet.new()
+
+    assigns = assign(assigns, :implemented, implemented)
+
+    ~H"""
+    <div class="flex h-full bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-sans">
+      <!-- Sidebar -->
+      <div id="sidebar" class="w-64 flex-shrink-0 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col transition-all duration-300 ease-in-out" data-layout-source="phoenix-api-app">
+        <div class="flex-1 overflow-y-auto p-4" phx-hook="ScrollPosition" data-scroll-key="phoenix-api-sidebar-nav" id="phoenix-api-sidebar-nav">
+          <nav class="space-y-1">
+            <%= for section <- @sections do %>
+              <div class="mt-6">
+                <h3 class="px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  {section.title}
+                </h3>
+                <div class="mt-2 space-y-1 pl-2">
+                  <%= for kata <- section.katas do %>
+                    <%= if MapSet.member?(@implemented, kata.num) do %>
+                      <.link
+                        navigate={"/phoenix-api-katas/#{kata.slug}"}
+                        class={[
+                          "group flex items-center px-4 py-2 text-sm font-medium rounded-md",
+                          if(kata.num == @current_kata_id,
+                            do: "bg-rose-50 dark:bg-rose-900/20 text-rose-700 dark:text-rose-300 font-semibold",
+                            else: "text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white"
+                          )
+                        ]}
+                      >
+                        <span class={["w-2 h-2 mr-3 rounded-full", kata.color]}></span>
+                        {kata.label}
+                      </.link>
+                    <% else %>
+                      <span class="group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-400 dark:text-gray-600 cursor-not-allowed">
+                        <span class="w-2 h-2 mr-3 rounded-full bg-gray-300 dark:bg-gray-600"></span>
+                        {kata.label}
+                      </span>
+                    <% end %>
+                  <% end %>
+                </div>
+              </div>
+            <% end %>
+          </nav>
+        </div>
+        <div class="p-4 border-t border-gray-200 dark:border-gray-700">
+          <div class="flex justify-center">
+            <.theme_toggle />
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Content -->
+      <div class="flex-1 flex flex-col overflow-hidden relative">
+        <div class="flex items-center h-8 px-2 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+          <button
+            id="phoenix-api-sidebar-toggle"
+            class="p-1 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            onclick="togglePhoenixApiSidebar()"
+            aria-label="Toggle sidebar"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+            </svg>
+          </button>
+        </div>
+
+        <main class="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-900 p-4 sm:p-6 lg:p-8">
+          <.flash_group flash={@flash} />
+          <div class="mx-auto max-w-5xl">
+            {@inner_content}
+          </div>
+        </main>
+      </div>
+    </div>
+    <script>
+      function togglePhoenixApiSidebar() {
         const sidebar = document.getElementById('sidebar');
         const isHidden = sidebar.classList.contains('-ml-64');
 

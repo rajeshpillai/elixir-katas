@@ -1,6 +1,6 @@
 defmodule ElixirKatasWeb.PhoenixKataData do
   @moduledoc """
-  Shared data module for Phoenix Katas sections, tags, and colors.
+  Shared data module for Phoenix Web Katas sections, tags, and colors.
   Used by both the sidebar layout and the index page.
   """
 

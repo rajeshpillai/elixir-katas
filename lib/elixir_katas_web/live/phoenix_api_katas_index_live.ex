@@ -1,17 +1,17 @@
-defmodule ElixirKatasWeb.PhoenixKatasIndexLive do
+defmodule ElixirKatasWeb.PhoenixApiKatasIndexLive do
   use ElixirKatasWeb, :live_view
   import ElixirKatasWeb.KataComponents
 
-  alias ElixirKatasWeb.PhoenixKataData
+  alias ElixirKatasWeb.PhoenixApiKataData
 
   def mount(_params, _session, socket) do
-    sections = PhoenixKataData.sections()
+    sections = PhoenixApiKataData.sections()
 
     # Detect which katas have implementation files
     implemented =
-      Path.wildcard("lib/elixir_katas_web/live/phoenix_kata_*_live.ex")
+      Path.wildcard("lib/elixir_katas_web/live/phoenix_api_kata_*_live.ex")
       |> Enum.map(fn f ->
-        case Regex.run(~r/phoenix_kata_(\d+)_/, f) do
+        case Regex.run(~r/phoenix_api_kata_(\d+)_/, f) do
           [_, num] -> num
           _ -> nil
         end
@@ -25,7 +25,7 @@ defmodule ElixirKatasWeb.PhoenixKatasIndexLive do
        filtered_sections: sections,
        search: "",
        active_tags: MapSet.new(),
-       all_tags: PhoenixKataData.all_tags(),
+       all_tags: PhoenixApiKataData.all_tags(),
        implemented: implemented
      )}
   end
@@ -88,10 +88,10 @@ defmodule ElixirKatasWeb.PhoenixKatasIndexLive do
     ~H"""
     <div class="max-w-4xl mx-auto py-8">
       <h1 class="text-3xl font-bold mb-4 text-gray-900 dark:text-white">
-        Phoenix Web Katas
+        Phoenix API Katas
       </h1>
       <p class="text-lg text-gray-600 dark:text-gray-300 mb-6">
-        Learn the Phoenix framework from the ground up. Select a kata from the sidebar or the list below.
+        Master REST APIs with Phoenix — authentication, file uploads, pagination, and production patterns.
       </p>
 
       <div class="mb-6 space-y-4">
@@ -102,7 +102,7 @@ defmodule ElixirKatasWeb.PhoenixKatasIndexLive do
             value={@search}
             placeholder="Search katas..."
             phx-debounce="200"
-            class="w-full px-4 py-2 pl-10 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+            class="w-full px-4 py-2 pl-10 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-rose-500 focus:border-transparent"
           />
           <svg class="absolute left-3 top-2.5 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -117,7 +117,7 @@ defmodule ElixirKatasWeb.PhoenixKatasIndexLive do
               class={[
                 "px-3 py-1 text-sm font-medium rounded-full border transition-colors cursor-pointer",
                 if(MapSet.member?(@active_tags, tag),
-                  do: "border-amber-500 bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200 dark:border-amber-400",
+                  do: "border-rose-500 bg-rose-100 text-rose-800 dark:bg-rose-900 dark:text-rose-200 dark:border-rose-400",
                   else: "border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:border-gray-400 dark:hover:border-gray-500"
                 )
               ]}
@@ -139,7 +139,7 @@ defmodule ElixirKatasWeb.PhoenixKatasIndexLive do
       <%= if @filtered_sections == [] do %>
         <div class="text-center py-12">
           <p class="text-gray-500 dark:text-gray-400 text-lg">No katas match your search.</p>
-          <button phx-click="clear_filters" class="mt-4 text-amber-600 dark:text-amber-400 hover:underline cursor-pointer">
+          <button phx-click="clear_filters" class="mt-4 text-rose-600 dark:text-rose-400 hover:underline cursor-pointer">
             Clear filters
           </button>
         </div>
@@ -147,7 +147,7 @@ defmodule ElixirKatasWeb.PhoenixKatasIndexLive do
 
       <%= for section <- @filtered_sections do %>
         <div class="mb-8">
-          <h2 class="text-xl font-bold text-amber-700 dark:text-amber-400 mb-4 border-b border-amber-200 dark:border-amber-800 pb-2">
+          <h2 class="text-xl font-bold text-rose-700 dark:text-rose-400 mb-4 border-b border-rose-200 dark:border-rose-800 pb-2">
             {section.title}
           </h2>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -155,9 +155,9 @@ defmodule ElixirKatasWeb.PhoenixKatasIndexLive do
               <.kata_card
                 title={kata.label}
                 description={kata.description}
-                path={"/phoenix-katas/#{kata.slug}"}
+                path={"/phoenix-api-katas/#{kata.slug}"}
                 tags={kata.tags}
-                tag_color_fn={&PhoenixKataData.tag_color/1}
+                tag_color_fn={&PhoenixApiKataData.tag_color/1}
                 disabled={not MapSet.member?(@implemented, kata.num)}
               />
             <% end %>

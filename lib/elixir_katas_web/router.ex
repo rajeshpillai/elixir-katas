@@ -40,6 +40,13 @@ defmodule ElixirKatasWeb.Router do
       live "/phoenix-katas/:slug", PhoenixKataHostLive, :index
     end
 
+    live_session :phoenix_api_katas,
+      layout: {ElixirKatasWeb.Layouts, :phoenix_api_app},
+      on_mount: [{ElixirKatasWeb.Hooks.KataSection, "Phoenix API"}] do
+      live "/phoenix-api-katas", PhoenixApiKatasIndexLive
+      live "/phoenix-api-katas/:slug", PhoenixApiKataHostLive, :index
+    end
+
     live_session :default,
       layout: {ElixirKatasWeb.Layouts, :app},
       on_mount: [{ElixirKatasWeb.Hooks.KataSection, "LiveView"}] do
