@@ -50,11 +50,26 @@ import { ChartJS } from "./hooks/chart_hook"
 import { AudioPlayer } from "./hooks/audio_player"
 import { VirtualScroll } from "./hooks/virtual_scroll"
 import CodeEditor from "./hooks/code_editor"
+import { SkillzEngineBridge } from "./hooks/skillzengine_bridge"
+
+const urlParams = new URLSearchParams(window.location.search);
+const se_api = urlParams.get("se_api") || sessionStorage.getItem("se_api");
+const se_token = urlParams.get("se_token") || sessionStorage.getItem("se_token");
+const se_path = urlParams.get("se_path") || sessionStorage.getItem("se_path");
+
+if (urlParams.get("se_api")) sessionStorage.setItem("se_api", urlParams.get("se_api"));
+if (urlParams.get("se_token")) sessionStorage.setItem("se_token", urlParams.get("se_token"));
+if (urlParams.get("se_path")) sessionStorage.setItem("se_path", urlParams.get("se_path"));
 
 const liveSocket = new LiveSocket("/live", Socket, {
   longPollFallbackMs: 2500,
-  params: { _csrf_token: csrfToken },
-  hooks: { ...colocatedHooks, ScrollPosition, InfiniteScroll, CursorTracker, InputMask, ChartJS, AudioPlayer, VirtualScroll, CodeEditor },
+  params: { 
+    _csrf_token: csrfToken,
+    se_api: se_api,
+    se_token: se_token,
+    se_path: se_path
+  },
+  hooks: { ...colocatedHooks, ScrollPosition, InfiniteScroll, CursorTracker, InputMask, ChartJS, AudioPlayer, VirtualScroll, CodeEditor, SkillzEngineBridge },
 })
 
 // Show progress bar on live navigation and form submits

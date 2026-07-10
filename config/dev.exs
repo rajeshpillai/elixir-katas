@@ -83,3 +83,9 @@ config :phoenix_live_view,
 
 # Disable swoosh api client as it is only required for production adapters.
 config :swoosh, :api_client, false
+
+# Enable polling fallback for file-watching inside containerized or virtual environments.
+config :phoenix_live_reload,
+  backend: :fs_poll,
+  interval: 500
+
