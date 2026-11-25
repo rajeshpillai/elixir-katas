@@ -4,11 +4,11 @@ defmodule ElixirKatasWeb.TaskyLive.Index do
   alias ElixirKatas.Tasky.Todo
 
   def mount(_params, _session, socket) do
-    if connected?(socket) do
-      Tasky.subscribe()
-    end
-
     user_id = socket.assigns.current_scope.user.id
+
+    if connected?(socket) do
+      Tasky.subscribe(user_id)
+    end
     categories = Tasky.list_categories(user_id)
 
     {:ok, 
@@ -102,13 +102,13 @@ defmodule ElixirKatasWeb.TaskyLive.Index do
   end
 
   def handle_event("toggle_complete", %{"id" => id}, socket) do
-    todo = Tasky.get_todo!(id)
+    todo = Tasky.get_todo!(socket.assigns.current_scope.user.id, id)
     {:ok, updated_todo} = Tasky.update_todo(todo, %{is_complete: !todo.is_complete})
     {:noreply, stream_insert(socket, :todos, updated_todo)}
   end
 
   def handle_event("toggle_favorite", %{"id" => id}, socket) do
-    todo = Tasky.get_todo!(id)
+    todo = Tasky.get_todo!(socket.assigns.current_scope.user.id, id)
     {:ok, updated_todo} = Tasky.update_todo(todo, %{is_favorite: !todo.is_favorite})
     {:noreply, stream_insert(socket, :todos, updated_todo)}
   end
@@ -130,7 +130,7 @@ defmodule ElixirKatasWeb.TaskyLive.Index do
   end
 
   def handle_event("delete_todo", %{"id" => id}, socket) do
-    todo = Tasky.get_todo!(id)
+    todo = Tasky.get_todo!(socket.assigns.current_scope.user.id, id)
     {:ok, _} = Tasky.delete_todo(todo)
     
     search = socket.assigns.search
@@ -146,7 +146,7 @@ defmodule ElixirKatasWeb.TaskyLive.Index do
   # Blue Belt Handlers
 
   def handle_event("open_todo", %{"id" => id}, socket) do
-    todo = Tasky.get_todo!(id)
+    todo = Tasky.get_todo!(socket.assigns.current_scope.user.id, id)
     {:noreply, assign(socket, selected_todo: todo)}
   end
 
@@ -160,7 +160,7 @@ defmodule ElixirKatasWeb.TaskyLive.Index do
     case Tasky.create_subtask(params) do
       {:ok, _subtask} ->
         # Refresh the selected todo to show new subtask
-        updated_todo = Tasky.get_todo!(socket.assigns.selected_todo.id)
+        updated_todo = Tasky.get_todo!(socket.assigns.current_scope.user.id, socket.assigns.selected_todo.id)
         {:noreply, assign(socket, selected_todo: updated_todo)}
       {:error, _changeset} ->
         {:noreply, put_flash(socket, :error, "Could not create subtask")}
@@ -168,18 +168,18 @@ defmodule ElixirKatasWeb.TaskyLive.Index do
   end
 
   def handle_event("toggle_subtask", %{"id" => id}, socket) do
-    subtask = ElixirKatas.Repo.get!(ElixirKatas.Tasky.Subtask, id)
+    subtask = Tasky.get_subtask!(socket.assigns.selected_todo, id)
     {:ok, _} = Tasky.update_subtask(subtask, %{is_complete: !subtask.is_complete})
     
-    updated_todo = Tasky.get_todo!(socket.assigns.selected_todo.id)
+    updated_todo = Tasky.get_todo!(socket.assigns.current_scope.user.id, socket.assigns.selected_todo.id)
     {:noreply, assign(socket, selected_todo: updated_todo)}
   end
 
   def handle_event("delete_subtask", %{"id" => id}, socket) do
-    subtask = ElixirKatas.Repo.get!(ElixirKatas.Tasky.Subtask, id)
+    subtask = Tasky.get_subtask!(socket.assigns.selected_todo, id)
     {:ok, _} = Tasky.delete_subtask(subtask)
 
-    updated_todo = Tasky.get_todo!(socket.assigns.selected_todo.id)
+    updated_todo = Tasky.get_todo!(socket.assigns.current_scope.user.id, socket.assigns.selected_todo.id)
     {:noreply, assign(socket, selected_todo: updated_todo)}
   end
 
@@ -190,7 +190,7 @@ defmodule ElixirKatasWeb.TaskyLive.Index do
 
     case Tasky.create_comment(params) do
       {:ok, _comment} ->
-        updated_todo = Tasky.get_todo!(socket.assigns.selected_todo.id)
+        updated_todo = Tasky.get_todo!(socket.assigns.current_scope.user.id, socket.assigns.selected_todo.id)
         {:noreply, assign(socket, selected_todo: updated_todo)}
       {:error, _changeset} ->
         {:noreply, put_flash(socket, :error, "Could not create comment")}
@@ -206,14 +206,16 @@ defmodule ElixirKatasWeb.TaskyLive.Index do
       consume_uploaded_entries(socket, :attachment, fn %{path: path}, entry ->
         dest_dir = Path.join(["priv", "static", "uploads"])
         File.mkdir_p!(dest_dir)
-        dest = Path.join(dest_dir, "#{entry.uuid}-#{entry.client_name}")
+        # Never trust the client's file name as a path: keep only its last segment.
+        stored_name = "#{entry.uuid}-#{Path.basename(entry.client_name)}"
+        dest = Path.join(dest_dir, stored_name)
         File.cp!(path, dest)
         
         # Return the params needed to create the attachment record
         {:ok, %{
           "filename" => entry.client_name,
           "content_type" => entry.client_type,
-          "path" => "/uploads/#{entry.uuid}-#{entry.client_name}",
+          "path" => "/uploads/#{stored_name}",
           "size" => entry.client_size,
           "todo_id" => socket.assigns.selected_todo.id
         }}
@@ -224,12 +226,12 @@ defmodule ElixirKatasWeb.TaskyLive.Index do
       Tasky.create_attachment(attrs)
     end)
 
-    updated_todo = Tasky.get_todo!(socket.assigns.selected_todo.id)
+    updated_todo = Tasky.get_todo!(socket.assigns.current_scope.user.id, socket.assigns.selected_todo.id)
     {:noreply, assign(socket, selected_todo: updated_todo)}
   end
 
   def handle_event("delete_attachment", %{"id" => id}, socket) do
-    attachment = ElixirKatas.Repo.get!(ElixirKatas.Tasky.Attachment, id)
+    attachment = Tasky.get_attachment!(socket.assigns.selected_todo, id)
     
     # Try to delete the file from disk (optional, but good practice)
     file_path = Path.join(["priv", "static", attachment.path])
@@ -237,7 +239,7 @@ defmodule ElixirKatasWeb.TaskyLive.Index do
 
     {:ok, _} = Tasky.delete_attachment(attachment)
     
-    updated_todo = Tasky.get_todo!(socket.assigns.selected_todo.id)
+    updated_todo = Tasky.get_todo!(socket.assigns.current_scope.user.id, socket.assigns.selected_todo.id)
     {:noreply, 
      socket 
      |> assign(:selected_todo, updated_todo)

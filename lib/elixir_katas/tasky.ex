@@ -7,14 +7,21 @@ defmodule ElixirKatas.Tasky do
   alias ElixirKatas.Repo
 
   alias ElixirKatas.Tasky.Todo
-  @topic "tasky"
 
-  def subscribe do
-    Phoenix.PubSub.subscribe(ElixirKatas.PubSub, @topic)
+  @doc """
+  Subscribes the caller to changes to the given user's todos.
+
+  Each user has their own topic so that todo broadcasts never reach
+  other users' LiveViews.
+  """
+  def subscribe(user_id) do
+    Phoenix.PubSub.subscribe(ElixirKatas.PubSub, topic(user_id))
   end
 
-  defp broadcast({:ok, todo}, event) do
-    Phoenix.PubSub.broadcast(ElixirKatas.PubSub, @topic, {event, todo})
+  defp topic(user_id), do: "tasky:#{user_id}"
+
+  defp broadcast({:ok, %Todo{} = todo}, event) do
+    Phoenix.PubSub.broadcast(ElixirKatas.PubSub, topic(todo.user_id), {event, todo})
     {:ok, todo}
   end
   defp broadcast({:error, _} = error, _event), do: error
@@ -40,7 +47,7 @@ defmodule ElixirKatas.Tasky do
     # Apply search filter
     query = if search && search != "" do
       search_term = "%#{search}%"
-      from t in base_query, where: ilike(t.title, ^search_term)
+      from t in base_query, where: like(t.title, ^search_term)
     else
       base_query
     end
@@ -88,7 +95,7 @@ defmodule ElixirKatas.Tasky do
     
     count_query = if search && search != "" do
       search_term = "%#{search}%"
-      from t in count_query, where: ilike(t.title, ^search_term)
+      from t in count_query, where: like(t.title, ^search_term)
     else
       count_query
     end
@@ -142,7 +149,7 @@ defmodule ElixirKatas.Tasky do
   def count_todos(user_id, search \\ nil) do
     query = if search && search != "" do
         search_term = "%#{search}%"
-        from t in Todo, where: t.user_id == ^user_id and ilike(t.title, ^search_term)
+        from t in Todo, where: t.user_id == ^user_id and like(t.title, ^search_term)
     else
         from t in Todo, where: t.user_id == ^user_id
     end
@@ -150,21 +157,22 @@ defmodule ElixirKatas.Tasky do
   end
 
   @doc """
-  Gets a single todo.
+  Gets a single todo owned by the given user.
 
   Raises `Ecto.NoResultsError` if the Todo does not exist.
 
   ## Examples
 
-      iex> get_todo!(123)
+      iex> get_todo!(user_id, 123)
       %Todo{}
 
-      iex> get_todo!(456)
+      iex> get_todo!(user_id, 456)
       ** (Ecto.NoResultsError)
 
   """
-  def get_todo!(id) do
-    Repo.get!(Todo, id)
+  def get_todo!(user_id, id) do
+    Todo
+    |> Repo.get_by!(id: id, user_id: user_id)
     |> Repo.preload([:subtasks, comments: [:user], attachments: []])
   end
 
@@ -259,6 +267,15 @@ defmodule ElixirKatas.Tasky do
     Repo.all(from s in Subtask, where: s.todo_id == ^todo_id, order_by: [asc: s.inserted_at])
   end
 
+  @doc """
+  Gets a subtask that belongs to the given todo.
+
+  Raises `Ecto.NoResultsError` if it does not exist or belongs to another todo.
+  """
+  def get_subtask!(%Todo{id: todo_id}, id) do
+    Repo.get_by!(Subtask, id: id, todo_id: todo_id)
+  end
+
   def create_subtask(attrs) do
     %Subtask{}
     |> Subtask.changeset(attrs)
@@ -297,6 +314,15 @@ defmodule ElixirKatas.Tasky do
   # ... Attachments ...
   def list_attachments(todo_id) do
     Repo.all(from a in Attachment, where: a.todo_id == ^todo_id, order_by: [desc: a.inserted_at])
+  end
+
+  @doc """
+  Gets an attachment that belongs to the given todo.
+
+  Raises `Ecto.NoResultsError` if it does not exist or belongs to another todo.
+  """
+  def get_attachment!(%Todo{id: todo_id}, id) do
+    Repo.get_by!(Attachment, id: id, todo_id: todo_id)
   end
 
   def create_attachment(attrs) do

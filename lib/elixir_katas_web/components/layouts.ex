@@ -512,6 +512,20 @@ defmodule ElixirKatasWeb.Layouts do
   end
 
   @doc """
+  Renders a minimal layout for the account pages (register, log in, confirm).
+  """
+  attr :flash, :map, required: true, doc: "the map of flash messages"
+
+  def auth(assigns) do
+    ~H"""
+    <main class="min-h-full bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 px-4 py-12 sm:px-6 lg:px-8">
+      <.flash_group flash={@flash} />
+      {@inner_content}
+    </main>
+    """
+  end
+
+  @doc """
   Shows the flash group with standard titles and content.
 
   ## Examples

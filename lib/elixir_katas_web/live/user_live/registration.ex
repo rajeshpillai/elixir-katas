@@ -31,13 +31,6 @@ defmodule ElixirKatasWeb.UserLive.Registration do
             phx-mounted={JS.focus()}
           />
 
-          <.input
-            field={@form[:password]}
-            type="password"
-            label="Password"
-            required
-          />
-
           <.button phx-disable-with="Creating account..." class="btn btn-primary w-full">
             Create an account
           </.button>

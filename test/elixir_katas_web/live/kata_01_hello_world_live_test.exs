@@ -3,35 +3,24 @@ defmodule ElixirKatasWeb.Kata01HelloWorldLiveTest do
 
   import Phoenix.LiveViewTest
 
+  @kata_path "/liveview-katas/01-hello-world"
+
   test "renders hello world kata", %{conn: conn} do
-    {:ok, view, html} = live(conn, "/katas/01-hello-world")
+    {:ok, view, html} = live(conn, @kata_path)
 
     assert html =~ "Kata 01: Hello World"
     assert html =~ "Description"
-    
-    # Check default tab content (Notes)
-    assert html =~ "prose dark:prose-invert"
-    
-    # Switch to Interactive
-    html = view
-           |> element("button", "Interactive")
-           |> render_click()
-    
-    assert html =~ "Welcome to your first Elixir LiveView Kata"
+
+    # The interactive tab is shown first and renders the compiled kata.
     assert html =~ "Click me!"
-    
-    # Switch to Source
-    html = view
-           |> element("button", "Source Code")
-           |> render_click()
-           
-    # Check for editor div hook
-    assert html =~ "phx-hook=\"CodeEditor\""
-    
-    # Test saving source (mocked in test env)
-    source = File.read!("lib/elixir_katas_web/live/kata_01_hello_world_live.ex")
-    
-    result = render_hook(view, "save_source", %{"source" => source})
-    assert result =~ "Source saved!"
+    assert view |> element("button", "Click me!") |> render_click() =~ "You clicked me!!!"
+
+    # Notes tab
+    html = view |> element("button", "Description") |> render_click()
+    assert html =~ "prose dark:prose-invert"
+
+    # Source tab mounts the code editor hook
+    html = view |> element("button", "Source Code") |> render_click()
+    assert html =~ ~s(phx-hook="CodeEditor")
   end
 end

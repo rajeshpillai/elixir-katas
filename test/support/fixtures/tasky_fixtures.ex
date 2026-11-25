@@ -4,17 +4,21 @@ defmodule ElixirKatas.TaskyFixtures do
   entities via the `ElixirKatas.Tasky` context.
   """
 
+  import ElixirKatas.AccountsFixtures
+
   @doc """
-  Generate a todo.
+  Generate a todo. Creates a new user unless `user` is given.
   """
-  def todo_fixture(attrs \\ %{}) do
-    {:ok, todo} =
-      attrs
-      |> Enum.into(%{
+  def todo_fixture(user \\ nil, attrs \\ %{}) do
+    user = user || user_fixture()
+
+    attrs =
+      Enum.into(attrs, %{
         is_complete: true,
         title: "some title"
       })
-      |> ElixirKatas.Tasky.create_todo()
+
+    {:ok, todo} = ElixirKatas.Tasky.create_todo(user.id, attrs)
 
     todo
   end

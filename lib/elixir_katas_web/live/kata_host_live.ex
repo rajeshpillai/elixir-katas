@@ -106,7 +106,7 @@ defmodule ElixirKatasWeb.KataHostLive do
         |> assign(:active_tab, initial_tab)
         |> assign(:notes_content, notes_content)
         |> assign(:kata_mode, kata_mode)
-       |> assign(:read_only, false)
+       |> assign(:read_only, user_id == 0)
        |> assign(:is_user_author, is_user_author)
        |> assign(:compiling, false)
        |> assign(:compile_error, nil)
@@ -162,6 +162,17 @@ defmodule ElixirKatasWeb.KataHostLive do
 
   def handle_event("set_tab", %{"tab" => tab}, socket) do
     {:noreply, assign(socket, active_tab: tab)}
+  end
+
+  # Editing compiles and runs code on the server, so the read-only flag
+  # must be enforced here, not only in the UI.
+  def handle_event("save_source", _params, %{assigns: %{read_only: true}} = socket) do
+    message =
+      if socket.assigns.user_id == 0,
+        do: "You must be logged in to edit.",
+        else: "This kata's source is read-only."
+
+    {:noreply, put_flash(socket, :error, message)}
   end
 
   def handle_event("save_source", %{"source" => source}, socket) do

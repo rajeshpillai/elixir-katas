@@ -109,6 +109,7 @@ defmodule ElixirKatasWeb.Router do
     pipe_through [:browser]
 
     live_session :current_user,
+      layout: {ElixirKatasWeb.Layouts, :auth},
       on_mount: [{ElixirKatasWeb.UserAuth, :mount_current_scope}] do
       live "/users/register", UserLive.Registration, :new
       live "/users/log-in", UserLive.Login, :new
