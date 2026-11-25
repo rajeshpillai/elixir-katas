@@ -29,7 +29,7 @@ LiveView doesn't re-transmit the whole page. It splits your template into static
 ```html
 <h1>Hello <%= @name %></h1>
 ```
-If `@name` changes from "Alice" to "Bob", LiveView sends *only* "Bob". The strings "<h1>Hello " and "</h1>" are never sent again.
+If `@name` changes from "Alice" to "Bob", LiveView sends *only* "Bob". The strings `"<h1>Hello "` and `"</h1>"` are never sent again.
 
 ## Common Pitfalls
 

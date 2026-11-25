@@ -18,7 +18,7 @@ defmodule ElixirKatasWeb.Kata98PDFGenerationLive do
     
       <div class="p-6 max-w-2xl mx-auto">
         <div class="mb-6 text-sm text-gray-500">
-          Generate PDF documents from HTML/Markdown using wkhtmltopdf
+          Generate PDF documents from HTML/Markdown using headless Chrome
         </div>
 
         <div class="bg-white p-6 rounded-lg shadow-sm border">

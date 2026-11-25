@@ -4,8 +4,10 @@ An interactive learning platform for mastering Elixir and Phoenix LiveView throu
 
 ## Prerequisites
 
-- **Erlang** >= 26.0
-- **Elixir** >= 1.15
+- **Erlang/OTP** >= 26 (developed on OTP 28.5)
+- **Elixir** >= 1.15 (developed on Elixir 1.19.7)
+
+The exact versions are pinned in `.tool-versions`, so `asdf install` sets them up.
 - **Node.js** >= 18 (for asset compilation)
 
 ### System Dependencies

@@ -91,7 +91,7 @@ defmodule ElixirKatasWeb.KataComponents do
 
           <% "notes" -> %>
             <div class="prose dark:prose-invert max-w-none">
-              {raw Earmark.as_html!(@notes_content)}
+              {raw ElixirKatasWeb.Markdown.trusted_html(@notes_content)}
             </div>
         <% end %>
       </div>
