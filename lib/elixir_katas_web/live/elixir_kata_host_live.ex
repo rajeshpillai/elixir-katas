@@ -84,6 +84,7 @@ defmodule ElixirKatasWeb.ElixirKataHostLive do
        |> assign(:source_code, source_code)
        |> assign(:user_id, user_id)
        |> assign(:kata_id, kata_id)
+       |> assign(:kata_slug, ElixirKatasWeb.SkillzEngineBridge.get_slug(kata_id, "Elixir") || slug)
        |> assign(:title, title)
        |> assign(:active_tab, initial_tab)
        |> assign(:notes_content, notes_content)
@@ -123,6 +124,11 @@ defmodule ElixirKatasWeb.ElixirKataHostLive do
       compiling={@compiling}
       saved_at={@saved_at}
       mode={@kata_mode}
+      se_api={@se_api}
+      se_token={@se_token}
+      se_path={@se_path}
+      completed_katas={@completed_katas}
+      kata_slug={@kata_slug}
     >
       <div class="h-full w-full">
         <%= if @dynamic_module do %>
@@ -207,6 +213,10 @@ defmodule ElixirKatasWeb.ElixirKataHostLive do
     else
       {:noreply, put_flash(socket, :error, "Cannot revert as Guest.")}
     end
+  end
+
+  def handle_event("complete_kata", _params, socket) do
+    {:noreply, ElixirKatasWeb.SkillzEngineBridge.handle_complete_kata_event(socket)}
   end
 
   # Catch-all to forward hook events to the component

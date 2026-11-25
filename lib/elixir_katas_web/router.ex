@@ -9,8 +9,15 @@ defmodule ElixirKatasWeb.Router do
     plug :fetch_live_flash
     plug :put_root_layout, html: {ElixirKatasWeb.Layouts, :root}
     plug :protect_from_forgery
-    plug :put_secure_browser_headers
+    plug :put_secure_browser_headers, %{
+      "content-security-policy" => "frame-ancestors 'self' http://localhost:3000"
+    }
+    plug :delete_x_frame_options
     plug :fetch_current_scope_for_user
+  end
+
+  defp delete_x_frame_options(conn, _opts) do
+    Plug.Conn.delete_resp_header(conn, "x-frame-options")
   end
 
   pipeline :api do
@@ -28,28 +35,28 @@ defmodule ElixirKatasWeb.Router do
     
     live_session :elixir_katas,
       layout: {ElixirKatasWeb.Layouts, :elixir_app},
-      on_mount: [{ElixirKatasWeb.Hooks.KataSection, "Elixir"}] do
+      on_mount: [{ElixirKatasWeb.Hooks.KataSection, "Elixir"}, ElixirKatasWeb.Hooks.SkillzEngineBridge] do
       live "/elixir-katas", ElixirKatasIndexLive
       live "/elixir-katas/:slug", ElixirKataHostLive, :index
     end
 
     live_session :phoenix_katas,
       layout: {ElixirKatasWeb.Layouts, :phoenix_app},
-      on_mount: [{ElixirKatasWeb.Hooks.KataSection, "Phoenix"}] do
+      on_mount: [{ElixirKatasWeb.Hooks.KataSection, "Phoenix"}, ElixirKatasWeb.Hooks.SkillzEngineBridge] do
       live "/phoenix-katas", PhoenixKatasIndexLive
       live "/phoenix-katas/:slug", PhoenixKataHostLive, :index
     end
 
     live_session :phoenix_api_katas,
       layout: {ElixirKatasWeb.Layouts, :phoenix_api_app},
-      on_mount: [{ElixirKatasWeb.Hooks.KataSection, "Phoenix API"}] do
+      on_mount: [{ElixirKatasWeb.Hooks.KataSection, "Phoenix API"}, ElixirKatasWeb.Hooks.SkillzEngineBridge] do
       live "/phoenix-api-katas", PhoenixApiKatasIndexLive
       live "/phoenix-api-katas/:slug", PhoenixApiKataHostLive, :index
     end
 
     live_session :default,
       layout: {ElixirKatasWeb.Layouts, :app},
-      on_mount: [{ElixirKatasWeb.Hooks.KataSection, "LiveView"}] do
+      on_mount: [{ElixirKatasWeb.Hooks.KataSection, "LiveView"}, ElixirKatasWeb.Hooks.SkillzEngineBridge] do
       live "/liveview-katas", KatasIndexLive
       # Specific routes for katas with extra path segments
       live "/liveview-katas/42-path-params/:id", KataHostLive, :kata_42

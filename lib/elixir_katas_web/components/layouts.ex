@@ -32,12 +32,14 @@ defmodule ElixirKatasWeb.Layouts do
     doc: "the current [scope](https://hexdocs.pm/phoenix/scopes.html)"
 
   def app(assigns) do
+    completed_katas = Map.get(assigns, :completed_katas, MapSet.new())
+    assigns = assign(assigns, :completed_katas, completed_katas)
     assigns = assign(assigns, :lv_sections, ElixirKatasWeb.LiveviewKataData.sections())
     current_kata_id = assigns[:kata_id]
     assigns = assign(assigns, :current_kata_id, current_kata_id)
 
     ~H"""
-    <div class="flex h-full bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-sans">
+    <div id="skillzengine-app-root" phx-hook="SkillzEngineBridge" class="flex h-full bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-sans">
       <!-- Sidebar -->
       <div id="sidebar" class="w-64 flex-shrink-0 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col transition-all duration-300 ease-in-out" data-layout-source="custom-app">
         <div class="flex-1 overflow-y-auto p-4" phx-hook="ScrollPosition" data-scroll-key="sidebar-nav" id="sidebar-nav">
@@ -59,7 +61,11 @@ defmodule ElixirKatasWeb.Layouts do
                         )
                       ]}
                     >
-                      <span class={["w-2 h-2 mr-3 rounded-full", kata.color]}></span>
+                      <%= if MapSet.member?(@completed_katas, kata.slug) do %>
+                        <svg class="w-4 h-4 mr-3 text-green-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+                      <% else %>
+                        <span class={["w-2 h-2 mr-3 rounded-full", kata.color]}></span>
+                      <% end %>
                       {kata.label}
                     </.link>
                   <% end %>
@@ -123,12 +129,14 @@ defmodule ElixirKatasWeb.Layouts do
     doc: "the current [scope](https://hexdocs.pm/phoenix/scopes.html)"
 
   def elixir_app(assigns) do
+    completed_katas = Map.get(assigns, :completed_katas, MapSet.new())
+    assigns = assign(assigns, :completed_katas, completed_katas)
     assigns = assign(assigns, :sections, ElixirKatasWeb.ElixirKataData.sections())
     current_kata_id = assigns[:kata_id]
     assigns = assign(assigns, :current_kata_id, current_kata_id)
 
     ~H"""
-    <div class="flex h-full bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-sans">
+    <div id="skillzengine-elixir-root" phx-hook="SkillzEngineBridge" class="flex h-full bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-sans">
       <!-- Sidebar -->
       <div id="sidebar" class="w-64 flex-shrink-0 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col transition-all duration-300 ease-in-out" data-layout-source="elixir-app">
         <div class="flex-1 overflow-y-auto p-4" phx-hook="ScrollPosition" data-scroll-key="elixir-sidebar-nav" id="elixir-sidebar-nav">
@@ -150,7 +158,11 @@ defmodule ElixirKatasWeb.Layouts do
                         )
                       ]}
                     >
-                      <span class={["w-2 h-2 mr-3 rounded-full", kata.color]}></span>
+                      <%= if MapSet.member?(@completed_katas, kata.slug) do %>
+                        <svg class="w-4 h-4 mr-3 text-green-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+                      <% else %>
+                        <span class={["w-2 h-2 mr-3 rounded-full", kata.color]}></span>
+                      <% end %>
                       {kata.label}
                     </.link>
                   <% end %>
@@ -214,6 +226,8 @@ defmodule ElixirKatasWeb.Layouts do
     doc: "the current [scope](https://hexdocs.pm/phoenix/scopes.html)"
 
   def phoenix_app(assigns) do
+    completed_katas = Map.get(assigns, :completed_katas, MapSet.new())
+    assigns = assign(assigns, :completed_katas, completed_katas)
     assigns = assign(assigns, :sections, ElixirKatasWeb.PhoenixKataData.sections())
     current_kata_id = assigns[:kata_id]
     assigns = assign(assigns, :current_kata_id, current_kata_id)
@@ -232,7 +246,7 @@ defmodule ElixirKatasWeb.Layouts do
     assigns = assign(assigns, :implemented, implemented)
 
     ~H"""
-    <div class="flex h-full bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-sans">
+    <div id="skillzengine-phoenix-root" phx-hook="SkillzEngineBridge" class="flex h-full bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-sans">
       <!-- Sidebar -->
       <div id="sidebar" class="w-64 flex-shrink-0 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col transition-all duration-300 ease-in-out" data-layout-source="phoenix-app">
         <div class="flex-1 overflow-y-auto p-4" phx-hook="ScrollPosition" data-scroll-key="phoenix-sidebar-nav" id="phoenix-sidebar-nav">
@@ -255,7 +269,11 @@ defmodule ElixirKatasWeb.Layouts do
                           )
                         ]}
                       >
-                        <span class={["w-2 h-2 mr-3 rounded-full", kata.color]}></span>
+                        <%= if MapSet.member?(@completed_katas, kata.slug) do %>
+                          <svg class="w-4 h-4 mr-3 text-green-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+                        <% else %>
+                          <span class={["w-2 h-2 mr-3 rounded-full", kata.color]}></span>
+                        <% end %>
                         {kata.label}
                       </.link>
                     <% else %>
@@ -325,6 +343,8 @@ defmodule ElixirKatasWeb.Layouts do
     doc: "the current [scope](https://hexdocs.pm/phoenix/scopes.html)"
 
   def phoenix_api_app(assigns) do
+    completed_katas = Map.get(assigns, :completed_katas, MapSet.new())
+    assigns = assign(assigns, :completed_katas, completed_katas)
     assigns = assign(assigns, :sections, ElixirKatasWeb.PhoenixApiKataData.sections())
     current_kata_id = assigns[:kata_id]
     assigns = assign(assigns, :current_kata_id, current_kata_id)
@@ -343,7 +363,7 @@ defmodule ElixirKatasWeb.Layouts do
     assigns = assign(assigns, :implemented, implemented)
 
     ~H"""
-    <div class="flex h-full bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-sans">
+    <div id="skillzengine-phoenix-api-root" phx-hook="SkillzEngineBridge" class="flex h-full bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-sans">
       <!-- Sidebar -->
       <div id="sidebar" class="w-64 flex-shrink-0 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col transition-all duration-300 ease-in-out" data-layout-source="phoenix-api-app">
         <div class="flex-1 overflow-y-auto p-4" phx-hook="ScrollPosition" data-scroll-key="phoenix-api-sidebar-nav" id="phoenix-api-sidebar-nav">
@@ -366,7 +386,11 @@ defmodule ElixirKatasWeb.Layouts do
                           )
                         ]}
                       >
-                        <span class={["w-2 h-2 mr-3 rounded-full", kata.color]}></span>
+                        <%= if MapSet.member?(@completed_katas, kata.slug) do %>
+                          <svg class="w-4 h-4 mr-3 text-green-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+                        <% else %>
+                          <span class={["w-2 h-2 mr-3 rounded-full", kata.color]}></span>
+                        <% end %>
                         {kata.label}
                       </.link>
                     <% else %>
