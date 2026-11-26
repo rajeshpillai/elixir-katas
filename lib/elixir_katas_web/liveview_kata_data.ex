@@ -151,6 +151,23 @@ defmodule ElixirKatasWeb.LiveviewKataData do
         %{num: "125", slug: "125-statemachine", label: "125 - State Machine", color: "bg-yellow-500", tags: ["otp", "state"], description: "Complex workflows with :gen_statem"},
         %{num: "139", slug: "139-virtual-scrolling", label: "139 - Virtual Scrolling", color: "bg-orange-500", tags: ["render", "js-interop"], description: "Efficiently rendering large datasets"},
         %{num: "140", slug: "140-confirm-dialog", label: "140 - Confirm Dialog", color: "bg-teal-500", tags: ["components", "forms"], description: "Form with data confirmation modal"}
+      ]},
+      # Ported from https://github.com/rajeshpillai/phoenix-liveview-tutorial.
+      # Kept in sync with `mix liveview_lab.sync`; see docs/liveview_lab_sync.md.
+      %{title: "Section 11: LiveView Lab", katas: [
+        %{num: "141", slug: "141-architecture", label: "141 - LiveView Architecture", color: "bg-indigo-500", tags: ["lifecycle", "render"], description: "BEAM processes, two-phase mount, WebSocket diffs"},
+        %{num: "142", slug: "142-lifecycle", label: "142 - Lifecycle Callbacks", color: "bg-emerald-500", tags: ["lifecycle"], description: "mount, handle_params, handle_event, handle_info, terminate"},
+        %{num: "143", slug: "143-assigns-reactivity", label: "143 - Assigns & Reactivity", color: "bg-blue-500", tags: ["state", "forms"], description: "Assigns, change tracking, forms and validation with to_form"},
+        %{num: "144", slug: "144-events-bindings", label: "144 - Events & Bindings", color: "bg-purple-500", tags: ["events"], description: "phx-click, phx-change, debounce, throttle, keyboard events"},
+        %{num: "145", slug: "145-navigation-routing", label: "145 - Navigation & Routing", color: "bg-cyan-500", tags: ["navigation"], description: "Patch vs navigate, handle_params, URL-driven state"},
+        %{num: "146", slug: "146-function-components", label: "146 - Function Components", color: "bg-orange-500", tags: ["components"], description: "Attributes, slots, slot arguments, global attrs"},
+        %{num: "147", slug: "147-errors-flash-uploads", label: "147 - Errors, Flash & Uploads", color: "bg-red-500", tags: ["uploads", "lifecycle"], description: "Flash messages, error patterns, file uploads with previews"},
+        %{num: "148", slug: "148-streams-async", label: "148 - Streams & Async", color: "bg-indigo-500", tags: ["streams", "async"], description: "Streams for large lists, async_result for non-blocking loads"},
+        %{num: "149", slug: "149-realtime-streaming", label: "149 - Real-time Streaming", color: "bg-violet-500", tags: ["async", "streams"], description: "Chunked server data, token-by-token UI, progress"},
+        %{num: "150", slug: "150-temporary-assigns", label: "150 - Temporary Assigns & Pagination", color: "bg-teal-500", tags: ["render", "streams"], description: "Memory optimisation, infinite scroll, phx-update=stream"},
+        %{num: "151", slug: "151-live-components", label: "151 - LiveComponents Deep Dive", color: "bg-orange-500", tags: ["components", "lifecycle"], description: "Stateful components, send_update, component lifecycle"},
+        %{num: "152", slug: "152-pubsub-presence", label: "152 - PubSub & Presence", color: "bg-pink-500", tags: ["pubsub"], description: "Multi-user real-time with PubSub and Presence"},
+        %{num: "153", slug: "153-js-hooks-commands", label: "153 - JS Hooks & Commands", color: "bg-yellow-500", tags: ["js-interop"], description: "Hooks, push events, JS commands, client-side state"}
       ]}
     ]
   end

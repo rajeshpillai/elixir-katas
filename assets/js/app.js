@@ -51,6 +51,7 @@ import { AudioPlayer } from "./hooks/audio_player"
 import { VirtualScroll } from "./hooks/virtual_scroll"
 import CodeEditor from "./hooks/code_editor"
 import { SkillzEngineBridge } from "./hooks/skillzengine_bridge"
+import { LiveviewLabHooks } from "./hooks/liveview_lab"
 
 const urlParams = new URLSearchParams(window.location.search);
 const se_api = urlParams.get("se_api") || sessionStorage.getItem("se_api");
@@ -69,7 +70,7 @@ const liveSocket = new LiveSocket("/live", Socket, {
     se_token: se_token,
     se_path: se_path
   },
-  hooks: { ...colocatedHooks, ScrollPosition, InfiniteScroll, CursorTracker, InputMask, ChartJS, AudioPlayer, VirtualScroll, CodeEditor, SkillzEngineBridge },
+  hooks: { ...colocatedHooks, ScrollPosition, InfiniteScroll, CursorTracker, InputMask, ChartJS, AudioPlayer, VirtualScroll, CodeEditor, SkillzEngineBridge, ...LiveviewLabHooks },
 })
 
 // Show progress bar on live navigation and form submits

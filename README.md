@@ -1,6 +1,6 @@
 # Elixir Katas
 
-An interactive learning platform for mastering Elixir and Phoenix LiveView through hands-on exercises. Built with Phoenix LiveView, featuring 85 core Elixir katas, 55 Phoenix Web katas, 20 Phoenix API katas, and 97 LiveView katas with live code editing, real-time compilation, and searchable/filterable index pages.
+An interactive learning platform for mastering Elixir and Phoenix LiveView through hands-on exercises. Built with Phoenix LiveView, featuring 85 core Elixir katas, 55 Phoenix Web katas, 20 Phoenix API katas, and 119 LiveView katas with live code editing, real-time compilation, and searchable/filterable index pages.
 
 ## Prerequisites
 
@@ -142,7 +142,7 @@ notes/
 | 8. Testing APIs | ConnTest, authenticated endpoint testing |
 | 9. Advanced | Webhooks, OpenAPI, background jobs |
 
-### LiveView Katas (97 katas, 10 sections)
+### LiveView Katas (119 katas, 11 sections)
 
 | Section | Topics |
 |---------|--------|
@@ -156,6 +156,7 @@ notes/
 | 8. Real-time & PubSub | Clock, chat, presence, cursors, game state |
 | 9. JS Interop & Hooks | Focus, scroll, clipboard, charts, hooks |
 | 10. Advanced | Async, uploads, PDF, CSV, GenServer, state machines |
+| 11. LiveView Lab | The 13 lessons from [phoenix-liveview-tutorial](https://github.com/rajeshpillai/phoenix-liveview-tutorial), kept in sync with `mix liveview_lab.sync` (see [docs/liveview_lab_sync.md](docs/liveview_lab_sync.md)) |
 
 ## Learn More
 

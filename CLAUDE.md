@@ -13,7 +13,7 @@ Elixir, Phoenix, LiveView, SQLite (via Ecto), Tailwind CSS, esbuild
 | Core Elixir (85) | `ElixirKataData` | `/elixir-katas` | `elixir_kata_` | `:elixir_app` | Emerald |
 | Phoenix Web (55) | `PhoenixKataData` | `/phoenix-katas` | `phoenix_kata_` | `:phoenix_app` | Amber |
 | Phoenix API (20) | `PhoenixApiKataData` | `/phoenix-api-katas` | `phoenix_api_kata_` | `:phoenix_api_app` | Rose |
-| LiveView (97) | `LiveviewKataData` | `/liveview-katas` | `kata_` | `:app` | Indigo |
+| LiveView (119) | `LiveviewKataData` | `/liveview-katas` | `kata_` | `:app` | Indigo |
 
 ## Adding a New Kata
 
@@ -22,6 +22,8 @@ Elixir, Phoenix, LiveView, SQLite (via Ecto), Tailwind CSS, esbuild
 3. Create notes file: `notes/<prefix><id>_<slug>_notes.md`
 
 Katas are discovered dynamically via `Path.wildcard/1` — no registration needed beyond the data entry.
+
+LiveView katas 141–153 ("Section 11: LiveView Lab") are ported from the phoenix-liveview-tutorial repo. Their notes are generated: don't edit them here. Follow `docs/liveview_lab_sync.md` and run `mix liveview_lab.sync`.
 
 ## Key Files
 

@@ -87,5 +87,9 @@ config :swoosh, :api_client, false
 # Enable polling fallback for file-watching inside containerized or virtual environments.
 config :phoenix_live_reload,
   backend: :fs_poll,
-  interval: 500
+  interval: 500,
+  # Only poll the folders the live_reload patterns above look at. Polling the
+  # project root also scans deps/, _build/ and node_modules/ every 500ms, and
+  # crashes the watcher when SQLite's temporary -shm/-wal files disappear.
+  dirs: ["lib", "priv/static", "priv/gettext"]
 
